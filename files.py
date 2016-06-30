@@ -77,7 +77,11 @@ def read_mappings(filepath, header=False, sep="\t", xcol=1, ycol=2):
             if words[xcol].strip() not in mapping:
                 mapping[words[xcol].strip()] = words[ycol].strip()
             else:
-                print("the key is duplicate!")
+                # print("read_mappings() the key is duplicated:", words[xcol].strip())
+                if mapping[words[xcol].strip()] != words[ycol].strip():
+                    print("read_mappings() fetal error, the key has different mapping values:",
+                          "key:", words[xcol].strip(), "value:", mapping[words[xcol].strip()],
+                          words[ycol].strip())
     return mapping
 
 

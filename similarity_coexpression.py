@@ -12,10 +12,7 @@ def gene_pair_similarity_coexp(genea, geneb, gene2expression):
     :param gene2expression:
     :return:
     """
-    if genea in gene2expression.keys() and geneb in gene2expression.keys():
-        return stats.stats.spearmanr(gene2expression[genea], gene2expression[geneb])
-    else:
-        return 0, 1
+    return stats.stats.spearmanr(gene2expression[genea], gene2expression[geneb])
 
 
 def disease_pair_similarity_coexp(diseasea, diseaseb, disease2gene, gene2expression):

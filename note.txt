@@ -1,0 +1,70 @@
+1. disease 到 gene 的映射问题
+比如disease A有30个gene(entrezid)， entrezid mapping symbol之后有25个gene(symbol),
+而这25个gene里只有20个注释了GO
+问题： 当用到GO来计算disease similarity的时候，如果用到基因的个数，该用哪一个
+参考：Menche J, Sharma A, Kitsak M, et al. Uncovering disease-disease relationships through 
+the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
+
+####ans#####
+因为要算平均值，所以用20
+############
+
+2. probesetid to entrezid的mapping问题
+一共有44775个probesetid需要做mapping
+
+用mygene做mapping：
+有29308个probesetid mapping到了
+stat: probesetid: 29308 entrezid: 18473 associations: 31287
+
+用david做mapping：
+有21722个probesetid mapping到了
+stat: probesetid: 21722 entrezid: 14097 associations: 24973
+
+mygene里的29308个里：
+mapping结果与david相同的有18693个
+mapping结果与david不同的有2158个
+mygene里能mapping到而david没有mapping到的有8457个
+
+david里能mapping到而mygene里没mapping到的有871个
+
+问题是这两种mapping结果用哪个
+
+决定合并两个结果
+
+3. Reference: Zhou X Z, Menche J, Barabási A L, et al. Human symptoms–disease network[J].
+Nature communications, 2014, 5.
+这篇文章计算了1596个mesh term之间的相似性，详见 "ncomms5212-s5.txt"
+1596个mesh term，有1577个通过用 "MeshTreeHierarchy.csv" mapping可以得到其mesh unique ID，
+有19个没有unique ID：
+Mycobacterium Infections, Atypical
+Intervertebral Disk Degeneration
+Epidermal Necrolysis, Toxic
+Hypophosphatemic Rickets, X-Linked Dominant
+Neuronal Migration Disorders
+Fetal Alcohol Syndrome
+Waardenburg's Syndrome
+Mental Retardation
+Wegener Granulomatosis
+Legg-Perthes Disease
+Sleep Disorders
+Macrocephaly
+Persistent Hyperinsulinemia Hypoglycemia of Infancy
+Sarcoma, Ewing's
+Arthritis, Juvenile Rheumatoid
+Job's Syndrome
+Drug Toxicity
+Dengue Hemorrhagic Fever
+Intervertebral Disk Displacement
+
+
+
+
+
+
+
+
+
+
+
+
+

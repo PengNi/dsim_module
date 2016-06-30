@@ -29,8 +29,4 @@ def gene_neighbor_info():
 
 
 if __name__ == "__main__":
-    a = set([1, 2, 2, 3])
-    b = list(a)
-    print(a)
-    print(b)
-
+    pass

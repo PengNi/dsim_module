@@ -11,7 +11,7 @@ class MeSH:
 
     def read_meshtreehierarchy_csv(self, filepath, header=True):
         """
-        read MeshTreeHierarchy.csv file to get each mesh term's heading,
+        read "MeshTreeHierarchy.csv" file to get each mesh term's heading,
         tree number and unique id
         :param filepath: "MeshTreeHierarchy.csv"
         :param header: if there is a head or not, default True
@@ -21,12 +21,20 @@ class MeSH:
             if header:
                 next(f)
             for line in f:
-                tempterm = MeSHTerms()
                 words = line.split("\t")
-                tempterm.setheading(words[2].strip())
-                tempterm.setuniqueid(words[1].strip())
-                tempterm.settreenumber(words[0].strip())
-                self._terms[words[1].strip()] = tempterm
+                uniqueid = words[1].strip()
+                if uniqueid not in self._terms.keys():
+                    tempterm = MeSHTerms()
+                    tempterm.setheading(words[2].strip())
+                    tempterm.setuniqueid(uniqueid)
+                    tempterm.addtreenumber(words[0].strip())
+                    self._terms[uniqueid] = tempterm
+                else:
+                    if self._terms[uniqueid].getheading() != words[2].strip():
+                        print(" read_meshtreehierarchy_csv() fetal error: the id has different headings:",
+                              uniqueid, self._terms[uniqueid].getheading(), words[2].strip())
+                    else:
+                        self._terms[uniqueid].addtreenumber(words[0].strip())
         print("MeSH read_meshtreehierarchy_csv finished!")
 
     def read_bin_file(self, filepath):
@@ -41,7 +49,7 @@ class MeSH:
 class MeSHTerms:
     def __init__(self):
         self._heading = ""
-        self._tree_number = ""
+        self._tree_numbers = set()
         self._unique_id = ""
 
     def getheading(self):
@@ -50,11 +58,14 @@ class MeSHTerms:
     def setheading(self, heading):
         self._heading = heading
 
-    def gettreenumber(self):
-        return self._tree_number
+    def gettreenumbers(self):
+        return self._tree_numbers
 
-    def settreenumber(self, treenumber):
-        self._tree_number = treenumber
+    def settreenumber(self, treenumbers):
+        self._tree_numbers = treenumbers
+
+    def addtreenumber(self, treenumber):
+        self._tree_numbers.add(treenumber)
 
     def getuniqueid(self):
         return self._unique_id
@@ -66,4 +77,4 @@ class MeSHTerms:
         print("[mesh term]")
         print("heading:", self._heading)
         print("unique id:", self._unique_id)
-        print("tree number:", self._tree_number)
+        print("tree numbers:", self._tree_numbers)
