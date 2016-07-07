@@ -29,7 +29,7 @@ def read_umls_disease_info(dgasso_score_cutoff):
         if str(did).startswith("umls"):
             umlsdiseases.getumlsdiseases()[str(did)] = UmlsDisease()
             umlsdiseases.getumlsdiseases()[str(did)].setname(umlsdiseaseid2name[did])
-    print("number of umls disease ids who have names:", len(umlsdiseases.getumlsdiseases()))
+    # print("number of umls disease ids who have names:", len(umlsdiseases.getumlsdiseases()))
 
     for did in umlsdiseaseid2categories.keys():
         if did not in umlsdiseases.getumlsdiseases().keys():

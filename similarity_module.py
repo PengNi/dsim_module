@@ -16,6 +16,40 @@ def read_interactome(interactomefile, weights, directed):
         return g
 
 
+def clear_interactome(interactomefile, cleared_file, sep='\t'):
+    """
+    remove self loops and parallel edges in the interactomefile,
+    save the cleared data in a new file
+    :param interactomefile: a file path of a "ncol" file contains interactome
+    :param cleared_file: file path of the cleared data to write
+    :param sep: delimiter
+    :return: None
+    """
+    node_pairs = {}
+    with open(interactomefile, mode='r') as f:
+        for line in f:
+            words = line.split(sep)
+            node1 = words[0].strip()
+            node2 = words[1].strip()
+            if node1 != node2:
+                if node1 in node_pairs.keys() and node2 in node_pairs.keys():
+                    if node2 not in node_pairs[node1] and node1 not in node_pairs[node2]:
+                        node_pairs[node1].add(node2)
+                elif node1 not in node_pairs.keys() and node2 not in node_pairs.keys():
+                    node_pairs[node1] = set()
+                    node_pairs[node1].add(node2)
+                elif node1 in node_pairs.keys():
+                    node_pairs[node1].add(node2)
+                else:
+                    node_pairs[node2].add(node1)
+            else:
+                print(line, end="")
+    with open(cleared_file, mode='w') as wf:
+        for n in node_pairs.keys():
+            for m in node_pairs[n]:
+                wf.write(n+sep+m+"\n")
+
+
 def density(dgassos, graph):
     """
     given a dict which contains a list of node groups, and an igraph object,
@@ -25,10 +59,75 @@ def density(dgassos, graph):
     :return: a dict which keys are module names and values are their density scores
     """
     ddensityscore = {}
-    for name in dgassos:
+    for name in dgassos.keys():
         nodes = graph.vs.select(name_in=dgassos[name])
         ddensityscore[name] = graph.subgraph(nodes).density()
     return ddensityscore
+
+
+def diameter(dgassos, graph):
+    """
+    given a dict which contains a list of node groups, and an igraph object,
+    return a dict which gives diameters of each node group based
+    on this igraph object.
+    :param dgassos: a dict object which keys are module names and values are module
+    nodes sets
+    :param graph: an igraph object
+    :return: a dict which keys are module names and values are diameters of modules
+    """
+    ddiameter = {}
+    for d in dgassos.keys():
+        nodes = graph.vs.select(name_in=dgassos[d])
+        sps = graph.shortest_paths(source=nodes, target=nodes, weights=None)
+        maxsps = []
+        for line in sps:
+            maxsps.append(max(line))
+        ddiameter[d] = max(maxsps)
+    return ddiameter
+
+
+def avg_degree(dgassos, graph):
+    """
+    given a dict which contains a list of node groups, and an igraph object,
+    return a dict which gives average degrees of these nodes in node groups based
+    on this igraph object.
+    :param dgassos: a dict object which keys are module names and values are module
+    nodes sets
+    :param graph: an igraph object
+    :return: a dict which keys are module names and values are average degrees of nodes
+    in modules
+    """
+    davgdegree = {}
+    for d in dgassos.keys():
+        nodes = graph.vs.select(name_in=dgassos[d])
+        indegree = sum(graph.subgraph(nodes).degree())
+        davgdegree[d] = indegree/len(nodes)
+    return davgdegree
+
+
+def avg_shortestpath(dgassos, graph):
+    """
+    given a dict which contains a list of node groups, and an igraph object,
+    return a dict which gives average shortest path length of these nodes in each
+    node group based on this igraph object.
+    :param dgassos: a dict object which keys are module names and values are module
+    nodes sets
+    :param graph: an igraph object
+    :return: a dict which keys are module names and values are their shortest
+    path length values
+    """
+    dsp = {}
+    for d in dgassos.keys():
+        nodes = graph.vs.select(name_in=dgassos[d])
+        sps = graph.shortest_paths(source=nodes, target=nodes, weights=None)
+        sumsps = 0
+        for ls in sps:
+            sumsps += sum(ls)
+        if len(nodes) > 1:
+            dsp[d] = sumsps/(len(nodes)*(len(nodes)-1))
+        else:
+            dsp[d] = 0
+    return dsp
 
 
 def lambda_module(dgassos, graph):
@@ -39,10 +138,13 @@ def lambda_module(dgassos, graph):
     :return: a dict which keys are module names and values are their lambda values
     """
     dlambda = {}
-    for name in dgassos:
+    for name in dgassos.keys():
         nodes = graph.vs.select(name_in=dgassos[name])
         din = sum(graph.subgraph(nodes).degree())
         dout = sum(graph.degree(vertices=nodes))
         dout = dout-din
-        dlambda[name] = din/dout
+        if dout == 0:
+            dlambda[name] = float('inf')
+        else:
+            dlambda[name] = din/dout
     return dlambda

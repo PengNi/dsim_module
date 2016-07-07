@@ -1,10 +1,53 @@
 #! /usr/bin/env python3
-from similarity_module import read_interactome
+import similarity_module
 from files import read_one_col
+from files import stat_assos
+from copy import deepcopy
+from umls_disease import read_all_gene_disease_associations
+
+
+def disease_module_info():
+    g = similarity_module.read_interactome("DataS1_interactome_rmslpe.tsv", False, False)
+    print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
+
+    disease_genes = read_all_gene_disease_associations("all_gene_disease_associations.tsv", 0)
+    print("disease-gene associations: ", end="")
+    stat_assos(disease_genes)
+
+    disease_genes_ori = deepcopy(disease_genes)
+
+    gvs = g.vs['name']
+    dkeys = deepcopy(list(disease_genes.keys()))
+    for d in dkeys:
+        gs = deepcopy(disease_genes[d])
+        for gene in gs:
+            if gene not in gvs:
+                disease_genes[d].remove(gene)
+        if len(disease_genes[d]) < 5:
+            del disease_genes[d]
+    print("disease-gene associations: ", end="")
+    stat_assos(disease_genes)
+
+    d_density = similarity_module.density(disease_genes, g)
+    print("density finished")
+    d_lambdamodule = similarity_module.lambda_module(disease_genes, g)
+    print("lambdamodule finished")
+    d_avgdegree = similarity_module.avg_degree(disease_genes, g)
+    print("avgdegree finished")
+    d_avgsp = similarity_module.avg_shortestpath(disease_genes, g)
+    print("avgsp finished")
+    d_diameter = similarity_module.diameter(disease_genes, g)
+    print("diameter finished")
+
+    print("disease\tnumber of genes\tnumber of genes in interactome\tavg degree\t"
+          "density\tavgsp\tdiameter\tlambdamodule")
+    for d in disease_genes.keys():
+        print(d, len(disease_genes_ori[d]), len(disease_genes[d]), d_avgdegree[d],
+              d_density[d], d_avgsp[d], d_diameter[d], d_lambdamodule[d], sep="\t")
 
 
 def gene_neighbor_info():
-    g = read_interactome("DataS1_interactome.tsv", False, False)
+    g = similarity_module.read_interactome("DataS1_interactome.tsv", False, False)
     print("number of vertices:", g.vcount())
 
     all_disease_genes = read_one_col("curated_gene_disease_associations.tsv", 2, True)
@@ -29,4 +72,4 @@ def gene_neighbor_info():
 
 
 if __name__ == "__main__":
-    pass
+    disease_module_info()
