@@ -1,9 +1,25 @@
 #! /usr/bin/env python3
 import similarity_module
 from files import read_one_col
+from files import read_mappings
 from files import stat_assos
 from copy import deepcopy
 from umls_disease import read_all_gene_disease_associations
+from umls_disease import read_umls_disease_info
+from similarity_symptom import termnamemap2umlsid
+
+
+def diseaseidmapping_hsdn():
+    meshnames1 = read_one_col("ncomms5212-s5.txt", 1, True)
+    meshnames2 = read_one_col("ncomms5212-s5.txt", 2, True)
+
+    meshnames = set(meshnames1).union(meshnames2)
+    print("meshnames needed to be map:", len(meshnames))
+    umlsdiseases = read_umls_disease_info(0)
+    meshname2meshid = read_mappings("MeshTreeHierarchy.csv", True, "\t", 3, 2)
+
+    meshname2umlsid = termnamemap2umlsid(meshnames, umlsdiseases, meshname2meshid)
+    print("mapped successfully:", len(meshname2umlsid))
 
 
 def disease_module_info():
@@ -72,4 +88,4 @@ def gene_neighbor_info():
 
 
 if __name__ == "__main__":
-    disease_module_info()
+    diseaseidmapping_hsdn()

@@ -11,7 +11,7 @@ def diseases_similarity_go(diseases, disease2gene, gene2go, go2gene):
     :param go2gene:
     :return: a dict (key-value: string-dict<string-float>)
     """
-    diseases = list(diseases)
+    diseases = list(set(diseases).intersection(set(disease2gene.keys())))
     n = len(diseases)
     sim_result = {}
     for i in range(0, n):
@@ -55,8 +55,8 @@ def disease_pair_similarity_go(diseasea, diseaseb, disease2gene, gene2go, go2gen
     :param go2gene:
     :return: a float number or zero
     """
-    genes_a = disease2gene[diseasea].intersection(gene2go.keys())
-    genes_b = disease2gene[diseaseb].intersection(gene2go.keys())
+    genes_a = disease2gene[diseasea].intersection(list(gene2go.keys()))
+    genes_b = disease2gene[diseaseb].intersection(list(gene2go.keys()))
 
     if len(genes_a) == 0 or len(genes_b) == 0:
         return 0

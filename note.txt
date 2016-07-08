@@ -8,7 +8,9 @@ the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
 ####ans#####
 因为要算平均值，所以用20
 ############
+#--------------------------------------------------------------------------------
 
+#--------------------------------------------------------------------------------
 2. probesetid to entrezid的mapping问题
 一共有44775个probesetid需要做mapping
 
@@ -30,7 +32,9 @@ david里能mapping到而mygene里没mapping到的有871个
 问题是这两种mapping结果用哪个
 
 决定合并两个结果
+#--------------------------------------------------------------------------------
 
+#--------------------------------------------------------------------------------
 3. Reference: Zhou X Z, Menche J, Barabási A L, et al. Human symptoms–disease network[J].
 Nature communications, 2014, 5.
 这篇文章计算了1596个mesh term之间的相似性，详见 "ncomms5212-s5.txt"
@@ -55,7 +59,101 @@ Job's Syndrome
 Drug Toxicity
 Dengue Hemorrhagic Fever
 Intervertebral Disk Displacement
+#--------------------------------------------------------------------------------
 
+现在需要将1596个mesh term name 转换成 DisGeNET中存在的umls id：
+有两种方式：
+(1) 因为DisGeNET提供了umls id 及其相应name，而这个name来看上去自于mesh，
+即可以直接用该name与umls id的映射来做mesh term name到umls id的转换：
+即 mesh term name->DisGeNET disease name->umls id
+(2) 利用从MeSH网站上下载的"MeshTreeHierarchy.csv"文件里mesh id和mesh term name
+的映射关系和DisGeNET提供的“ls-umls2mesh-exactMatch.ttl”文件里mesh id和umls id的
+映射关系做转换：
+即mesh term name->mesh id->umls id
+
+
+问题是umls id和mesh id之间可能存在多对多（至少是一对多）的关系。
+以下是利用这两种方式做mapping结果的对比：
+using umlsnames to map got 0 result, using mesh ids to map got 0 result: 54
+using umlsnames to map got 0 result, using mesh ids to map got 1 result: 211
+using umlsnames to map got 0 result, using mesh ids to map got multi results: 97
+using umlsnames to map got 1 result, using mesh ids to map got 0 result: 7
+using umlsnames to map got 1 result, using mesh ids to map got 1 result, and these 2 results are the same: 824
+using umlsnames to map got 1 result, using mesh ids to map got 1 result, and these 2 results are different: 3
+using umlsnames to map got 1 result, using mesh ids to map got multi results, and 1 result by umlsnames is in multi results: 400
+using umlsnames to map got 1 result, using mesh ids to map got multi results, but 1 result by umlsnames is not in multi results: 0
+
+大方向是如果两种方式有不同结果以第一种方式为准
+
+能用的mapping首先有211+7+824+400=1442个
+
+用两种方式得到不同单一结果的有3个，这3个的结果以第一种方式（umls name mapping）的为准:
+Osteomalacia umls:C0029442 {'umls:C3887650'}
+Macular Degeneration umls:C0024437 {'umls:C0242383'}
+Hearing Loss umls:C3887873 {'umls:C1384666'}
+
+用第一种方式没有结果且用第2种方式有多重结果的有97个，
+这97个怎么处理，有疑问
+
+两种方式都没有mapping结果的有54个
+
+!!!!!!!------------------------------------
+需要注意的是由于name和name之间比较，有可能有两个字符串字母都一样但大小写不一样的问题，
+本次用这两种方式进行mapping时都统一先把name的字符串进行了小写化（Python: tolower()),
+然后在进行比较。
+这是不进行小写化的mapping结果：
+using umlsnames to map got 0 result, using mesh ids to map got 0 result: 55
+using umlsnames to map got 0 result, using mesh ids to map got 1 result: 234
+using umlsnames to map got 0 result, using mesh ids to map got multi results: 111
+using umlsnames to map got 1 result, using mesh ids to map got 0 result: 6
+using umlsnames to map got 1 result, using mesh ids to map got 1 result, and these 2 results are the same: 802
+using umlsnames to map got 1 result, using mesh ids to map got 1 result, and these 2 results are different: 2
+using umlsnames to map got 1 result, using mesh ids to map got multi results, and 1 result by umlsnames is in multi results: 386
+using umlsnames to map got 1 result, using mesh ids to map got multi results, but 1 result by umlsnames is not in multi results: 0
+
+进行小写化后新增的能mapping到umls id的mesh term name：
+umlsname: Facial Paralysis ; facial paralysis
+umlsname: Liposarcoma ; liposarcoma
+umlsname: Erectile Dysfunction ; erectile dysfunction
+umlsname: Liver Neoplasms ; liver neoplasms
+umlsname: Erythrokeratodermia Variabilis ; erythrokeratodermia variabilis
+umlsname: Rothmund-Thomson Syndrome ; rothmund-thomson syndrome
+umlsname: Hypereosinophilic Syndrome ; hypereosinophilic syndrome
+umlsname: Orthostatic Intolerance ; orthostatic intolerance
+umlsname: Frontotemporal Dementia ; frontotemporal dementia
+umlsname: Exocrine Pancreatic Insufficiency ; exocrine pancreatic insufficiency
+umlsname: Acute Kidney Injury ; acute kidney injury
+umlsname: Muscle Hypotonia ; muscle hypotonia
+umlsname: Leiomyosarcoma ; leiomyosarcoma
+umlsname: Depressive Disorder ; depressive disorder
+umlsname: Smith-Magenis Syndrome ; smith-magenis syndrome
+umlsname: Coffin-Lowry Syndrome ; coffin-lowry syndrome
+umlsname: Liver Diseases ; liver diseases
+umlsname: Lung Diseases ; lung diseases
+umlsname: Glycogen Storage Disease Type II ; glycogen storage disease type ii
+umlsname: Dental Caries ; dental caries
+umlsname: Isaacs Syndrome ; isaacs syndrome
+umlsname: Macular Degeneration ; macular degeneration
+umlsname: Cranial Nerve Diseases ; cranial nerve diseases
+umlsname: Fibroma ; fibroma
+umlsname: Facial Asymmetry ; facial asymmetry
+umlsname: Leukemia ; leukemia
+umlsname: Melanoma ; melanoma
+umlsname: Insulinoma ; insulinoma
+umlsname: Polyps ; polyps
+umlsname: Eosinophilic Esophagitis ; eosinophilic esophagitis
+umlsname: Drug Toxicity ; drug toxicity
+umlsname: Bone Neoplasms ; bone neoplasms
+umlsname: Heart Failure ; heart failure
+umlsname: Adrenocortical Carcinoma ; adrenocortical carcinoma
+umlsname: Hypokalemic Periodic Paralysis ; hypokalemic periodic paralysis
+umlsname: Pallister-Hall Syndrome ; pallister-hall syndrome
+umlsname: Anaphylaxis ; anaphylaxis
+umlsname: Prostatitis ; prostatitis
+!!!!!!!------------------------------------
+#--------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------
 4. 疾病基因关系，基因网络统计
 (1) all_gene_disease_associations.tsv
 取score的cuttoff为0（取全部的关系）时
@@ -76,9 +174,37 @@ diseases: 299 genes: 3173 associations: 29775
  nodes: 13460 edges: 141296
  去掉自环和重复边后：
  nodes: 13397 edges: 138427
+#--------------------------------------------------------------------------------
 
+#--------------------------------------------------------------------------------
 5. at the last of last, 要不要试试合并PheGenI和DisGeNET的疾病基因关系来做，
 如果DisGeNET的数据不够的话。
+#--------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------
+6. 用GO或co expression评价自己方法算出来的疾病相似性时，只评价GO相似性或co expression相似性非0的
+疾病对？
+参考：Menche J, Sharma A, Kitsak M, et al. Uncovering disease-disease relationships through 
+the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
+
+只对非0的疾病对进行评价貌似比较合理
+#--------------------------------------------------------------------------------
+
+#--------------------------------------------------------------------------------
+7. 疾病ID种类太多了 是不是考虑把所有不同ID mapping到同一种上
+比如疾病基因关系中的疾病用的UMLS ID;
+用来做评价的文章human symptom disease network (HSDN)里用的是mesh term name；
+comorbidity里疾病用的是ICD9 id；
+hamaneh2014那篇可能要用来比较的文章，用的是mesh id 加上 omim id；
+
+那么是不是要把所有不同的ID都映射到 umls id 上，而不是每种不同的评价方式用不同的ID。
+
+具体做法：把所有不同id 统一转换成umls id，而不是针对不同的评价方法用不同的ID。比如，
+把HSDN的结果和comorbidity的结果里的疾病id都转换成umls id，然后再用这两个作为标准去做
+其他方法的评价；而不是把其他方法的疾病id转换成mesh term name，再用HSDN评价，而把其他
+方法的疾病id转换成icd9 id，再用comorbidity评价。
+#--------------------------------------------------------------------------------
+
 
 
 
