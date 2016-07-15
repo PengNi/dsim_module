@@ -22,7 +22,7 @@ def read_go_annotation_file(filepath, hcec, qualifier):
     with open(filepath, mode='r') as f:
         for line in f:
             if not line.startswith("!"):
-                words = line.split("\t")
+                words = line.strip().split("\t")
                 if hcec and words[6].strip() not in go_annotation_evidence_codes:
                     continue
                 if qualifier and words[3].strip() != "":

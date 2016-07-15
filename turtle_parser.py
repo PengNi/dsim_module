@@ -103,7 +103,7 @@ def ttl_parser_umls2do_exact(filepath):
             if stripline.startswith("skos:exactMatch "):
                 doids = stripline.split(",")
                 for doid in doids:
-                    umls2do[umls].add(doid.strip().split("/")[4].strip().split(">")[0].strip().lower())
+                    umls2do[umls].add(doid.strip().split("/")[4].strip().split(">")[0].strip())
             line = f.readline()
     return umls2do
 

@@ -19,7 +19,9 @@ def read_one_col(filepath, col, header=False, sep="\t"):
         if header:
             next(f)
         for line in f:
-            eles.append(line.split(sep=sep)[col].strip())
+            words = line.strip().split(sep=sep)
+            if len(words) > col:
+                eles.append(words[col].strip())
     return eles
 
 
@@ -43,14 +45,16 @@ def read_assos(filepath, header=False, sep="\t", xcol=1, ycol=2):
         if header:
             next(f)
         for line in f:
-            words = line.split(sep=sep)
-            if words[xcol].strip() not in assos:
-                assos[words[xcol].strip()] = set()
-            # # ---------------------
-            # if words[ycol].strip() in assos[words[xcol].strip()]:
-            #     print("read_assos() duplicated associations:", words[ycol].strip(), words[xcol].strip())
-            # # ---------------------
-            assos[words[xcol].strip()].add(words[ycol].strip())
+            words = line.strip().split(sep=sep)
+            if len(words) > xcol and len(words) > ycol:
+                k = words[xcol].strip()
+                if k not in assos:
+                    assos[k] = set()
+                # # ---------------------
+                # if words[ycol].strip() in assos[words[xcol].strip()]:
+                #     print("read_assos() duplicated associations:", words[ycol].strip(), words[xcol].strip())
+                # # ---------------------
+                assos[k].add(words[ycol].strip())
     return assos
 
 
@@ -73,15 +77,16 @@ def read_mappings(filepath, header=False, sep="\t", xcol=1, ycol=2):
         if header:
             next(f)
         for line in f:
-            words = line.split(sep=sep)
-            if words[xcol].strip() not in mapping:
-                mapping[words[xcol].strip()] = words[ycol].strip()
-            else:
-                # print("read_mappings() the key is duplicated:", words[xcol].strip())
-                if mapping[words[xcol].strip()] != words[ycol].strip():
-                    print("read_mappings() fetal error, the key has different mapping values:",
-                          "key:", words[xcol].strip(), "value:", mapping[words[xcol].strip()],
-                          words[ycol].strip())
+            words = line.strip().split(sep=sep)
+            if len(words) > xcol and len(words) > ycol:
+                k = words[xcol].strip()
+                if k not in mapping:
+                    mapping[k] = words[ycol].strip()
+                else:
+                    # print("read_mappings() the key is duplicated:", words[xcol].strip())
+                    if mapping[k] != words[ycol].strip():
+                        print("read_mappings() fetal error, the key has different mapping values:",
+                              "key:", k, "value:", mapping[k], words[ycol].strip())
     return mapping
 
 
@@ -125,8 +130,8 @@ def write_assos(dictionary, filepath, header=False, sep="\t"):
 
 def write_slist(slist, filepath, header=False):
     """
-    write a list  which each element is a string to a file.
-    :param slist: a list of strings
+    write a list which each element is a string to a file.
+    :param slist: a list (set is ok, may be) of strings
     :param filepath: file path to a file
     :param header: boolean, need a head or not, if True, the head will be "V1",
     default False

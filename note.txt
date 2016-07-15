@@ -1,4 +1,4 @@
-1. disease 到 gene 的映射问题
+1. disease到gene的映射问题
 比如disease A有30个gene(entrezid)， entrezid mapping symbol之后有25个gene(symbol),
 而这25个gene里只有20个注释了GO
 问题： 当用到GO来计算disease similarity的时候，如果用到基因的个数，该用哪一个
@@ -11,16 +11,30 @@ the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
 #--------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------
-2. probesetid to entrezid的mapping问题
-一共有44775个probesetid需要做mapping
+2. probeid to entrezid的mapping问题
+reference: Su A I, Wiltshire T, Batalov S, et al. A gene atlas of the mouse and 
+human protein-encoding transcriptomes[J]. Proceedings of the National Academy of 
+Sciences of the United States of America, 2004, 101(16): 6062-6067.
 
+data downloding site: http://biogps.org/downloads/  dataset: human U133A/GNF1H
+
+一共有44775个probeid需要做mapping
+
+#!!!!!!!!!!!!!-------------------------------------------------
+文章里提供的数据中有关于probeid的annotation，annotation里有
+probeid到entrezid的mapping。
+mapping统计结果：
+probeid: 29202 entrezid: 18608 associations: 31490
+#!!!!!!!!!!!!!-------------------------------------------------
+
+#-----------------------用第三方mapping工具的结果--------------
 用mygene做mapping：
-有29308个probesetid mapping到了
-stat: probesetid: 29308 entrezid: 18473 associations: 31287
+有29308个probeid mapping到了
+stat: probeid: 29308 entrezid: 18473 associations: 31287
 
 用david做mapping：
-有21722个probesetid mapping到了
-stat: probesetid: 21722 entrezid: 14097 associations: 24973
+有21722个probeid mapping到了
+stat: probeid: 21722 entrezid: 14097 associations: 24973
 
 mygene里的29308个里：
 mapping结果与david相同的有18693个
@@ -32,6 +46,22 @@ david里能mapping到而mygene里没mapping到的有871个
 问题是这两种mapping结果用哪个
 
 决定合并两个结果
+合并之后：
+stat: probeid: 30179 entrezid: 19505 associations: 35201
+#--------------------------------------------------------------
+
+#-----两种方式（文章提供的数据注释里的mapping和第三方工具的mapping）的比较------
+probeid2entrezid mapping result from mygene and david:	stat_assos: keys: 30179 values: 19505 associations: 35201
+probeid2entrezid mapping result from the paper:	stat_assos: keys: 29202 values: 18608 associations: 31490
+用文章里的mapping和第三方工具mapping都有结果的probeid有 28957 个
+这个28957个里有1836个，两种方式的mapping结果是不同的
+#-------------------------------------------------------------------------------
+
+#---------结论-------------------------------------------------
+(1) 以文章里提供的mapping为准
+(2) 先不将第三方工具（mygene, david）的mapping结果作为补充，
+只用文章提供的mapping结果
+#--------------------------------------------------------------
 #--------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------
@@ -92,8 +122,17 @@ Osteomalacia umls:C0029442 {'umls:C3887650'}
 Macular Degeneration umls:C0024437 {'umls:C0242383'}
 Hearing Loss umls:C3887873 {'umls:C1384666'}
 
+所以能有单一mapping结果的mesh term name有1442+3=1445个，通过统计得到：
+这1445个mesh term name mapping到了1445个不同的umls id
+
 用第一种方式没有结果且用第2种方式有多重结果的有97个，
 这97个怎么处理，有疑问
+(经过和老师讨论之后，处理方式为：尽量用一对一的mapping，但实在不能一对一的话，
+有多重结果的就用多重结果，所以这97个就用第二种方式mapping的结果)
+
+通过统计又得到：
+1445+97=1542个，这1542个mesh term name mapping到了1736个不同的umls id,
+而且没有多个mesh term name mapping到相同的umls id这种情况
 
 两种方式都没有mapping结果的有54个
 
@@ -205,8 +244,79 @@ hamaneh2014那篇可能要用来比较的文章，用的是mesh id 加上 omim id；
 方法的疾病id转换成icd9 id，再用comorbidity评价。
 #--------------------------------------------------------------------------------
 
+#--------------------------------------------------------------------------------
+8. 70对疾病作为ground truth
+reference: Cheng L, Li J, Ju P, et al. SemFunSim: a new method for measuring disease similarity by 
+integrating semantic and gene functional association[J]. PloS one, 2014, 9(6): e99415.
 
+这70个疾病对是47个doid之间的，根据"ls-umls2do-exactMatch.ttl" mapping到umls id上结果如下：
+DOID:11612 {'umls:C0032460'}
+DOID:1459 {'umls:C0020676'}
+DOID:9120 {'umls:C0002726'}
+DOID:9455 {'umls:C0023794'}
+DOID:5419 {'umls:C0220702'}
+DOID:326 {'umls:C0022116'}
+DOID:9588 {'umls:C0014038'}
+DOID:12336 {'umls:C0021364'}
+DOID:2377 {'umls:C0026769'}
+DOID:1936 {'umls:C0004153'}
+DOID:12858 {'umls:C0020179'}
+DOID:12176 {'umls:C0018021'}
+DOID:13809 {'umls:C0020474'}
+DOID:7148 {'umls:C0003873'}
+DOID:12365 {'umls:C0024530'}
+DOID:423 {'umls:C0026848'}
+DOID:0050700 {'umls:C0033141', 'umls:C0036529', 'umls:C0878544'}
+DOID:9471 {'umls:C0025289'}
+DOID:11335 {'umls:C0036202'}
+DOID:5844 {'umls:C0027051'}
+DOID:289 {'umls:C0014175'}
+DOID:12930 {'umls:C0007193'}
+DOID:552 {'umls:C0032285'}
+DOID:1826 {'umls:C0014544'}
+DOID:1485 {'umls:C0010674'}
+DOID:848 {'umls:C0003864'}
+DOID:2355 {'umls:C0002871'}
+DOID:11476 {'umls:C0029456'}
+DOID:419 {'umls:C0011644'}
+DOID:2352 {'umls:C0018995'}
+DOID:3312 {'umls:C0024713', 'umls:C0005587', 'umls:C0005586'}
+DOID:898 {'umls:C0022680'}
+DOID:615 {'umls:C0023530'}
+DOID:9351 {'umls:C0011849'}
+DOID:2349 {'umls:C0003850'}
+DOID:6132 {'umls:C0008677', 'umls:C0006277'}
+DOID:3083 {'umls:C0024117'}
+DOID:633 {'umls:C0027121'}
+DOID:4989 {'umls:C0030305'}
+DOID:83
+DOID:10652 {'umls:C0002395'}
+DOID:1596 {'umls:C0011570'}
+DOID:8469 {'umls:C0021400'}
+DOID:9970 {'umls:C0028754'}
+DOID:1564 {'umls:C0026946'}
+DOID:2841 {'umls:C0004096'}
+DOID:12558 {'umls:C0162674'}
 
+有一个没有mapping结果: DOID:83
+有三个有多个结果：
+DOID:0050700 {'umls:C0033141', 'umls:C0036529', 'umls:C0878544'}
+  DOID:0050700: cardiomyopathy
+  umls:C0033141: Cardiomyopathies, Primary
+  umls:C0036529: Myocardial Diseases, Secondary
+  umls:C0878544: Cardiomyopathies
+  选 DOID:0050700->umls:C0878544
+DOID:3312 {'umls:C0024713', 'umls:C0005587', 'umls:C0005586'}
+  DOID:3312: bipolar disorder
+  umls:C0024713: Manic Disorder
+  umls:C0005587: Depression, Bipolar
+  umls:C0005586: Bipolar Disorder
+  选 DOID:3312->umls:C0005586
+DOID:6132 {'umls:C0008677', 'umls:C0006277'}
+  DOID:6132: bronchitis
+  umls:C0008677: Bronchitis, Chronic
+  umls:C0006277: Bronchitis
+  选DOID:6132->umls:C0006277
 
 
 
