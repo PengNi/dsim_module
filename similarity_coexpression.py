@@ -63,6 +63,11 @@ def diseases_similarity_coexp(diseases, disease2gene, gene2expression):
     :return: a dict (key-value: string-dict<string-float>)
     """
     diseases = list(set(diseases).intersection(set(disease2gene.keys())))
+
+    disease2gene_new = {}
+    for d in diseases:
+        disease2gene_new[d] = disease2gene[d].intersection(gene2expression.keys())
+
     n = len(diseases)
     sim_result = {}
     for i in range(0, n):
@@ -70,8 +75,9 @@ def diseases_similarity_coexp(diseases, disease2gene, gene2expression):
         for j in range(i, n):
             sim_result[diseases[i]][diseases[j]] = disease_pair_similarity_coexp(diseases[i],
                                                                                  diseases[j],
-                                                                                 disease2gene,
+                                                                                 disease2gene_new,
                                                                                  gene2expression)
+        print(i)
     return sim_result
 
 
@@ -97,18 +103,19 @@ def disease_pair_similarity_coexp(diseasea, diseaseb, disease2gene, gene2express
     :param gene2expression:
     :return:
     """
-    genea = disease2gene[diseasea].intersection(set(gene2expression.keys()))
-    geneb = disease2gene[diseaseb].intersection(set(gene2expression.keys()))
+    genea = disease2gene[diseasea]
+    geneb = disease2gene[diseaseb]
 
     if len(genea) == 0 or len(geneb) == 0:
         return 0
     else:
         count = 0
-        simsum = 0
+        simsum = 0.0
         for a in genea:
             for b in geneb:
                 if a != b:
-                    simsum += gene_pair_similarity_coexp(a, b, gene2expression)
+                    gsim = gene_pair_similarity_coexp(a, b, gene2expression)
+                    simsum += abs(gsim[0])
                     count += 1
         if count != 0:
             return simsum/count

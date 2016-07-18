@@ -12,13 +12,18 @@ def diseases_similarity_go(diseases, disease2gene, gene2go, go2gene):
     :return: a dict (key-value: string-dict<string-float>)
     """
     diseases = list(set(diseases).intersection(set(disease2gene.keys())))
+
+    disease2gene_new = {}
+    for d in diseases:
+        disease2gene_new[d] = disease2gene[d].intersection(set(gene2go.keys()))
+
     n = len(diseases)
     sim_result = {}
     for i in range(0, n):
         sim_result[diseases[i]] = {}
         for j in range(i, n):
             simvalue = disease_pair_similarity_go(diseases[i], diseases[j],
-                                                  disease2gene, gene2go, go2gene)
+                                                  disease2gene_new, gene2go, go2gene)
             sim_result[diseases[i]][diseases[j]] = simvalue
     return sim_result
 
@@ -36,7 +41,7 @@ def gene_pair_similarity_go(genea, geneb, gene2go, go2gene):
     """
     sharedgos = gene2go[genea].intersection(gene2go[geneb])
     if len(sharedgos) == 0:
-        return 0
+        return 0.0
     num = []
     for go in sharedgos:
         num.append(len(go2gene[go]))
@@ -55,14 +60,14 @@ def disease_pair_similarity_go(diseasea, diseaseb, disease2gene, gene2go, go2gen
     :param go2gene:
     :return: a float number or zero
     """
-    genes_a = disease2gene[diseasea].intersection(list(gene2go.keys()))
-    genes_b = disease2gene[diseaseb].intersection(list(gene2go.keys()))
+    genes_a = disease2gene[diseasea]
+    genes_b = disease2gene[diseaseb]
 
     if len(genes_a) == 0 or len(genes_b) == 0:
         return 0
     else:
         count = 0
-        sim_sum = 0
+        sim_sum = 0.0
         for a in genes_a:
             for b in genes_b:
                 if a != b:

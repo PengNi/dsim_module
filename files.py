@@ -92,7 +92,7 @@ def read_mappings(filepath, header=False, sep="\t", xcol=1, ycol=2):
 
 def write_mappings(dictionary, filepath, header=False, sep="\t"):
     """
-    write dict where each key only has one value (int or str or else, not list) to a file.
+    write dict where each key only has one value (int or str or else, not list) to a file
     :param dictionary: dict object
     :param filepath: file path of a file
     :param header: boolean, need a head or not, if True, the head will be "V1'sep'V2",
@@ -111,7 +111,7 @@ def write_mappings(dictionary, filepath, header=False, sep="\t"):
 def write_assos(dictionary, filepath, header=False, sep="\t"):
     """
     write dict where each key's value is a set contains entities associated with the key
-    to a file.
+    to a file
     :param dictionary: dict object
     :param filepath: file path of a file
     :param header: boolean, need a head or not, if True, the head will be "V1'sep'V2",
@@ -126,6 +126,27 @@ def write_assos(dictionary, filepath, header=False, sep="\t"):
             for v in dictionary[k]:
                 f.write(str(k) + sep + str(v) + "\n")
     print("write_assos: writing finished.")
+
+
+def write_sims(simdict, filepath, header=False, sep='\t'):
+    """
+    write dict contains similarities between each two entities (e.g. diseases)
+    to a file
+    :param simdict: dict, key-value (string-dict<string-float>):
+    {entity1:{entity2: sim1, entity3: sim2,},}
+    :param filepath: file path to a file
+    :param header: boolean, need a head or not, if True, the head will be
+    "V1sepV2sepsim",default False
+    :param sep: delimiter, default '\t'
+    :return:
+    """
+    with open(filepath, mode='w') as f:
+        if header:
+            f.write("V1" + sep + "V2" + sep + "sim\n")
+        for k1 in simdict.keys():
+            for k2 in simdict[k1].keys():
+                f.write(str(k1) + sep + str(k2) + sep + str(simdict[k1][k2]) + "\n")
+    print("write_sims: writing finished.")
 
 
 def write_slist(slist, filepath, header=False):

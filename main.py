@@ -7,12 +7,46 @@ from files import stat_assos
 from files import stat_maps
 from files import write_assos
 from files import write_mappings
+from files import write_sims
 from copy import deepcopy
 from umls_disease import read_all_gene_disease_associations
 from umls_disease import read_umls_disease_info
 from mapping import termname2umlsid
 from mapping import icd9cmid2umlsid_3digit
 from mapping import doid2umlsid
+from similarity_coexpression import read_probeid_expfile
+from similarity_coexpression import probeexp2geneexp
+from similarity_coexpression import diseases_similarity_coexp
+
+
+def similarity_cal_coexpression():
+    disease2gene_entrez = read_all_gene_disease_associations("all_gene_disease_associations.tsv",
+                                                             0.06, True, True)
+    stat_assos(disease2gene_entrez)
+    genecoexp = read_probeid_expfile("U133AGNF1B.gcrma.avg.cleared.entrezid.tsv", False)
+    print(len(genecoexp))
+    dsim_coexp = diseases_similarity_coexp(set(disease2gene_entrez.keys()), disease2gene_entrez, genecoexp)
+    print(len(dsim_coexp))
+    write_sims(dsim_coexp, "similarity_coexp_umls.tsv")
+
+
+def geneid_convert_coexpression():
+    gene2probe = read_assos("probeid2entrezid_gcrma_anno.tsv", False, "\t", 2, 1)
+    stat_assos(gene2probe)
+    probeexp = read_probeid_expfile("U133AGNF1B.gcrma.avg.cleared.tab", True, '\t')
+    print(len(probeexp))
+    geneexp = probeexp2geneexp(probeexp, gene2probe)
+    print(len(geneexp))
+    with open('U133AGNF1B.gcrma.avg.cleared.entrezid.tsv', mode='w') as wf:
+        for g in geneexp.keys():
+            wf.write(g)
+            for v in geneexp[g]:
+                wf.write('\t'+str(v))
+            wf.write('\n')
+
+
+def similarity_cal():
+    pass
 
 
 def do2umls_mapping():
@@ -169,4 +203,4 @@ def gene_neighbor_info():
 
 
 if __name__ == "__main__":
-    do2umls_mapping()
+    similarity_cal_coexpression()
