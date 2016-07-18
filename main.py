@@ -17,17 +17,135 @@ from mapping import doid2umlsid
 from similarity_coexpression import read_probeid_expfile
 from similarity_coexpression import probeexp2geneexp
 from similarity_coexpression import diseases_similarity_coexp
+from gene_ontology import read_go_annotation_file
+from gene_ontology import GeneOntology
+from gene_ontology import invert_dict
+from gene_ontology import add_implicit_annotations
+from similarity_go import diseases_similarity_go
+
+
+namespaces = ("biological_process", "molecular_function", "cellular_component")
+
+
+def similarity_cal_go():
+    disease2gene_symbol = read_all_gene_disease_associations("all_gene_disease_associations.tsv",
+                                                             0.06, True, False)
+    print("disease gene assos: ", end='')
+    stat_assos(disease2gene_symbol)
+
+    geneonto = GeneOntology()
+    geneonto.readobofile("go.obo")
+    go2gene = read_go_annotation_file("gene_association.goa_human")
+    print("go2gene assos original: ", end='')
+    stat_assos(go2gene)
+    go2gene_expand = add_implicit_annotations(go2gene, geneonto)
+    print("go2gene assos expanded: ", end='')
+    stat_assos(go2gene_expand)
+    go2gene_expand_bp = {}
+    go2gene_expand_cc = {}
+    go2gene_expand_mf = {}
+    for go in go2gene_expand.keys():
+        if geneonto.getterms()[go].getnamespace() == "biological_process":
+            go2gene_expand_bp[go] = deepcopy(go2gene_expand[go])
+        if geneonto.getterms()[go].getnamespace() == "cellular_component":
+            go2gene_expand_cc[go] = deepcopy(go2gene_expand[go])
+        if geneonto.getterms()[go].getnamespace() == "molecular_function":
+            go2gene_expand_mf[go] = deepcopy(go2gene_expand[go])
+    print("go2gene assos expanded bp: ", end='')
+    stat_assos(go2gene_expand_bp)
+    print("go2gene assos expanded cc: ", end='')
+    stat_assos(go2gene_expand_cc)
+    print("go2gene assos expanded mf: ", end='')
+    stat_assos(go2gene_expand_mf)
+
+    gene2go_expand_bp = invert_dict(go2gene_expand_bp)
+    dsim_go_bp = diseases_similarity_go(list(disease2gene_symbol.keys()), disease2gene_symbol,
+                                        gene2go_expand_bp, go2gene_expand_bp)
+    write_sims(dsim_go_bp, "similarity_go_bp_umls_dcutoff006.tsv")
+
+    gene2go_expand_cc = invert_dict(go2gene_expand_cc)
+    dsim_go_cc = diseases_similarity_go(list(disease2gene_symbol.keys()), disease2gene_symbol,
+                                        gene2go_expand_cc, go2gene_expand_cc)
+    write_sims(dsim_go_cc, "similarity_go_cc_umls_dcutoff006.tsv")
+
+    gene2go_expand_mf = invert_dict(go2gene_expand_mf)
+    dsim_go_mf = diseases_similarity_go(list(disease2gene_symbol.keys()), disease2gene_symbol,
+                                        gene2go_expand_mf, go2gene_expand_mf)
+    write_sims(dsim_go_mf, "similarity_go_bp_umls_dcutoff006.tsv")
+
+
+def go2gene_stats():
+    geneonto = GeneOntology()
+    geneonto.readobofile("go.obo")
+    bpcount = 0
+    cccount = 0
+    mfcount = 0
+    for go in geneonto.getterms().keys():
+        if geneonto.getterms()[go].getnamespace() == "biological_process":
+            bpcount += 1
+        if geneonto.getterms()[go].getnamespace() == "cellular_component":
+            cccount += 1
+        if geneonto.getterms()[go].getnamespace() == "molecular_function":
+            mfcount += 1
+    print("bp:", bpcount, "cc:", cccount, "mf:", mfcount)
+
+    go2gene = read_go_annotation_file("gene_association.goa_human")
+    print("go2gene assos original: ", end='')
+    stat_assos(go2gene)
+    go2gene_expand_bp = {}
+    go2gene_expand_cc = {}
+    go2gene_expand_mf = {}
+    for go in go2gene.keys():
+        if geneonto.getterms()[go].getnamespace() == "biological_process":
+            go2gene_expand_bp[go] = deepcopy(go2gene[go])
+        if geneonto.getterms()[go].getnamespace() == "cellular_component":
+            go2gene_expand_cc[go] = deepcopy(go2gene[go])
+        if geneonto.getterms()[go].getnamespace() == "molecular_function":
+            go2gene_expand_mf[go] = deepcopy(go2gene[go])
+    print("go2gene assos original bp: ", end='')
+    stat_assos(go2gene_expand_bp)
+    print("go2gene assos original cc: ", end='')
+    stat_assos(go2gene_expand_cc)
+    print("go2gene assos original mf: ", end='')
+    stat_assos(go2gene_expand_mf)
+
+    go2gene_expand = add_implicit_annotations(go2gene, geneonto)
+    print("go2gene assos expanded: ", end='')
+    stat_assos(go2gene_expand)
+    go2gene_expand_bp = {}
+    go2gene_expand_cc = {}
+    go2gene_expand_mf = {}
+    for go in go2gene_expand.keys():
+        if geneonto.getterms()[go].getnamespace() == "biological_process":
+            go2gene_expand_bp[go] = deepcopy(go2gene_expand[go])
+        if geneonto.getterms()[go].getnamespace() == "cellular_component":
+            go2gene_expand_cc[go] = deepcopy(go2gene_expand[go])
+        if geneonto.getterms()[go].getnamespace() == "molecular_function":
+            go2gene_expand_mf[go] = deepcopy(go2gene_expand[go])
+    print("go2gene assos expanded bp: ", end='')
+    stat_assos(go2gene_expand_bp)
+    print("go2gene assos expanded cc: ", end='')
+    stat_assos(go2gene_expand_cc)
+    print("go2gene assos expanded mf: ", end='')
+    stat_assos(go2gene_expand_mf)
 
 
 def similarity_cal_coexpression():
     disease2gene_entrez = read_all_gene_disease_associations("all_gene_disease_associations.tsv",
                                                              0.06, True, True)
+    print("disease gene assos: ", end='')
     stat_assos(disease2gene_entrez)
     genecoexp = read_probeid_expfile("U133AGNF1B.gcrma.avg.cleared.entrezid.tsv", False)
-    print(len(genecoexp))
+    print("number of all genes have exp value:s", len(genecoexp))
+
+    alldgs = set()
+    for gs in disease2gene_entrez.values():
+        for g in gs:
+            alldgs.add(g)
+    print("numbers of disease genes having exp values:", len(alldgs.intersection(set(genecoexp.keys()))))
+
     dsim_coexp = diseases_similarity_coexp(set(disease2gene_entrez.keys()), disease2gene_entrez, genecoexp)
-    print(len(dsim_coexp))
-    write_sims(dsim_coexp, "similarity_coexp_umls.tsv")
+    write_sims(dsim_coexp, "similarity_coexp_umls_dgcutoff006.tsv")
 
 
 def geneid_convert_coexpression():
@@ -203,4 +321,4 @@ def gene_neighbor_info():
 
 
 if __name__ == "__main__":
-    similarity_cal_coexpression()
+    similarity_cal_go()

@@ -1,15 +1,18 @@
 #! /usr/bin/env python3
 """defining a class for Gene Ontology"""
 import queue
+from copy import deepcopy
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
 go_annotation_evidence_codes = ("EXP", "IDA", "IMP", "IGI", "IEP", "ISS", "ISA", "ISM", "ISO")
 goid_old2new = {"GO:0097481": "GO:0014069", }
 
 
-def read_go_annotation_file(filepath, hcec, qualifier):
+def read_go_annotation_file(filepath, hcec=True, qualifier=True):
     """
     read go annotation file
+    Reference: Menche J, Sharma A, Kitsak M, et al. Uncovering disease-disease relationships through
+    the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
     :param filepath: a path of go annotation file
     :param hcec: boolean virable, True means only annotations with high confidence
     evidence code are used, False means annotations with all evidence code are used
@@ -30,13 +33,13 @@ def read_go_annotation_file(filepath, hcec, qualifier):
                 if words[4].strip() not in assos:
                     assos[words[4].strip()] = set()
                 assos[words[4].strip()].add(words[2].strip())
-        # -------------------------------------------change some alt_ids
+        # -----------change some alt_ids-------------
         for goid_old in goid_old2new.keys():
             if goid_old in assos.keys():
                 if goid_old2new[goid_old] in assos.keys():
                     assos[goid_old2new[goid_old]] |= assos[goid_old]
                 else:
-                    assos[goid_old2new[goid_old]] = assos[goid_old].copy()
+                    assos[goid_old2new[goid_old]] = deepcopy(assos[goid_old])
                 assos.pop(goid_old, None)
         # -------------------------------------------
     return assos
@@ -46,25 +49,32 @@ def add_implicit_annotations(goannotationdict, geneontology):
     """
     add all implicit general annotations by up-propagating the given annotations
     along the full GO tree
-    :param goannotationdict: dict where key are gene symbols and values are sets of
-    GO terms associated with the key, get from go annotation file
+    Reference: Menche J, Sharma A, Kitsak M, et al. Uncovering disease-disease relationships through
+    the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
+    :param goannotationdict: dict where keys are GO terms and values are sets of
+    gene symbols associated with the key, get from go annotation file
     :param geneontology: a GeneOntology object
-    :return: a dict
+    :return: an expanded goannotationdict
     """
     assos = {}
-    for k in goannotationdict.keys():
+    for k in geneontology.getterms().keys():
         assos[k] = set()
         q = queue.Queue()
-        for go in goannotationdict[k]:
-            q.put(go)
+        q.put(k)
         while not q.empty():
             temp = q.get()
-            assos[k].add(temp)
-            if temp in geneontology.getterms():
-                for t in geneontology.getterms()[temp].getparents():
+            if temp in goannotationdict.keys():
+                for g in goannotationdict[temp]:
+                    assos[k].add(g)
+            if temp in geneontology.getterms().keys():
+                for t in geneontology.getterms()[temp].getchildren():
                     q.put(t)
             else:
                 print(temp, " is not in gene ontology for some reasons")
+    ks = list(assos.keys())
+    for k in ks:
+        if len(assos[k]) == 0:
+            del assos[k]
     return assos
 
 
@@ -155,7 +165,7 @@ class GeneOntology:
                             self._terms[p] = termtemp
                         self._terms[p].addchild(goid)
                 i += 1
-        print("initialize terms size: ", len(self._terms))
+        print("initialize terms size:", len(self._terms))
 
 
 class GOTerm:

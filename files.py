@@ -33,8 +33,8 @@ def read_assos(filepath, header=False, sep="\t", xcol=1, ycol=2):
     :param header: a boolean variable indicates if the first row is a head or not,
     default False
     :param sep: delimiter, a string, default "\t"
-    :param xcol: the column number contains the dict's key, default 1
-    :param ycol: the column number contains the dict's value, default 2
+    :param xcol: number of the column contains the dict's key, default 1
+    :param ycol: number of the column contains the dict's value, default 2
     :return: a dict object which keys are entities in the first row, values are
     set of entities have relationships with the key.
     """
@@ -66,8 +66,8 @@ def read_mappings(filepath, header=False, sep="\t", xcol=1, ycol=2):
     :param header: a boolean variable indicates if the first row is a head or not,
     default False
     :param sep: delimiter, a string, default "\t"
-    :param xcol: the column number contains the dict's key, default 1
-    :param ycol: the column number contains the dict's value, default 2
+    :param xcol: number of the column contains the dict's key, default 1
+    :param ycol: number of the column contains the dict's value, default 2
     :return: a dict which each key is a string and the corresponding value is a string
     """
     mapping = {}
@@ -88,6 +88,36 @@ def read_mappings(filepath, header=False, sep="\t", xcol=1, ycol=2):
                         print("read_mappings() fetal error, the key has different mapping values:",
                               "key:", k, "value:", mapping[k], words[ycol].strip())
     return mapping
+
+
+def read_sims(filepath, header=False, sep="\t", xcol=1, ycol=2, vcol=3):
+    """
+    read triplet similarity into key-value format from a table file
+    :param filepath: a path of a table file which contains at least 3 columns
+    :param header: a boolean variable indicates if the first row is a head or not,
+    default False
+    :param sep: delimiter, a string, default "\t"
+    :param xcol: number of the column contains entities, default 1
+    :param ycol: number of another column contains entities, default 2
+    :param vcol: number of the column contains the similarity values, default 3
+    :return: dict, key-value: string-dict<string-value> ({entity1: {entity2: sim, }, }
+    """
+    sim = {}
+    with open(filepath, mode='r') as f:
+        if header:
+            next(f)
+        xcol -= 1
+        ycol -= 1
+        vcol -= 1
+        for line in f:
+            words = line.split(sep)
+            entity1 = words[xcol].strip()
+            entity2 = words[ycol].strip()
+            simvalue = float(words[vcol].strip())
+            if entity1 not in sim.keys():
+                sim[entity1] = {}
+            sim[entity1][entity2] = simvalue
+    return sim
 
 
 def write_mappings(dictionary, filepath, header=False, sep="\t"):
@@ -138,7 +168,7 @@ def write_sims(simdict, filepath, header=False, sep='\t'):
     :param header: boolean, need a head or not, if True, the head will be
     "V1sepV2sepsim",default False
     :param sep: delimiter, default '\t'
-    :return:
+    :return: None
     """
     with open(filepath, mode='w') as f:
         if header:

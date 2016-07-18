@@ -317,11 +317,40 @@ DOID:6132 {'umls:C0008677', 'umls:C0006277'}
   umls:C0008677: Bronchitis, Chronic
   umls:C0006277: Bronchitis
   选DOID:6132->umls:C0006277
+#----------------------------------------------------------------------
 
+#----------------------------------------------------------------------
+9. go-gene(gene symbol)关系统计
+文件版本：
+go.obo: 
+format-version: 1.2
+data-version: releases/2016-06-14
+date: 13:06:2016 11:57
 
+gene_association.goa_human:
+!GOC Validation Date: 05/20/2016 $
+!Submission Date: 5/11/2016
+!Generated: 2016-05-09 09:17
+!GO-version: http://purl.obolibrary.org/obo/go/releases/2016-05-07/go.owl
 
+go.obo里共44937个term, 其中不同类型的统计如下：
+	bp: 29637 cc: 4121 mf: 11179
 
-
+按照下面文章的做法提取go-gene的关系:
+Menche J, Sharma A, Kitsak M, et al. Uncovering disease-disease relationships through 
+the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
+(1) 从"gene_association.goa_human"里提取的关系有：
+	go2gene assos original: go: 12009 gene: 12575 associations: 89642
+	分三种类型统计：
+	go2gene assos original bp: go: 8268 gene: 8629 associations: 44487
+	go2gene assos original cc: go: 1123 gene: 10749 associations: 30666
+	go2gene assos original mf: go: 2618 gene: 6893 associations: 14489
+(2) 扩充注释（一个gene如果注释一个GO term，那么这个gene也会注释这个GO term的祖先）之后关系有：
+	go2gene assos expanded: go: 16432 gene: 12575 associations: 705011
+	扩充之后分三种类型的统计：
+	go2gene assos expanded bp: go: 11860 gene: 8629 associations: 475292
+	go2gene assos expanded cc: go: 1373 gene: 10749 associations: 148237
+	go2gene assos expanded mf: go: 3199 gene: 6893 associations: 81482
 
 
 

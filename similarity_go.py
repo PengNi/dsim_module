@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 """calculate similarity of gene or disease pairs based on GO"""
+import time
 
 
 def diseases_similarity_go(diseases, disease2gene, gene2go, go2gene):
@@ -15,16 +16,24 @@ def diseases_similarity_go(diseases, disease2gene, gene2go, go2gene):
 
     disease2gene_new = {}
     for d in diseases:
-        disease2gene_new[d] = disease2gene[d].intersection(set(gene2go.keys()))
+        genestemp = disease2gene[d].intersection(gene2go.keys())
+        if len(genestemp) > 0:
+            disease2gene_new[d] = genestemp
+    diseases = list(disease2gene_new.keys())
+    print("there are {} diseases can be calculated.".format(len(diseases)))
 
     n = len(diseases)
     sim_result = {}
+    print("cal started at:", time.strftime('%X %x %Z'))
+    t0 = time.time()
     for i in range(0, n):
+        print(i, diseases[i], "gene number:", len(disease2gene_new[diseases[i]]))
         sim_result[diseases[i]] = {}
         for j in range(i, n):
             simvalue = disease_pair_similarity_go(diseases[i], diseases[j],
                                                   disease2gene_new, gene2go, go2gene)
             sim_result[diseases[i]][diseases[j]] = simvalue
+        print("------------------------------- cost time:", str(time.time() - t0))
     return sim_result
 
 
@@ -63,16 +72,13 @@ def disease_pair_similarity_go(diseasea, diseaseb, disease2gene, gene2go, go2gen
     genes_a = disease2gene[diseasea]
     genes_b = disease2gene[diseaseb]
 
-    if len(genes_a) == 0 or len(genes_b) == 0:
-        return 0
-    else:
-        count = 0
-        sim_sum = 0.0
-        for a in genes_a:
-            for b in genes_b:
-                if a != b:
-                    count += 1
-                    sim_sum += gene_pair_similarity_go(a, b, gene2go, go2gene)
-        if count != 0:
-            return sim_sum/count
-        return 0
+    count = 0
+    sim_sum = 0.0
+    for a in genes_a:
+        for b in genes_b:
+            if a != b:
+                count += 1
+                sim_sum += gene_pair_similarity_go(a, b, gene2go, go2gene)
+    if count != 0:
+        return sim_sum/count
+    return 0

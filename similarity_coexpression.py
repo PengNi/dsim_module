@@ -2,6 +2,7 @@
 """calculate similarity of gene or disease pairs based on gene coexpression"""
 from scipy import stats
 from numpy import mean
+import time
 
 
 def read_probeid_expfile(filepath, header=True, sep='\t'):
@@ -63,21 +64,27 @@ def diseases_similarity_coexp(diseases, disease2gene, gene2expression):
     :return: a dict (key-value: string-dict<string-float>)
     """
     diseases = list(set(diseases).intersection(set(disease2gene.keys())))
-
     disease2gene_new = {}
     for d in diseases:
-        disease2gene_new[d] = disease2gene[d].intersection(gene2expression.keys())
+        genestemp = disease2gene[d].intersection(gene2expression.keys())
+        if len(genestemp) > 0:
+            disease2gene_new[d] = genestemp
+    diseases = list(disease2gene_new.keys())
+    print("there are {} diseases can be calculated.".format(len(diseases)))
 
     n = len(diseases)
     sim_result = {}
+    print("cal started at:", time.strftime('%X %x %Z'))
+    t0 = time.time()
     for i in range(0, n):
+        print(i, diseases[i], "gene number:", len(disease2gene_new[diseases[i]]))
         sim_result[diseases[i]] = {}
         for j in range(i, n):
             sim_result[diseases[i]][diseases[j]] = disease_pair_similarity_coexp(diseases[i],
                                                                                  diseases[j],
                                                                                  disease2gene_new,
                                                                                  gene2expression)
-        print(i)
+        print("------------------------------- cost time:", str(time.time() - t0))
     return sim_result
 
 
@@ -106,17 +113,14 @@ def disease_pair_similarity_coexp(diseasea, diseaseb, disease2gene, gene2express
     genea = disease2gene[diseasea]
     geneb = disease2gene[diseaseb]
 
-    if len(genea) == 0 or len(geneb) == 0:
-        return 0
-    else:
-        count = 0
-        simsum = 0.0
-        for a in genea:
-            for b in geneb:
-                if a != b:
-                    gsim = gene_pair_similarity_coexp(a, b, gene2expression)
-                    simsum += abs(gsim[0])
-                    count += 1
-        if count != 0:
-            return simsum/count
-        return 0
+    count = 0
+    simsum = 0.0
+    for a in genea:
+        for b in geneb:
+            if a != b:
+                gsim = gene_pair_similarity_coexp(a, b, gene2expression)
+                simsum += abs(gsim[0])
+                count += 1
+    if count != 0:
+        return simsum/count
+    return 0
