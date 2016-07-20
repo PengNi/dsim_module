@@ -93,7 +93,8 @@ def read_mappings(filepath, header=False, sep="\t", xcol=1, ycol=2):
 def read_sims(filepath, header=False, sep="\t", xcol=1, ycol=2, vcol=3):
     """
     read triplet similarity into key-value format from a table file
-    :param filepath: a path of a table file which contains at least 3 columns
+    :param filepath: a path of a table file which contains at least 3 columns,
+    2 cols are names and the other col is values
     :param header: a boolean variable indicates if the first row is a head or not,
     default False
     :param sep: delimiter, a string, default "\t"
@@ -118,6 +119,21 @@ def read_sims(filepath, header=False, sep="\t", xcol=1, ycol=2, vcol=3):
                 sim[entity1] = {}
             sim[entity1][entity2] = simvalue
     return sim
+
+
+def read_simmatrix(filepath, rowheader=True, colheader=True, sep="\t"):
+    """
+    read similarity matrix into key-value format from a table file, the table
+    file must contains rownames (rowheader=True) or colnames (colheader=True)
+    or both, if there is only one which is True, this method considers that
+    the matrix defaults to a symmetric matrix
+    :param filepath: a path of a table file which contains a sim matrix
+    :param rowheader: a boolean variable indicates if the first row is a head or not,
+    default False
+    :param sep: delimiter, a string, default "\t"
+    :return: dict, key-value: string-dict<string-value> ({entity1: {entity2: sim, }, }
+    """
+    pass
 
 
 def write_mappings(dictionary, filepath, header=False, sep="\t"):

@@ -71,7 +71,7 @@ def similarity_cal_go():
     gene2go_expand_mf = invert_dict(go2gene_expand_mf)
     dsim_go_mf = diseases_similarity_go(list(disease2gene_symbol.keys()), disease2gene_symbol,
                                         gene2go_expand_mf, go2gene_expand_mf)
-    write_sims(dsim_go_mf, "similarity_go_bp_umls_dcutoff006.tsv")
+    write_sims(dsim_go_mf, "similarity_go_mf_umls_dcutoff006.tsv")
 
 
 def go2gene_stats():
@@ -321,4 +321,4 @@ def gene_neighbor_info():
 
 
 if __name__ == "__main__":
-    similarity_cal_go()
+    pass

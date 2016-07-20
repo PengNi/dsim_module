@@ -213,6 +213,8 @@ diseases: 299 genes: 3173 associations: 29775
  nodes: 13460 edges: 141296
  去掉自环和重复边后：
  nodes: 13397 edges: 138427
+ 最大连通分支：
+ nodes: 13329 edges: 138356
 #--------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------
@@ -351,6 +353,15 @@ the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
 	go2gene assos expanded bp: go: 11860 gene: 8629 associations: 475292
 	go2gene assos expanded cc: go: 1373 gene: 10749 associations: 148237
 	go2gene assos expanded mf: go: 3199 gene: 6893 associations: 81482
+#------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 
 
 
