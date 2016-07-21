@@ -22,9 +22,37 @@ from gene_ontology import GeneOntology
 from gene_ontology import invert_dict
 from gene_ontology import add_implicit_annotations
 from similarity_go import diseases_similarity_go
+from evaluation import eva_70benchmarkpairs
 
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
+
+
+def evaluation_70benchmarkset():
+    pathlist = ['similarity_icod_umls_dcutoff006_triplet.tsv',
+                'similarity_suntopo_umls_dcutoff006_triplet.tsv',
+                'similarity_funsim_umls_dcutoff006.tsv',
+                'similarity_bog_umls_dcutoff006_triplet.tsv',
+                'similarity_go_mf_umls_dcutoff006.tsv']
+
+    benchmarkpairs = read_assos("data/ground_truth_68_disease_pairs_umlsid.tsv")
+    stat_assos(benchmarkpairs)
+    bmptuple = []
+    for p in benchmarkpairs.keys():
+        for q in benchmarkpairs[p]:
+            bmptuple.append((p, q))
+    evaress = eva_70benchmarkpairs(pathlist, bmptuple)
+    for er in evaress:
+        print("x time")
+        print("d1\td2\ticod\tsuntopo\tfunsim\tbog\tgomf\tlabel")
+        for d1 in er.keys():
+            for d2 in er[d1].keys():
+                print(d1+"\t"+d2+'\t'+str(er[d1][d2][pathlist[0]])+'\t' +
+                      str(er[d1][d2][pathlist[1]])+'\t' +
+                      str(er[d1][d2][pathlist[2]])+'\t' +
+                      str(er[d1][d2][pathlist[3]])+'\t' +
+                      str(er[d1][d2][pathlist[4]])+'\t' +
+                      str(er[d1][d2]['label']))
 
 
 def similarity_cal_go():
@@ -321,4 +349,4 @@ def gene_neighbor_info():
 
 
 if __name__ == "__main__":
-    pass
+    evaluation_70benchmarkset()

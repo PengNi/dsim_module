@@ -118,6 +118,13 @@ def read_sims(filepath, header=False, sep="\t", xcol=1, ycol=2, vcol=3):
             if entity1 not in sim.keys():
                 sim[entity1] = {}
             sim[entity1][entity2] = simvalue
+            if entity1 != entity2 and entity2 in sim.keys() and entity1 in sim[entity2].keys():
+                print(entity1, entity2, "are duplicate in the file.")
+                del sim[entity2][entity1]
+        ks = list(sim.keys())
+        for k in ks:
+            if len(sim[k]) == 0:
+                del sim[k]
     return sim
 
 
