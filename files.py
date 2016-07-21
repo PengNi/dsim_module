@@ -128,12 +128,46 @@ def read_simmatrix(filepath, rowheader=True, colheader=True, sep="\t"):
     or both, if there is only one which is True, this method considers that
     the matrix defaults to a symmetric matrix
     :param filepath: a path of a table file which contains a sim matrix
-    :param rowheader: a boolean variable indicates if the first row is a head or not,
-    default False
+    :param rowheader: a boolean variable indicates if the first col is a head or not,
+    default True
+    :param colheader: a boolean variable indicates if the first row is a head or not,
+    default True
     :param sep: delimiter, a string, default "\t"
     :return: dict, key-value: string-dict<string-value> ({entity1: {entity2: sim, }, }
     """
-    pass
+    sim = {}
+    if not rowheader | colheader:
+        print("the matrix must have at least one header for row and col names")
+        return None
+    with open(filepath, mode='r') as f:
+        rownames = []
+        colnames = []
+        starter = 0
+        if rowheader:
+            starter = 1
+            rownames = read_one_col(filepath, 1, colheader, sep)
+        if colheader:
+            rns = next(f)
+            colnames = rns.strip().split(sep)
+        if not colheader & rowheader:
+            if rowheader:
+                colnames = rownames
+            else:
+                rownames = colnames
+        rcount = 0
+        for line in f:
+            words = line.strip().split(sep)
+            if rownames[rcount] not in sim.keys():
+                sim[rownames[rcount]] = {}
+            for i in range(0, len(colnames)):
+                vtemp = float(words[i+starter])
+                if colnames[i] in sim.keys() and rownames[rcount] in sim[colnames[i]].keys():
+                    if vtemp != sim[colnames[i]][rownames[rcount]]:
+                        print(rownames[rcount], colnames[i], "have two sim values.")
+                else:
+                    sim[rownames[rcount]][colnames[i]] = vtemp
+            rcount += 1
+    return sim
 
 
 def write_mappings(dictionary, filepath, header=False, sep="\t"):
