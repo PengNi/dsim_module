@@ -28,14 +28,14 @@ namespaces = ("biological_process", "molecular_function", "cellular_component")
 
 
 def similarity_cal_go():
-    disease2gene_symbol = read_all_gene_disease_associations("all_gene_disease_associations.tsv",
+    disease2gene_symbol = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
                                                              0.06, True, False)
     print("disease gene assos: ", end='')
     stat_assos(disease2gene_symbol)
 
     geneonto = GeneOntology()
     geneonto.readobofile("go.obo")
-    go2gene = read_go_annotation_file("gene_association.goa_human")
+    go2gene = read_go_annotation_file("data/gene_association.goa_human")
     print("go2gene assos original: ", end='')
     stat_assos(go2gene)
     go2gene_expand = add_implicit_annotations(go2gene, geneonto)
@@ -89,7 +89,7 @@ def go2gene_stats():
             mfcount += 1
     print("bp:", bpcount, "cc:", cccount, "mf:", mfcount)
 
-    go2gene = read_go_annotation_file("gene_association.goa_human")
+    go2gene = read_go_annotation_file("data/gene_association.goa_human")
     print("go2gene assos original: ", end='')
     stat_assos(go2gene)
     go2gene_expand_bp = {}
@@ -131,11 +131,11 @@ def go2gene_stats():
 
 
 def similarity_cal_coexpression():
-    disease2gene_entrez = read_all_gene_disease_associations("all_gene_disease_associations.tsv",
+    disease2gene_entrez = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
                                                              0.06, True, True)
     print("disease gene assos: ", end='')
     stat_assos(disease2gene_entrez)
-    genecoexp = read_probeid_expfile("U133AGNF1B.gcrma.avg.cleared.entrezid.tsv", False)
+    genecoexp = read_probeid_expfile("data/U133AGNF1B.gcrma.avg.cleared.entrezid.tsv", False)
     print("number of all genes have exp value:s", len(genecoexp))
 
     alldgs = set()
@@ -149,13 +149,13 @@ def similarity_cal_coexpression():
 
 
 def geneid_convert_coexpression():
-    gene2probe = read_assos("probeid2entrezid_gcrma_anno.tsv", False, "\t", 2, 1)
+    gene2probe = read_assos("data/probeid2entrezid_gcrma_anno.tsv", False, "\t", 2, 1)
     stat_assos(gene2probe)
-    probeexp = read_probeid_expfile("U133AGNF1B.gcrma.avg.cleared.tab", True, '\t')
+    probeexp = read_probeid_expfile("data/U133AGNF1B.gcrma.avg.cleared.tab", True, '\t')
     print(len(probeexp))
     geneexp = probeexp2geneexp(probeexp, gene2probe)
     print(len(geneexp))
-    with open('U133AGNF1B.gcrma.avg.cleared.entrezid.tsv', mode='w') as wf:
+    with open('data/U133AGNF1B.gcrma.avg.cleared.entrezid.tsv', mode='w') as wf:
         for g in geneexp.keys():
             wf.write(g)
             for v in geneexp[g]:
@@ -171,8 +171,8 @@ def do2umls_mapping():
     uds = read_umls_disease_info(0)
     do2umls = doid2umlsid(uds)
     stat_assos(do2umls)
-    doid1 = read_one_col("ground_truth_70_disease_pairs_doid.tab", 1, True)
-    doid2 = read_one_col("ground_truth_70_disease_pairs_doid.tab", 2, True)
+    doid1 = read_one_col("data/ground_truth_70_disease_pairs_doid.tab", 1, True)
+    doid2 = read_one_col("data/ground_truth_70_disease_pairs_doid.tab", 2, True)
     doids = set(doid1).union(doid2)
     print("doids:", len(doids))
     do2umls_map = {}
@@ -187,9 +187,9 @@ def do2umls_mapping():
             elif d == "DOID:6132":
                 do2umls_map[d] = "umls:C0006277"
     write_mappings(do2umls_map, "ground_truth_doid2umlsid_46diseases.tsv")
-    with open("ground_truth_70_disease_pairs_doid.tab", mode='r') as rf:
+    with open("data/ground_truth_70_disease_pairs_doid.tab", mode='r') as rf:
         next(rf)
-        with open("ground_truth_68_disease_pairs_umlsid.tsv", mode='w') as wf:
+        with open("data/ground_truth_68_disease_pairs_umlsid.tsv", mode='w') as wf:
             for line in rf:
                 ids = line.strip().split('\t')
                 id1 = ids[0].strip()
@@ -199,14 +199,14 @@ def do2umls_mapping():
 
 
 def probeid2entrezid_compare():
-    probeid_need2conv = set(read_one_col("U133AGNF1B.gcrma.avg.cleared.tab",
+    probeid_need2conv = set(read_one_col("data/U133AGNF1B.gcrma.avg.cleared.tab",
                                          1, True))
     print("number of probeids need to be converted:", len(probeid_need2conv))
 
-    p2e_mnd = read_assos("probeid2entrezid_mygenendavid.txt")
+    p2e_mnd = read_assos("data/probeid2entrezid_mygenendavid.txt")
     print("probeid2entrezid mapping result from mygene and david:\t", end='')
     stat_assos(p2e_mnd)
-    p2e_ann = read_assos("U133A_annotation.tsv")
+    p2e_ann = read_assos("data/U133A_annotation.tsv")
     print("probeid2entrezid mapping result from the paper:\t", end='')
     stat_assos(p2e_ann)
 
@@ -237,7 +237,7 @@ def diseaseidmapping_hsdn():
     meshnames = set(meshnames1).union(meshnames2)
     print("meshnames needed to be map:", len(meshnames))
     umlsdiseases = read_umls_disease_info(0)
-    meshname2meshid = read_mappings("MeshTreeHierarchy.csv", True, "\t", 3, 2)
+    meshname2meshid = read_mappings("data/MeshTreeHierarchy.csv", True, "\t", 3, 2)
 
     meshname2umlsid = termname2umlsid(meshnames, umlsdiseases, meshname2meshid)
     print("mapped successfully:", len(meshname2umlsid))
@@ -252,14 +252,14 @@ def diseaseidmapping_hsdn():
     print("one to one:", len(meshname2umlsid_sgl))
     stat_maps(meshname2umlsid_sgl)
     stat_assos(meshname2umlsid)
-    write_assos(meshname2umlsid, "meshtermname2umlsid_hsdn.tsv")
+    write_assos(meshname2umlsid, "data/meshtermname2umlsid_hsdn.tsv")
 
 
 def disease_module_info():
-    g = similarity_module.read_interactome("DataS1_interactome_rmslpe.tsv", False, False)
+    g = similarity_module.read_interactome("data/DataS1_interactome_rmslpe.tsv", False, False)
     print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
 
-    disease_genes = read_all_gene_disease_associations("all_gene_disease_associations.tsv", 0)
+    disease_genes = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv", 0)
     print("disease-gene associations: ", end="")
     stat_assos(disease_genes)
 
@@ -296,10 +296,10 @@ def disease_module_info():
 
 
 def gene_neighbor_info():
-    g = similarity_module.read_interactome("DataS1_interactome.tsv", False, False)
+    g = similarity_module.read_interactome("data/DataS1_interactome.tsv", False, False)
     print("number of vertices:", g.vcount())
 
-    all_disease_genes = read_one_col("curated_gene_disease_associations.tsv", 2, True)
+    all_disease_genes = read_one_col("data/curated_gene_disease_associations.tsv", 2, True)
     all_disease_genes = set(all_disease_genes)
     print("number of disease genes:", len(all_disease_genes))
     all_disease_genes = all_disease_genes.intersection(set(g.vs['name']))

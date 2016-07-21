@@ -12,17 +12,17 @@ def read_umls_disease_info(dgasso_score_cutoff):
     """
     umlsdiseases = UmlsDiseases()
 
-    umlsdiseaseid2name = turtle_parser.ttl_parser_disease2name("disease.ttl")
-    umlsdiseaseid2categories = turtle_parser.ttl_parser_disease2class("disease.ttl")
-    umlsdiseaseid2meshid = turtle_parser.ttl_parser_umls2mesh_exact("ls-umls2mesh-exactMatch.ttl")
-    umlsdiseaseid2omimid = turtle_parser.ttl_parser_umls2omim_exact("ls-umls2omim-exactMatch.ttl")
-    umlsdiseaseid2doid = turtle_parser.ttl_parser_umls2do_exact("ls-umls2do-exactMatch.ttl")
-    umlsdiseaseid2icd9cm = turtle_parser.ttl_parser_umls2icd9cm_exact("ls-umls2icd9cm-exactMatch.ttl")
-    umlsdiseaseid2hpoid = turtle_parser.ttl_parser_umls2hpo_exact("ls-umls2hpo-exactMatch.ttl")
+    umlsdiseaseid2name = turtle_parser.ttl_parser_disease2name("data/disease.ttl")
+    umlsdiseaseid2categories = turtle_parser.ttl_parser_disease2class("data/disease.ttl")
+    umlsdiseaseid2meshid = turtle_parser.ttl_parser_umls2mesh_exact("data/ls-umls2mesh-exactMatch.ttl")
+    umlsdiseaseid2omimid = turtle_parser.ttl_parser_umls2omim_exact("data/ls-umls2omim-exactMatch.ttl")
+    umlsdiseaseid2doid = turtle_parser.ttl_parser_umls2do_exact("data/ls-umls2do-exactMatch.ttl")
+    umlsdiseaseid2icd9cm = turtle_parser.ttl_parser_umls2icd9cm_exact("data/ls-umls2icd9cm-exactMatch.ttl")
+    umlsdiseaseid2hpoid = turtle_parser.ttl_parser_umls2hpo_exact("data/ls-umls2hpo-exactMatch.ttl")
 
-    umlsdiseaseid2entrezid = read_all_gene_disease_associations("all_gene_disease_associations.tsv",
+    umlsdiseaseid2entrezid = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
                                                                 dgasso_score_cutoff)
-    umlsdiseaseid2genesymbol = read_all_gene_disease_associations("all_gene_disease_associations.tsv",
+    umlsdiseaseid2genesymbol = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
                                                                   dgasso_score_cutoff, True, False)
 
     for did in umlsdiseaseid2name.keys():
