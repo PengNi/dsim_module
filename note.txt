@@ -51,8 +51,8 @@ stat: probeid: 30179 entrezid: 19505 associations: 35201
 #--------------------------------------------------------------
 
 #-----两种方式（文章提供的数据注释里的mapping和第三方工具的mapping）的比较------
-probeid2entrezid mapping result from mygene and david:	stat_assos: keys: 30179 values: 19505 associations: 35201
-probeid2entrezid mapping result from the paper:	stat_assos: keys: 29202 values: 18608 associations: 31490
+probeid2entrezid mapping result from mygene and david:	stat_assos: probeid: 30179 entrezid: 19505 associations: 35201
+probeid2entrezid mapping result from the paper:	stat_assos: probeid: 29202 entrezid: 18608 associations: 31490
 用文章里的mapping和第三方工具mapping都有结果的probeid有 28957 个
 这个28957个里有1836个，两种方式的mapping结果是不同的
 #-------------------------------------------------------------------------------
@@ -60,7 +60,7 @@ probeid2entrezid mapping result from the paper:	stat_assos: keys: 29202 values: 
 #---------结论-------------------------------------------------
 (1) 以文章里提供的mapping为准
 (2) 先不将第三方工具（mygene, david）的mapping结果作为补充，
-只用文章提供的mapping结果
+    只用文章提供的mapping结果
 #--------------------------------------------------------------
 #--------------------------------------------------------------------------------
 

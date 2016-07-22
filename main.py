@@ -41,7 +41,7 @@ def evaluation_70benchmarkset():
     for p in benchmarkpairs.keys():
         for q in benchmarkpairs[p]:
             bmptuple.append((p, q))
-    evaress = eva_70benchmarkpairs(pathlist, bmptuple)
+    evaress = eva_70benchmarkpairs(pathlist, bmptuple, 5)
     for er in evaress:
         print("x time")
         print("d1\td2\ticod\tsuntopo\tfunsim\tbog\tgomf\tlabel")
