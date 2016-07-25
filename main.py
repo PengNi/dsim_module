@@ -33,7 +33,7 @@ def evaluation_70benchmarkset():
                 'similarity_suntopo_umls_dcutoff006_triplet.tsv',
                 'similarity_funsim_umls_dcutoff006.tsv',
                 'similarity_bog_umls_dcutoff006_triplet.tsv',
-                'similarity_go_mf_umls_dcutoff006.tsv']
+                'simialrity_module1_umls_dcutoff006.tsv']
 
     benchmarkpairs = read_assos("data/ground_truth_68_disease_pairs_umlsid.tsv")
     stat_assos(benchmarkpairs)
@@ -43,8 +43,8 @@ def evaluation_70benchmarkset():
             bmptuple.append((p, q))
     evaress = eva_70benchmarkpairs(pathlist, bmptuple, 5)
     for er in evaress:
-        print("x time")
-        print("d1\td2\ticod\tsuntopo\tfunsim\tbog\tgomf\tlabel")
+        print("-----------------time-----------------------------------------------------")
+        print("d1\td2\ticod\tsuntopo\tfunsim\tbog\tmodule1\tlabel")
         for d1 in er.keys():
             for d2 in er[d1].keys():
                 print(d1+"\t"+d2+'\t'+str(er[d1][d2][pathlist[0]])+'\t' +
@@ -191,8 +191,17 @@ def geneid_convert_coexpression():
             wf.write('\n')
 
 
-def similarity_cal():
-    pass
+def similarity_cal_module():
+    disease2gene_entrez = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
+                                                             0.06, True, True)
+    print("disease gene assos: ", end='')
+    stat_assos(disease2gene_entrez)
+
+    g = similarity_module.read_interactome("data/DataS1_interactome_rmslpe.tsv", False, False)
+    print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
+
+    sims = similarity_module.similarity_cal_module_1(disease2gene_entrez, g)
+    write_sims(sims, "simialrity_module1_umls_dcutoff006.tsv")
 
 
 def do2umls_mapping():
@@ -321,6 +330,32 @@ def disease_module_info():
     for d in disease_genes.keys():
         print(d, len(disease_genes_ori[d]), len(disease_genes[d]), d_avgdegree[d],
               d_density[d], d_avgsp[d], d_diameter[d], d_lambdamodule[d], sep="\t")
+
+
+def disease_module_info_simplify():
+    g = similarity_module.read_interactome("data/DataS1_interactome_rmslpe.tsv", False, False)
+    print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
+
+    disease_genes = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv", 0.06)
+    print("disease-gene associations: ", end="")
+    stat_assos(disease_genes)
+
+    gvs = set(g.vs['name'])
+    disease_genes_filtered = {}
+    for d in disease_genes.keys():
+        gs = disease_genes[d].intersection(gvs)
+        if len(gs) != 0:
+            disease_genes_filtered[d] = gs
+    print("disease-gene (in interactome) associations: ", end="")
+    stat_assos(disease_genes_filtered)
+
+    print("disease\tnumber of genes\tnumber of genes in interactome")
+    for d in disease_genes.keys():
+        print(d, len(disease_genes[d]), sep='\t', end="\t")
+        if d in disease_genes_filtered.keys():
+            print(len(disease_genes_filtered[d]))
+        else:
+            print(str(0))
 
 
 def gene_neighbor_info():

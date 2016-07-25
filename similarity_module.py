@@ -65,6 +65,58 @@ def density(dgassos, graph):
     return ddensityscore
 
 
+def similarity_cal_module_1(dgassos, graph, gncutoff=0):
+    """
+    module cal method 1
+    :param dgassos: a dict object which keys are module names and values are module
+    nodes sets
+    :param graph: an igraph object
+    :param gncutoff: gene number cut off, only diseases whose number of associated
+    genes in graph is no less than gncutoff will be calculated
+    :return: a dict, (key-value: string-dict<string-float>)
+    """
+    gvs = set(graph.vs['name'])
+
+    dgassos_new = {}
+    for d in dgassos.keys():
+        dgleft = gvs.intersection(dgassos[d])
+        if len(dgleft) > gncutoff:
+            dgassos_new[d] = dgleft
+    diseases = list(dgassos_new.keys())
+    print("there are {} diseases can be calculated.".format(len(diseases)))
+
+    sims = {}
+    for i in range(0, len(diseases)):
+        sims[diseases[i]] = {}
+        for j in range(i, len(diseases)):
+            gsi = dgassos_new[diseases[i]]
+            gsj = dgassos_new[diseases[j]]
+            gsintersect = gsi.intersection(gsj)
+            gsid = gsi.difference(gsj)
+            gsjd = gsj.difference(gsi)
+            conncount = 0
+            if len(gsintersect) != 0:
+                for g in gsid:
+                    if if_connected(graph, g, gsintersect):
+                        conncount += 1
+                for g in gsjd:
+                    if if_connected(graph, g, gsintersect):
+                        conncount += 1
+            for g in gsid:
+                if if_connected(graph, g, gsjd):
+                    conncount += 1
+            sims[diseases[i]][diseases[j]] = (len(gsintersect)**2+conncount)/(len(gsi)*len(gsj))
+        print(i, "done..")
+    return sims
+
+
+def if_connected(graph, node, nodes):
+    for n in nodes:
+        if graph.are_connected(node, n):
+            return True
+    return False
+
+
 def diameter(dgassos, graph):
     """
     given a dict which contains a list of node groups, and an igraph object,
