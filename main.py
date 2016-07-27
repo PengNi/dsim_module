@@ -33,7 +33,7 @@ def evaluation_70benchmarkset():
                 'similarity_suntopo_umls_dcutoff006_triplet.tsv',
                 'similarity_funsim_umls_dcutoff006.tsv',
                 'similarity_bog_umls_dcutoff006_triplet.tsv',
-                'simialrity_module1_umls_dcutoff006.tsv']
+                'similarity_module1_umls_dcutoff006.tsv']
 
     benchmarkpairs = read_assos("data/ground_truth_68_disease_pairs_umlsid.tsv")
     stat_assos(benchmarkpairs)
@@ -200,8 +200,10 @@ def similarity_cal_module():
     g = similarity_module.read_interactome("data/DataS1_interactome_rmslpe.tsv", False, False)
     print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
 
-    sims = similarity_module.similarity_cal_module_1(disease2gene_entrez, g)
-    write_sims(sims, "simialrity_module1_umls_dcutoff006.tsv")
+    # sims = similarity_module.similarity_cal_module_1(disease2gene_entrez, g)
+    # write_sims(sims, "similarity_module1_umls_dcutoff006.tsv")
+    sims = similarity_module.similarity_cal_module_2(disease2gene_entrez, g)
+    write_sims(sims, "similarity_module2_umls_dcutoff006.tsv")
 
 
 def do2umls_mapping():
@@ -384,4 +386,4 @@ def gene_neighbor_info():
 
 
 if __name__ == "__main__":
-    evaluation_70benchmarkset()
+    similarity_cal_module()
