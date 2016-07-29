@@ -141,6 +141,7 @@ def similarity_cal_module_2(dgassos, graph, gncutoff=0):
     gene_pairscount = 0
     for i in range(0, len(diseases)):
         sims[diseases[i]] = {}
+        print(i, diseases[i], len(dgassos_new[diseases[i]]))
         for j in range(i, len(diseases)):
             gsi = dgassos_new[diseases[i]]
             gsj = dgassos_new[diseases[j]]
@@ -160,7 +161,7 @@ def similarity_cal_module_2(dgassos, graph, gncutoff=0):
                         sumtdis += tdistemp
                         genetrandis[gi][gj] = tdistemp
             sims[diseases[i]][diseases[j]] = sumtdis/(len(gsi)*len(gsj))
-        print(i, " done..")
+        print(" done..")
     stat_assos(genetrandis)
     print("gene pairs calculated:", gene_pairscount)
     return sims

@@ -23,6 +23,7 @@ from gene_ontology import invert_dict
 from gene_ontology import add_implicit_annotations
 from similarity_go import diseases_similarity_go
 from evaluation import eva_70benchmarkpairs
+from evaluation import eva_rocs
 
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
@@ -41,10 +42,10 @@ def evaluation_70benchmarkset():
     for p in benchmarkpairs.keys():
         for q in benchmarkpairs[p]:
             bmptuple.append((p, q))
-    evaress = eva_70benchmarkpairs(pathlist, bmptuple, 5)
+    evaress = eva_70benchmarkpairs(pathlist, bmptuple, 1)
     for er in evaress:
         print("-----------------time-----------------------------------------------------")
-        print("d1\td2\ticod\tsuntopo\tfunsim\tbog\tmodule1\tlabel")
+        print("d1\td2\tmodule1\tlabel")
         for d1 in er.keys():
             for d2 in er[d1].keys():
                 print(d1+"\t"+d2+'\t'+str(er[d1][d2][pathlist[0]])+'\t' +
@@ -53,6 +54,24 @@ def evaluation_70benchmarkset():
                       str(er[d1][d2][pathlist[3]])+'\t' +
                       str(er[d1][d2][pathlist[4]])+'\t' +
                       str(er[d1][d2]['label']))
+    print("-tpr--fpr----------------------------------------------------------------------")
+    tpfprs = eva_rocs(evaress)
+    for tpfpr in tpfprs:
+        print("-----------------time-----------------------------------------------------")
+        methodnames = list(tpfpr.keys())
+        for name in methodnames:
+            fprs = []
+            tprs = []
+            for fpr, tpr in tpfpr[name]:
+                fprs.append(fpr)
+                tprs.append(tpr)
+            print(name+"_fpr", end='')
+            for fpr in fprs:
+                print("\t"+str(fpr), end='')
+            print("\n"+name+"_tpr", end='')
+            for tpr in tprs:
+                print("\t"+str(tpr), end='')
+            print()
 
 
 def similarity_cal_go():
@@ -386,4 +405,4 @@ def gene_neighbor_info():
 
 
 if __name__ == "__main__":
-    similarity_cal_module()
+    evaluation_70benchmarkset()

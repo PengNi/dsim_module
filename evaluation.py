@@ -4,6 +4,59 @@ from files import read_sims
 from files import stat_assos
 from copy import deepcopy
 from random import randint
+from operator import itemgetter
+
+
+def eva_rocs(scoredicts):
+    """
+    transform scores and labels to tprs and fprs
+    :param scoredicts: a list of dicts, one dict contains one result,
+    dict: {disease1: {disease2:{method1: simvalue, method2: simvalue, ..., label: 0/1}, }, }
+    (from eva_70benchmarkpairs())
+    :return: a list of dicts, each dict contains tpr and tpr for one or more methods
+    """
+    ress = []
+    for scoredict in scoredicts:
+        ress.append(eva_roc(scoredict))
+    return ress
+
+
+def eva_roc(scoredict):
+    """
+    based on all kind of scores and label in scoredict, calculate the tpr and fpr
+    of each kind of score
+    :param scoredict: dict: {disease1: {disease2:{method1: simvalue, method2: simvalue, ...,
+    label: 0/1}, }, } (in this case, scoredict is from eva_70benchmarkpairs_onetime())
+    :return: dict, {method1: [(float1, float2), ], method2: [], } (float1 is fpr, float2 is tpr)
+    """
+    scorenlabel = {}
+    tpfp = {}
+    d1 = list(scoredict.keys())[0]
+    d2 = list(scoredict[d1].keys())[0]
+    methodnames = set(scoredict[d1][d2].keys())
+    methodnames.discard('label')
+    for m in methodnames:
+        scorenlabel[m] = []
+        tpfp[m] = []
+
+    for d1 in scoredict.keys():
+        for d2 in scoredict[d1].keys():
+            for m in methodnames:
+                scorenlabel[m].append((scoredict[d1][d2][m], scoredict[d1][d2]['label']))
+    for m in methodnames:
+        sltemp = sorted(scorenlabel[m], key=itemgetter(0, 1), reverse=True)
+        slable = []
+        for i in range(0, len(sltemp)):
+            slable.append(sltemp[i][1])
+        conditionp = sum(slable)
+        conditionf = len(slable) - conditionp
+        tp = 0
+        tpfp[m].append((0.0, 0.0))
+        for i in range(0, len(slable)):
+            tp += slable[i]
+            fp = i+1-tp
+            tpfp[m].append((fp/conditionf, tp/conditionp))
+    return tpfp
 
 
 def eva_70benchmarkpairs(methodfilepaths, benchmarkpairs, times=1):
@@ -79,7 +132,7 @@ def eva_70benchmarkpairs_onetime(allsims, alldpairs, bencallist):
     :param allsims: dict, {sim1: { d1: {d2: simvalue, }, }, sim2: {}, }
     :param alldpairs: dict, {d1: [d2, d3], d2: [], }
     :param bencallist: list of tuples
-    :return: dict, dict patterm is
+    :return: dict, dict pattern is
     {disease1: {disease2:{method1: simvalue, method2: simvalue, ..., label: 0/1}, }, }
     """
     d1s = list(alldpairs.keys())
