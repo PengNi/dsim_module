@@ -44,6 +44,7 @@ def eva_roc(scoredict):
             for m in methodnames:
                 scorenlabel[m].append((scoredict[d1][d2][m], scoredict[d1][d2]['label']))
     for m in methodnames:
+        # when sorting, add 1 (label) as a sort key or not?
         sltemp = sorted(scorenlabel[m], key=itemgetter(0, 1), reverse=True)
         slable = []
         for i in range(0, len(sltemp)):

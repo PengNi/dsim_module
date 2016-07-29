@@ -29,7 +29,7 @@ from evaluation import eva_rocs
 namespaces = ("biological_process", "molecular_function", "cellular_component")
 
 
-def evaluation_70benchmarkset():
+def evaluation_70benchmarkset(times=1):
     pathlist = ['similarity_icod_umls_dcutoff006_triplet.tsv',
                 'similarity_suntopo_umls_dcutoff006_triplet.tsv',
                 'similarity_funsim_umls_dcutoff006.tsv',
@@ -42,18 +42,23 @@ def evaluation_70benchmarkset():
     for p in benchmarkpairs.keys():
         for q in benchmarkpairs[p]:
             bmptuple.append((p, q))
-    evaress = eva_70benchmarkpairs(pathlist, bmptuple, 1)
+    evaress = eva_70benchmarkpairs(pathlist, bmptuple, times)
     for er in evaress:
         print("-----------------time-----------------------------------------------------")
-        print("d1\td2\tmodule1\tlabel")
+        d1 = list(er.keys())[0]
+        d2 = list(er[d1].keys())[0]
+        methodnames = list(er[d1][d2].keys())
+        methodnames.remove('label')
+        print("d1\td2\tlabel", end='')
+        for m in methodnames:
+            print("\t"+m, end='')
+        print()
         for d1 in er.keys():
             for d2 in er[d1].keys():
-                print(d1+"\t"+d2+'\t'+str(er[d1][d2][pathlist[0]])+'\t' +
-                      str(er[d1][d2][pathlist[1]])+'\t' +
-                      str(er[d1][d2][pathlist[2]])+'\t' +
-                      str(er[d1][d2][pathlist[3]])+'\t' +
-                      str(er[d1][d2][pathlist[4]])+'\t' +
-                      str(er[d1][d2]['label']))
+                print(d1+'\t'+d2+'\t' + str(er[d1][d2]['label']), end='')
+                for m in methodnames:
+                    print("\t"+str(er[d1][d2][m]), end='')
+                print()
     print("-tpr--fpr----------------------------------------------------------------------")
     tpfprs = eva_rocs(evaress)
     for tpfpr in tpfprs:
@@ -405,4 +410,4 @@ def gene_neighbor_info():
 
 
 if __name__ == "__main__":
-    evaluation_70benchmarkset()
+    evaluation_70benchmarkset(1)
