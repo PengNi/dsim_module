@@ -7,6 +7,58 @@ from random import randint
 from operator import itemgetter
 
 
+def eva_groundtruth(methodfilepaths, groundtruthfilepath, topn=5000):
+    """
+    evaluate disease sim methods from methodfilepaths based on the disease sim
+    scores in groundtruthfilepath
+    :param methodfilepaths: a list of file paths (strings)
+    :param groundtruthfilepath: file path of ground truth disease sim scores
+    :param topn: get topn pairs have the highest scores for evaluating
+    :return: to be decided
+    """
+    groundtruth_sim = read_sims(groundtruthfilepath)
+    print("reading groundtrthfile completed!")
+
+    sims = {}
+    for fp in methodfilepaths:
+        sims[fp] = read_sims(fp)
+    print("reading sim files completed!")
+
+    dpairs = {}
+    for dk in groundtruth_sim.keys():
+        dpairs[dk] = set(groundtruth_sim[dk].keys())
+    for i in range(0, len(methodfilepaths)):
+        simtemp = sims[methodfilepaths[i]]
+        for dpk in dpairs.keys():
+            scopy = deepcopy(dpairs[dpk])
+            for s in scopy:
+                if not ((dpk in simtemp.keys() and s in simtemp[dpk].keys()) or
+                        (s in simtemp.keys() and dpk in simtemp[s].keys())):
+                    dpairs[dpk].remove(s)
+    ds = list(dpairs.keys())
+    for d in ds:
+        dpairs[d].discard(d)
+        if len(dpairs[d]) == 0:
+            del dpairs[d]
+    print("number of disease pairs which all methods can cal: ", end='')
+    stat_assos(dpairs)
+    for d in dpairs.keys():
+        dpairs[d] = list(dpairs[d])
+
+    topnpairs = {}
+    for fp in methodfilepaths:
+        simtemp = []
+        for d in dpairs.keys():
+            for p in dpairs[d]:
+                simtemp.append((d, p, findsimvalue(d, p, sims[fp])))
+        simtemp = sorted(simtemp, key=itemgetter(2), reverse=True)
+        topnpairs[fp] = []
+        for i in range(0, topn):
+            topnpairs[fp].append((simtemp[i][0], simtemp[i][1], simtemp[i][2],
+                                  findsimvalue(simtemp[i][0], simtemp[i][1], groundtruth_sim)))
+    return topnpairs
+
+
 def eva_rocs(scoredicts):
     """
     transform scores and labels to tprs and fprs

@@ -29,12 +29,26 @@ from evaluation import eva_rocs
 namespaces = ("biological_process", "molecular_function", "cellular_component")
 
 
+def evaluation_groundtruth():
+    pathlist = ['similarity_icod_umls_dcutoff006_triplet.tsv',
+                'similarity_suntopo_umls_dcutoff006_triplet.tsv',
+                'similarity_funsim_umls_dcutoff006.tsv',
+                'similarity_bog_umls_dcutoff006_triplet.tsv',
+                'similarity_module1_umls_dcutoff006.tsv',
+                'similarity_module2_umls_dcutoff006.tsv']
+    gtpathlist = ['similarity_go_bp_umls_dcutoff006.tsv',
+                  'similarity_go_cc_umls_dcutoff006.tsv',
+                  'similarity_go_mf_umls_dcutoff006.tsv',
+                  'similarity_coexp_umls_dgcutoff006.tsv']
+
+
 def evaluation_70benchmarkset(times=1):
     pathlist = ['similarity_icod_umls_dcutoff006_triplet.tsv',
                 'similarity_suntopo_umls_dcutoff006_triplet.tsv',
                 'similarity_funsim_umls_dcutoff006.tsv',
                 'similarity_bog_umls_dcutoff006_triplet.tsv',
-                'similarity_module1_umls_dcutoff006.tsv']
+                'similarity_module1_umls_dcutoff006.tsv',
+                'similarity_module2_umls_dcutoff006.tsv']
 
     benchmarkpairs = read_assos("data/ground_truth_68_disease_pairs_umlsid.tsv")
     stat_assos(benchmarkpairs)
