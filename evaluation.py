@@ -18,6 +18,7 @@ def eva_readsims(methodfilepaths):
     for fp in methodfilepaths:
         sims[fp] = read_sims(fp)
     print("reading sim files completed!")
+    return sims
 
 
 def eva_groundtruth(sims, groundtruthfilepath, topn=5000):
