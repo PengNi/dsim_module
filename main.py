@@ -5,9 +5,11 @@ from files import read_mappings
 from files import read_assos
 from files import stat_assos
 from files import stat_maps
+from files import stat_sims
 from files import write_assos
 from files import write_mappings
 from files import write_sims
+from files import read_sims
 from copy import deepcopy
 from umls_disease import read_all_gene_disease_associations
 from umls_disease import read_umls_disease_info
@@ -22,8 +24,10 @@ from gene_ontology import GeneOntology
 from gene_ontology import invert_dict
 from gene_ontology import add_implicit_annotations
 from similarity_go import diseases_similarity_go
+from evaluation import eva_readsims
 from evaluation import eva_70benchmarkpairs
 from evaluation import eva_rocs
+from evaluation import eva_groundtruth
 
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
@@ -39,7 +43,25 @@ def evaluation_groundtruth():
     gtpathlist = ['similarity_go_bp_umls_dcutoff006.tsv',
                   'similarity_go_cc_umls_dcutoff006.tsv',
                   'similarity_go_mf_umls_dcutoff006.tsv',
-                  'similarity_coexp_umls_dgcutoff006.tsv']
+                  'similarity_coexp_umls_dgcutoff006.tsv',
+                  'similarity_symptom_1445umlsid.tsv',
+                  'similarity_symptom_1736umlsid.tsv']
+
+    msims = eva_readsims(pathlist)
+
+    n = 10000
+    evagtres = eva_groundtruth(msims, gtpathlist[0], topn=n)
+    print(gtpathlist[0]+"----------------------------")
+    mnames = list(evagtres.keys())
+    for mn in mnames:
+        print(mn+"\t\t\t", end='')
+    print()
+    for i in range(0, n):
+        for mn in mnames:
+            tupletemp = evagtres[mn][i]
+            for x in tupletemp:
+                print(str(x)+"\t", end='')
+        print()
 
 
 def evaluation_70benchmarkset(times=1):
@@ -56,7 +78,8 @@ def evaluation_70benchmarkset(times=1):
     for p in benchmarkpairs.keys():
         for q in benchmarkpairs[p]:
             bmptuple.append((p, q))
-    evaress = eva_70benchmarkpairs(pathlist, bmptuple, times)
+    msims = eva_readsims(pathlist)
+    evaress = eva_70benchmarkpairs(msims, bmptuple, times)
     for er in evaress:
         print("-----------------time-----------------------------------------------------")
         d1 = list(er.keys())[0]
@@ -332,6 +355,44 @@ def diseaseidmapping_hsdn():
     write_assos(meshname2umlsid, "data/meshtermname2umlsid_hsdn.tsv")
 
 
+def conv_meshname2umlsid_in_hsdn():
+    hsdnsims = read_sims("data/ncomms5212-s5.txt", True)
+    stat_sims(hsdnsims)
+
+    meshid2umlsid = read_assos("data/meshtermname2umlsid_hsdn.tsv")
+    stat_assos(meshid2umlsid)
+
+    meshid2umlsid_one2one = {}
+    for m in meshid2umlsid.keys():
+        if len(meshid2umlsid[m]) == 1:
+            meshid2umlsid_one2one[m] = list(meshid2umlsid[m])[0]
+    print("number of meshids who have unique umlsid:", len(meshid2umlsid_one2one))
+
+    hsdnumlssims = {}
+    for m1 in hsdnsims.keys():
+        if m1 in meshid2umlsid_one2one.keys():
+            hsdnumlssims[meshid2umlsid_one2one[m1]] = {}
+            for m2 in hsdnsims[m1].keys():
+                if m2 in meshid2umlsid_one2one.keys():
+                    hsdnumlssims[meshid2umlsid_one2one[m1]][meshid2umlsid_one2one[m2]] = hsdnsims[m1][m2]
+    stat_sims(hsdnumlssims)
+    write_sims(hsdnumlssims, "similarity_symptom_1445umlsid.tsv")
+
+    hsdnumlssims = {}
+    for m1 in hsdnsims.keys():
+        if m1 in meshid2umlsid.keys():
+            for um1 in meshid2umlsid[m1]:
+                if um1 not in hsdnumlssims.keys():
+                    hsdnumlssims[um1] = {}
+            for m2 in hsdnsims[m1].keys():
+                if m2 in meshid2umlsid.keys():
+                    for um2 in meshid2umlsid[m2]:
+                        for um1 in meshid2umlsid[m1]:
+                            hsdnumlssims[um1][um2] = hsdnsims[m1][m2]
+    stat_sims(hsdnumlssims)
+    write_sims(hsdnumlssims, "similarity_symptom_1736umlsid.tsv")
+
+
 def disease_module_info():
     g = similarity_module.read_interactome("data/DataS1_interactome_rmslpe.tsv", False, False)
     print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
@@ -424,4 +485,4 @@ def gene_neighbor_info():
 
 
 if __name__ == "__main__":
-    evaluation_70benchmarkset(1)
+    evaluation_groundtruth()

@@ -299,6 +299,22 @@ def stat_maps(maps):
     print("stat_maps: keys:", len(maps.keys()), "values:", len(values))
 
 
+def stat_sims(sims):
+    """
+    print some stats of sims
+    :param sims: sims from method read_sims() or read_simmatrix()
+    :return: None
+    """
+    nkeys = len(sims)
+    entities = set(sims.keys())
+    assos = 0
+    for p in sims.keys():
+        for q in sims[p].keys():
+            entities.add(q)
+            assos += 1
+    print("stat_sims: keys:", nkeys, "entities:", len(entities), "assos:", assos)
+
+
 def combine_two_assos(dict1, dict2):
     """
     combine two dicts, each dict's key-value is string-set<string>

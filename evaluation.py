@@ -7,11 +7,25 @@ from random import randint
 from operator import itemgetter
 
 
-def eva_groundtruth(methodfilepaths, groundtruthfilepath, topn=5000):
+def eva_readsims(methodfilepaths):
+    """
+    read sims from all files in methodfilepaths
+    :param methodfilepaths: a list of file paths (strings)
+    :return: dict, keys are file paths, values are results from method
+    read_sims()
+    """
+    sims = {}
+    for fp in methodfilepaths:
+        sims[fp] = read_sims(fp)
+    print("reading sim files completed!")
+
+
+def eva_groundtruth(sims, groundtruthfilepath, topn=5000):
     """
     evaluate disease sim methods from methodfilepaths based on the disease sim
     scores in groundtruthfilepath
-    :param methodfilepaths: a list of file paths (strings)
+    :param sims: got from method eva_readsims(), contains sims of methods need
+    to be evaluated
     :param groundtruthfilepath: file path of ground truth disease sim scores
     :param topn: get topn pairs have the highest scores for evaluating
     :return: to be decided
@@ -19,14 +33,10 @@ def eva_groundtruth(methodfilepaths, groundtruthfilepath, topn=5000):
     groundtruth_sim = read_sims(groundtruthfilepath)
     print("reading groundtrthfile completed!")
 
-    sims = {}
-    for fp in methodfilepaths:
-        sims[fp] = read_sims(fp)
-    print("reading sim files completed!")
-
     dpairs = {}
     for dk in groundtruth_sim.keys():
         dpairs[dk] = set(groundtruth_sim[dk].keys())
+    methodfilepaths = list(sims.keys())
     for i in range(0, len(methodfilepaths)):
         simtemp = sims[methodfilepaths[i]]
         for dpk in dpairs.keys():
@@ -112,13 +122,14 @@ def eva_roc(scoredict):
     return tpfp
 
 
-def eva_70benchmarkpairs(methodfilepaths, benchmarkpairs, times=1):
+def eva_70benchmarkpairs(sims, benchmarkpairs, times=1):
     """
     use 70 disease pairs as benchmark set to evaluation disease similarity methods
     reference: Cheng L, Li J, Ju P, et al. SemFunSim: a new method for measuring disease
     similarity by integrating semantic and gene functional association[J]. PloS one,
     2014, 9(6): e99415.
-    :param methodfilepaths: a list of file paths of methods' results
+    :param sims: got from method eva_readsims(), contains sims of methods need
+    to be evaluated
     :param benchmarkpairs: list of tuples which each tuple contains two diseases,
     can be obtained from file "data/ground_truth_68_disease_pairs_umlsid.tsv"
     :param times: times to replicate the evaluation, one time produces one result which
@@ -126,11 +137,7 @@ def eva_70benchmarkpairs(methodfilepaths, benchmarkpairs, times=1):
     :return: a list of dicts, one dict contains one result,
     dict: {disease1: {disease2:{method1: simvalue, method2: simvalue, ..., label: 0/1}, }, }
     """
-    sims = {}
-    for fp in methodfilepaths:
-        sims[fp] = read_sims(fp)
-    print("reading sim files completed!")
-
+    methodfilepaths = list(sims.keys())
     dpairs = {}
     for dk in sims[methodfilepaths[0]].keys():
         dpairs[dk] = set(sims[methodfilepaths[0]][dk].keys())
