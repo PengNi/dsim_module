@@ -49,19 +49,21 @@ def evaluation_groundtruth():
 
     msims = eva_readsims(pathlist)
 
-    n = 10000
-    evagtres = eva_groundtruth(msims, gtpathlist[0], topn=n)
-    print(gtpathlist[0]+"----------------------------")
-    mnames = list(evagtres.keys())
-    for mn in mnames:
-        print(mn+"\t\t\t", end='')
-    print()
-    for i in range(0, n):
+    n = 1000000
+    for g in [0, 4]:
+        evagtres = eva_groundtruth(msims, gtpathlist[g], topn=n)
+        print(gtpathlist[g]+"----------------------------")
+        mnames = list(evagtres.keys())
         for mn in mnames:
-            tupletemp = evagtres[mn][i]
-            for x in tupletemp:
-                print(str(x)+"\t", end='')
+            print(mn+"\t\t\t", end='')
         print()
+        for i in range(0, n):
+            if len(evagtres[mnames[0]]) > i:
+                for mn in mnames:
+                    tupletemp = evagtres[mn][i]
+                    for x in tupletemp:
+                        print(str(x)+"\t", end='')
+                print()
 
 
 def evaluation_70benchmarkset(times=1):

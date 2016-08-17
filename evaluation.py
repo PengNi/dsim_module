@@ -64,6 +64,8 @@ def eva_groundtruth(sims, groundtruthfilepath, topn=5000):
                 simtemp.append((d, p, findsimvalue(d, p, sims[fp])))
         simtemp = sorted(simtemp, key=itemgetter(2), reverse=True)
         topnpairs[fp] = []
+        if len(simtemp) < topn:
+            topn = len(simtemp)
         for i in range(0, topn):
             topnpairs[fp].append((simtemp[i][0], simtemp[i][1], simtemp[i][2],
                                   findsimvalue(simtemp[i][0], simtemp[i][1], groundtruth_sim)))
