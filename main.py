@@ -28,7 +28,6 @@ from evaluation import eva_readsims
 from evaluation import eva_70benchmarkpairs
 from evaluation import eva_rocs
 from evaluation import eva_groundtruth
-from operator import itemgetter
 
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
