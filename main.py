@@ -28,6 +28,7 @@ from evaluation import eva_readsims
 from evaluation import eva_70benchmarkpairs
 from evaluation import eva_rocs
 from evaluation import eva_groundtruth
+from operator import itemgetter
 
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
@@ -55,7 +56,7 @@ def evaluation_groundtruth():
         print(gtpathlist[g]+"----------------------------")
         mnames = list(evagtres.keys())
         for mn in mnames:
-            print(mn+"\t\t\t", end='')
+            print(mn+"\t\t\t\t", end='')
         print()
         for i in range(0, n):
             if len(evagtres[mnames[0]]) > i:
