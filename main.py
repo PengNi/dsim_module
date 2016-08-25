@@ -26,7 +26,8 @@ from gene_ontology import add_implicit_annotations
 from similarity_go import diseases_similarity_go
 from evaluation import eva_readsims
 from evaluation import eva_70benchmarkpairs
-from evaluation import eva_rocs
+from evaluation import eva_ranking
+from evaluation import eva_tprfprs
 from evaluation import eva_groundtruth
 
 
@@ -67,12 +68,13 @@ def evaluation_groundtruth():
 
 
 def evaluation_70benchmarkset(times=1):
-    pathlist = ['similarity_icod_umls_dcutoff006_triplet.tsv',
-                'similarity_suntopo_umls_dcutoff006_triplet.tsv',
+    pathlist = [  # 'similarity_icod_umls_dcutoff006_triplet.tsv',
+                # 'similarity_suntopo_umls_dcutoff006_triplet.tsv',
                 'similarity_funsim_umls_dcutoff006.tsv',
-                'similarity_bog_umls_dcutoff006_triplet.tsv',
+                # 'similarity_bog_umls_dcutoff006_triplet.tsv',
                 'similarity_module1_umls_dcutoff006.tsv',
-                'similarity_module2_umls_dcutoff006.tsv']
+                # 'similarity_module2_umls_dcutoff006.tsv'
+                ]
 
     benchmarkpairs = read_assos("data/ground_truth_68_disease_pairs_umlsid.tsv")
     stat_assos(benchmarkpairs)
@@ -82,8 +84,9 @@ def evaluation_70benchmarkset(times=1):
             bmptuple.append((p, q))
     msims = eva_readsims(pathlist)
     evaress = eva_70benchmarkpairs(msims, bmptuple, times)
+    print("------------scores and lable---------------------------------------------------")
     for er in evaress:
-        print("-----------------time-----------------------------------------------------")
+        print("-----------------time------------------------------------------------------")
         d1 = list(er.keys())[0]
         d2 = list(er[d1].keys())[0]
         methodnames = list(er[d1][d2].keys())
@@ -98,23 +101,30 @@ def evaluation_70benchmarkset(times=1):
                 for m in methodnames:
                     print("\t"+str(er[d1][d2][m]), end='')
                 print()
+    print("-ranking disease pairs---------------------------------------------------------")
+    for er in evaress:
+        print("---------------time--------------------------------------------------------")
+        ranktemp = eva_ranking(er)
+        ms = list(ranktemp.keys())
+        for m in ms:
+            print(m+"\t\t\t", end="")
+        print()
+        llen = len(ranktemp[ms[0]])
+        for i in range(0, llen):
+            for m in ms:
+                for j in range(0, 4):
+                    print(str(ranktemp[m][i][j])+"\t", end="")
+            print()
     print("-tpr--fpr----------------------------------------------------------------------")
-    tpfprs = eva_rocs(evaress)
+    tpfprs = eva_tprfprs(evaress)
     for tpfpr in tpfprs:
-        print("-----------------time-----------------------------------------------------")
+        print("-----------------time------------------------------------------------------")
         methodnames = list(tpfpr.keys())
-        for name in methodnames:
-            fprs = []
-            tprs = []
-            for fpr, tpr in tpfpr[name]:
-                fprs.append(fpr)
-                tprs.append(tpr)
-            print(name+"_fpr", end='')
-            for fpr in fprs:
-                print("\t"+str(fpr), end='')
-            print("\n"+name+"_tpr", end='')
-            for tpr in tprs:
-                print("\t"+str(tpr), end='')
+        llen = len(tpfpr[methodnames[0]])
+        for i in range(0, llen):
+            for name in methodnames:
+                for j in range(0, 2):
+                    print(str(tpfpr[name][i][j])+"\t", end="")
             print()
 
 
@@ -487,4 +497,4 @@ def gene_neighbor_info():
 
 
 if __name__ == "__main__":
-    evaluation_groundtruth()
+    evaluation_70benchmarkset(3)

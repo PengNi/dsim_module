@@ -72,7 +72,7 @@ def eva_groundtruth(sims, groundtruthfilepath, topn=5000):
     return topnpairs
 
 
-def eva_rocs(scoredicts):
+def eva_tprfprs(scoredicts):
     """
     transform scores and labels to tprs and fprs
     :param scoredicts: a list of dicts, one dict contains one result,
@@ -82,38 +82,55 @@ def eva_rocs(scoredicts):
     """
     ress = []
     for scoredict in scoredicts:
-        ress.append(eva_roc(scoredict))
+        ress.append(eva_tprfpr(eva_ranking(scoredict)))
     return ress
 
 
-def eva_roc(scoredict):
+def eva_ranking(scoredict):
     """
-    based on all kind of scores and label in scoredict, calculate the tpr and fpr
-    of each kind of score
+    based on scores and label in scoredict, ranking disease pairs in the purpose of
+    calculating tpr and fpr
     :param scoredict: dict: {disease1: {disease2:{method1: simvalue, method2: simvalue, ...,
     label: 0/1}, }, } (in this case, scoredict is from eva_70benchmarkpairs_onetime())
-    :return: dict, {method1: [(float1, float2), ], method2: [], } (float1 is fpr, float2 is tpr)
+    :return: a dict which each value is a sorted list based on a sort strategy,
+    {method1: [(disease1, disease2, simscore, label), ], method2: [], }
     """
     scorenlabel = {}
-    tpfp = {}
     d1 = list(scoredict.keys())[0]
     d2 = list(scoredict[d1].keys())[0]
     methodnames = set(scoredict[d1][d2].keys())
     methodnames.discard('label')
     for m in methodnames:
         scorenlabel[m] = []
-        tpfp[m] = []
 
     for d1 in scoredict.keys():
         for d2 in scoredict[d1].keys():
             for m in methodnames:
-                scorenlabel[m].append((scoredict[d1][d2][m], scoredict[d1][d2]['label']))
+                scorenlabel[m].append((d1, d2, scoredict[d1][d2][m], scoredict[d1][d2]['label']))
     for m in methodnames:
-        sltemp = sorted(scorenlabel[m], key=itemgetter(1))
-        sltemp = sorted(sltemp, key=itemgetter(0), reverse=True)
+        # sort strategy---------------------------------------------------------
+        scorenlabel[m] = sorted(scorenlabel[m], key=itemgetter(3))
+        scorenlabel[m] = sorted(scorenlabel[m], key=itemgetter(2), reverse=True)
+        # ----------------------------------------------------------------------
+    return scorenlabel
+
+
+def eva_tprfpr(scorenlabel):
+    """
+    based on all kind of scores and label in scoredict, calculate the tpr and fpr
+    of each kind of score
+    :param scorenlabel: a dict which each value is a sorted list based on a sort strategy,
+    {method1: [(disease1, disease2, simscore, label), ], method2: [], }
+    :return: dict, {method1: [(float1, float2), ], method2: [], } (float1 is fpr, float2 is tpr)
+    """
+    tpfp = {}
+    methodnames = set(scorenlabel.keys())
+    for m in methodnames:
+        tpfp[m] = []
+        sltemp = scorenlabel[m]
         slable = []
         for i in range(0, len(sltemp)):
-            slable.append(sltemp[i][1])
+            slable.append(sltemp[i][3])
         conditionp = sum(slable)
         conditionf = len(slable) - conditionp
         tp = 0
