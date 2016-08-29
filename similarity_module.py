@@ -67,7 +67,7 @@ def density(dgassos, graph):
     return ddensityscore
 
 
-def similarity_cal_module_1(dgassos, graph, gncutoff=0):
+def similarity_cal_module_1(dgassos, graph, gncutoff=1):
     """
     module cal method 1
     :param dgassos: a dict object which keys are module names and values are module
@@ -82,7 +82,7 @@ def similarity_cal_module_1(dgassos, graph, gncutoff=0):
     dgassos_new = {}
     for d in dgassos.keys():
         dgleft = gvs.intersection(dgassos[d])
-        if len(dgleft) > gncutoff:
+        if len(dgleft) >= gncutoff:
             dgassos_new[d] = dgleft
     diseases = list(dgassos_new.keys())
     print("there are {} diseases can be calculated.".format(len(diseases)))
@@ -117,7 +117,7 @@ def connected_count(graph, node, nodes):
     return count
 
 
-def similarity_cal_module_2(dgassos, graph, gncutoff=0):
+def similarity_cal_module_2(dgassos, graph, gncutoff=1):
     """
     module cal method 2
     :param dgassos: a dict object which keys are module names and values are module
@@ -132,7 +132,7 @@ def similarity_cal_module_2(dgassos, graph, gncutoff=0):
     dgassos_new = {}
     for d in dgassos.keys():
         dgleft = gvs.intersection(dgassos[d])
-        if len(dgleft) > gncutoff:
+        if len(dgleft) >= gncutoff:
             dgassos_new[d] = dgleft
     diseases = list(dgassos_new.keys())
     print("there are {} diseases can be calculated.".format(len(diseases)))
@@ -169,6 +169,161 @@ def similarity_cal_module_2(dgassos, graph, gncutoff=0):
 
 def transformed_distance(shortestpathdis=0, a=1, b=1):
     return a*math.exp(-b*shortestpathdis)
+
+
+def similarity_cal_module_3(dgassos, graph, gncutoff=1):
+    """
+    module cal method 3
+    :param dgassos: a dict object which keys are module names and values are module
+    nodes sets
+    :param graph: an igraph object
+    :param gncutoff: gene number cut off, only diseases whose number of associated
+    genes in graph is no less than gncutoff will be calculated
+    :return: a dict, (key-value: string-dict<string-float>)
+    """
+    gvs = set(graph.vs['name'])
+
+    dgassos_new = {}
+    for d in dgassos.keys():
+        dgleft = gvs.intersection(dgassos[d])
+        if len(dgleft) >= gncutoff:
+            dgassos_new[d] = dgleft
+    diseases = list(dgassos.keys())
+    print("there are {} diseases can be calculated.".format(len(diseases)))
+
+    sims = {}
+    for i in range(0, len(diseases)):
+        sims[diseases[i]] = {}
+        for j in range(i, len(diseases)):
+            gsi_ori = dgassos[diseases[i]]
+            gsj_ori = dgassos[diseases[j]]
+            gsintersect_ori = gsi_ori.intersection(gsj_ori)
+            conncount = 0
+            if diseases[i] in dgassos_new.keys() and diseases[j] in dgassos_new.keys():
+                gsi = dgassos_new[diseases[i]]
+                gsj = dgassos_new[diseases[j]]
+                gsintersect = gsi.intersection(gsj)
+                gsid = gsi.difference(gsj)
+                gsjd = gsj.difference(gsi)
+                if len(gsintersect) != 0:
+                    for g in gsid:
+                        conncount += connected_count(graph, g, gsintersect)
+                    for g in gsjd:
+                        conncount += connected_count(graph, g, gsintersect)
+                for g in gsid:
+                    conncount += connected_count(graph, g, gsjd)
+            sims[diseases[i]][diseases[j]] = (len(gsintersect_ori) ** 2 + conncount) / (len(gsi_ori) * len(gsj_ori))
+        print(i, "done..")
+    return sims
+
+
+def similarity_cal_module_4(dgassos, graph, gncutoff=1):
+    """
+    module cal method 1
+    :param dgassos: a dict object which keys are module names and values are module
+    nodes sets
+    :param graph: an igraph object
+    :param gncutoff: gene number cut off, only diseases whose number of associated
+    genes in graph is no less than gncutoff will be calculated
+    :return: a dict, (key-value: string-dict<string-float>)
+    """
+    gvs = set(graph.vs['name'])
+
+    dgassos_new = {}
+    for d in dgassos.keys():
+        dgleft = gvs.intersection(dgassos[d])
+        if len(dgleft) >= gncutoff:
+            dgassos_new[d] = dgleft
+    diseases = list(dgassos_new.keys())
+    print("there are {} diseases can be calculated.".format(len(diseases)))
+
+    allgenes = set()
+    for d in diseases:
+        allgenes |= dgassos_new[d]
+    sims = {}
+    for i in range(0, len(diseases)):
+        sims[diseases[i]] = {}
+        for j in range(i, len(diseases)):
+            gsi = dgassos_new[diseases[i]]
+            gsj = dgassos_new[diseases[j]]
+            gsintersect = gsi.intersection(gsj)
+            gsid = gsi.difference(gsj)
+            gsjd = gsj.difference(gsi)
+            conncount = 0
+            if len(gsintersect) != 0:
+                for g in gsid:
+                    conncount += connected_count(graph, g, gsintersect)
+                for g in gsjd:
+                    conncount += connected_count(graph, g, gsintersect)
+            for g in gsid:
+                conncount += connected_count(graph, g, gsjd)
+            avgic = (ic(len(gsi), len(allgenes)) + ic(len(gsj), len(allgenes)))/2
+            sims[diseases[i]][diseases[j]] = (len(gsintersect)**2+conncount)/(len(gsi)*len(gsj))*avgic
+        print(i, "done..")
+    return sims
+
+
+def ic(lowern, uppern):
+    return -math.log(lowern/uppern, 2)
+
+
+def similarity_cal_module_5(dgassos, graph, gncutoff=1):
+    """
+    module cal method 1
+    :param dgassos: a dict object which keys are module names and values are module
+    nodes sets
+    :param graph: an igraph object
+    :param gncutoff: gene number cut off, only diseases whose number of associated
+    genes in graph is no less than gncutoff will be calculated
+    :return: a dict, (key-value: string-dict<string-float>)
+    """
+    gvs = set(graph.vs['name'])
+
+    dgassos_new = {}
+    for d in dgassos.keys():
+        dgleft = gvs.intersection(dgassos[d])
+        if len(dgleft) >= gncutoff:
+            dgassos_new[d] = dgleft
+    diseases = list(dgassos_new.keys())
+    print("there are {} diseases can be calculated.".format(len(diseases)))
+
+    sims = {}
+    for i in range(0, len(diseases)-1):
+        sims[diseases[i]] = {}
+        for j in range(i+1, len(diseases)):
+            gsi = dgassos_new[diseases[i]]
+            gsj = dgassos_new[diseases[j]]
+            gsintersect = gsi.intersection(gsj)
+            gsid = gsi.difference(gsj)
+            gsjd = gsj.difference(gsi)
+            conncount = 0
+            if len(gsintersect) != 0:
+                for g in gsid:
+                    conncount += connected_count(graph, g, gsintersect)
+                for g in gsjd:
+                    conncount += connected_count(graph, g, gsintersect)
+            for g in gsid:
+                conncount += connected_count(graph, g, gsjd)
+            sim = (len(gsintersect)**2+conncount)/(len(gsi)*len(gsj))
+            sims[diseases[i]][diseases[j]] = sim
+            if diseases[j] not in sims.keys():
+                sims[diseases[j]] = {}
+            sims[diseases[j]][diseases[i]] = sim
+        print(i, "done..")
+    normsims = {}
+    maxsims = {}
+    for d in diseases:
+        maxsims[d] = max([i for i in sims[d].values()])
+    for i in range(0, len(diseases)-1):
+        normsims[diseases[i]] = {}
+        for j in range(i+1, len(diseases)):
+            avgmaxsim = (maxsims[diseases[i]] + maxsims[diseases[j]])/2
+            if avgmaxsim == 0:
+                normsims[diseases[i]][diseases[j]] = 0
+            else:
+                normsims[diseases[i]][diseases[j]] = sims[diseases[i]][diseases[j]]/avgmaxsim
+        print(i, "done...")
+    return normsims
 
 
 def diameter(dgassos, graph):

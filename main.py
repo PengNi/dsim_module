@@ -71,9 +71,11 @@ def evaluation_70benchmarkset(times=1):
     pathlist = [  # 'similarity_icod_umls_dcutoff006_triplet.tsv',
                 # 'similarity_suntopo_umls_dcutoff006_triplet.tsv',
                 'similarity_funsim_umls_dcutoff006.tsv',
-                # 'similarity_bog_umls_dcutoff006_triplet.tsv',
+                'similarity_bog_umls_dcutoff006_triplet.tsv',
                 'similarity_module1_umls_dcutoff006.tsv',
-                # 'similarity_module2_umls_dcutoff006.tsv'
+                'similarity_module3_umls_dcutoff006.tsv',
+                'similarity_module4_umls_dcutoff006.tsv',
+                'similarity_module5_umls_dcutoff006.tsv'
                 ]
 
     benchmarkpairs = read_assos("data/ground_truth_68_disease_pairs_umlsid.tsv")
@@ -275,8 +277,14 @@ def similarity_cal_module():
 
     # sims = similarity_module.similarity_cal_module_1(disease2gene_entrez, g)
     # write_sims(sims, "similarity_module1_umls_dcutoff006.tsv")
-    sims = similarity_module.similarity_cal_module_2(disease2gene_entrez, g)
-    write_sims(sims, "similarity_module2_umls_dcutoff006.tsv")
+    # sims = similarity_module.similarity_cal_module_2(disease2gene_entrez, g)
+    # write_sims(sims, "similarity_module2_umls_dcutoff006.tsv")
+    # sims = similarity_module.similarity_cal_module_3(disease2gene_entrez, g)
+    # write_sims(sims, "similarity_module3_umls_dcutoff006.tsv")
+    # sims = similarity_module.similarity_cal_module_4(disease2gene_entrez, g)
+    # write_sims(sims, "similarity_module4_umls_dcutoff006.tsv")
+    sims = similarity_module.similarity_cal_module_5(disease2gene_entrez, g)
+    write_sims(sims, "similarity_module5_umls_dcutoff006.tsv")
 
 
 def do2umls_mapping():
