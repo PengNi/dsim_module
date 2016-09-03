@@ -374,6 +374,27 @@ ROC曲线。
 个人倾向于用(2)
 #------------------------------------------------------------------------
 
+#------------------------------------------------------------------------
+11. 关于hamaneh文章
+Reference: Hamaneh M B, Yu Y K. Relating diseases by integrating gene associations and 
+information flow through protein interaction network[J]. PloS one, 2014, 9(10): e110936.
+这篇文章计算疾病之间的关系,需要注意：
+(1) 只计算了最底层的疾病（CTD/MeSH目录结构）
+(2) 只计算了在它的disease-protein network中存在于最大连通分支中的疾病
+(3) 在disease-protein network中，点是disease或protein。input_graph.pkl解析出来的数据里，
+有部分点的自环（或者说邻接矩阵里的对角线上）的值/权重为4.0，而对角线上的其余值为0.0。
+    猜测（没有经过严谨的验证）：权重为4.0的自环为蛋白质网络里确实存在的自相互作用。
+#------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
 
 
 

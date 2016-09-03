@@ -70,12 +70,13 @@ def evaluation_groundtruth():
 def evaluation_70benchmarkset(times=1):
     pathlist = [  # 'similarity_icod_umls_dcutoff006_triplet.tsv',
                 # 'similarity_suntopo_umls_dcutoff006_triplet.tsv',
-                'similarity_funsim_umls_dcutoff006.tsv',
+                # 'similarity_funsim_umls_dcutoff006.tsv',
                 'similarity_bog_umls_dcutoff006_triplet.tsv',
-                'similarity_module1_umls_dcutoff006.tsv',
-                'similarity_module3_umls_dcutoff006.tsv',
-                'similarity_module4_umls_dcutoff006.tsv',
-                'similarity_module5_umls_dcutoff006.tsv'
+                'similarity_bognew_umls_dcutoff006_triplet.tsv'
+                # 'similarity_module1_umls_dcutoff006.tsv',
+                # 'similarity_module3_umls_dcutoff006.tsv',
+                # 'similarity_module4_umls_dcutoff006.tsv',
+                # 'similarity_module5_umls_dcutoff006.tsv'
                 ]
 
     benchmarkpairs = read_assos("data/ground_truth_68_disease_pairs_umlsid.tsv")
@@ -503,6 +504,88 @@ def gene_neighbor_info():
         lennondn = len(nei) - len(dn)
         print(gene + "\t" + str(len(nei)) + "\t" + str(len(dn)) + "\t" + str(lennondn))
 
+
+def disease_gene_network_hamaneh():
+    g = similarity_module.read_interactome("data/DataS1_interactome.tsv", False, False)
+    print("number of vertices:", g.vcount())
+    gvs = set(g.vs['name'])
+
+    disease2gene_entrez = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
+                                                             0.06, True, True)
+    print("disease gene assos: ", end='')
+    stat_assos(disease2gene_entrez)
+
+    dgassos_new = {}
+    for d in disease2gene_entrez.keys():
+        dgleft = gvs.intersection(disease2gene_entrez[d])
+        if len(dgleft) >= 1:
+            dgassos_new[d] = dgleft
+    print("disease gene assos left: ", end='')
+    stat_assos(dgassos_new)
+
+    selfloop = set()
+    with open("data/hamaneh_dgnetwrok_umlscutoff006_interactomewithselfloop", mode='w') as f:
+        for e in g.es:
+            ns = g.vs[e.source]['name']
+            nt = g.vs[e.target]['name']
+            if ns == nt:
+                f.write(ns+'\t'+nt+'\t4.0\n')
+                selfloop.add(ns)
+            else:
+                f.write(ns+'\t'+nt+"\t1.0\n")
+                f.write(nt+'\t'+ns+'\t1.0\n')
+        for g in gvs:
+            if g not in selfloop:
+                f.write(g+'\t'+g+'\t0.0\n')
+        for d in dgassos_new.keys():
+            f.write(d+'\t'+d+'\t0.0\n')
+            for g in dgassos_new[d]:
+                f.write(d+'\t'+g+'\t1.0\n')
+                f.write(g + '\t' + d + '\t1.0\n')
+    with open("data/hamaneh_dgnetwork_nodes", mode='w') as f:
+        for g in gvs:
+            f.write(g+'\n')
+        for d in dgassos_new.keys():
+            f.write(d+'\n')
+
+
+def check_dgnetwork():
+    samec = 0
+    diffd = {}
+    with open("data/graph_edges.txt", mode='r') as f:
+        for line in f:
+            words = line.strip().split("\t")
+            if words[0] == words[1]:
+                samec += 1
+                if not (words[2] == "4.0" or words[2] == "0.0"):
+                    print(line, end='')
+            else:
+                if words[2] != "1.0":
+                    print(line, end='')
+                if not (words[1] in diffd.keys() and words[0] in diffd[words[1]]):
+                    if words[0] not in diffd.keys():
+                        diffd[words[0]] = set()
+                    diffd[words[0]].add(words[1])
+    print("self loops:", samec)
+    stat_assos(diffd)
+
+
+def get_disease_correlations_hamaneh():
+    disease_included = set(read_one_col("data/hamaneh_included_diseases", 1))
+    print(type(disease_included), len(disease_included))
+    disease_cors = read_sims("data/hamaneh_correlations", True, '\t', 1, 2, 3)
+    stat_sims(disease_cors)
+
+    newdisease_cors = {}
+    for d1 in disease_cors.keys():
+        if d1 in disease_included:
+            for d2 in disease_cors[d1].keys():
+                if d2 in disease_included:
+                    if ('umls:'+d1) not in newdisease_cors.keys():
+                        newdisease_cors['umls:'+d1] = {}
+                    newdisease_cors['umls:'+d1]['umls:'+d2] = disease_cors[d1][d2]
+    stat_sims(newdisease_cors)
+    write_sims(newdisease_cors, "similarity_hamaneh_interactomenumls_dgcuff006.tsv")
 
 if __name__ == "__main__":
     evaluation_70benchmarkset(3)
