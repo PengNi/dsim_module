@@ -1,3 +1,4 @@
+#--------------------------------------------------------------------------------
 1. disease到gene的映射问题
 比如disease A有30个gene(entrezid)， entrezid mapping symbol之后有25个gene(symbol),
 而这25个gene里只有20个注释了GO
@@ -386,9 +387,23 @@ information flow through protein interaction network[J]. PloS one, 2014, 9(10): 
     猜测（没有经过严谨的验证）：权重为4.0的自环为蛋白质网络里确实存在的自相互作用。
 #------------------------------------------------------------------------
 
-
-
-
+#------------------------------------------------------------------------
+12. disease-gene assos 过滤问题
+(1) 当用到基因网络的时候，到底用不用基因网络里的基因过滤疾病基因关系？
+    比如说disgenetd的all_gene_disease_associations.tsv在score取cutoff (0.06) 之后，
+    疾病基因关系统计为diseases: 7887 genes: 9696 associations: 41261;
+    如果用基因网络 (DataS1_interactome_rmslpe.tsv, 13397 vertices) 的点过滤，关系就变为
+    diseases: 6643 genes: 6761 associations: 36133.
+    那么，当计算疾病相似性用到基因网络时，疾病基因关系到底用不用过滤？
+个人倾向于过滤，尤其是当用两两基因相似性值（或其他量化基因与基因关系的值）的平均值计算疾病
+关系时。
+(2) 此问题可延伸到其他生物数据，比如说用GO或co-exp算疾病关系时。(参考问题1)
+下面文章里的方法没有过滤：
+1. Cheng L, Li J, Ju P, et al. SemFunSim: a new method for measuring disease similarity by
+integrating semantic and gene functional association[J]. PloS one, 2014, 9(6): e99415.
+2. Li P, Nie Y, Yu J. Fusing literature and full network data improves disease similarity
+computation[J]. BMC bioinformatics, 2016, 17(1): 326.
+#-------------------------------------------------------------------------
 
 
 

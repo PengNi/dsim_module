@@ -29,21 +29,23 @@ from evaluation import eva_70benchmarkpairs
 from evaluation import eva_ranking
 from evaluation import eva_tprfprs
 from evaluation import eva_groundtruth
-
+import experiments
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
 
 
 def evaluation_groundtruth():
-    pathlist = ['similarity_icod_umls_dcutoff006_triplet.tsv',
-                'similarity_suntopo_umls_dcutoff006_triplet.tsv',
-                'similarity_funsim_umls_dcutoff006.tsv',
-                'similarity_bog_umls_dcutoff006_triplet.tsv',
-                'similarity_module1_umls_dcutoff006.tsv',
-                'similarity_module2_umls_dcutoff006.tsv']
-    gtpathlist = ['similarity_go_bp_umls_dcutoff006.tsv',
-                  'similarity_go_cc_umls_dcutoff006.tsv',
-                  'similarity_go_mf_umls_dcutoff006.tsv',
+    pathlist = ['similarity_icod_umls_dgcutoff006_triplet.tsv',
+                'similarity_suntopo_umls_dgcutoff006_triplet.tsv',
+                'similarity_funsim_umls_dgcutoff006.tsv',
+                'similarity_bog_umls_dgcutoff006_triplet.tsv',
+                'similarity_hamaneh_interactomenumls_dgcuff006.tsv',
+                # 'similarity_module1_umls_dgcutoff006.tsv',
+                'similarity_module1_umls_dgcutoff006.tsv'
+                ]
+    gtpathlist = ['similarity_go_bp_umls_dgcutoff006.tsv',
+                  'similarity_go_cc_umls_dgcutoff006.tsv',
+                  'similarity_go_mf_umls_dgcutoff006.tsv',
                   'similarity_coexp_umls_dgcutoff006.tsv',
                   'similarity_symptom_1445umlsid.tsv',
                   'similarity_symptom_1736umlsid.tsv']
@@ -68,15 +70,15 @@ def evaluation_groundtruth():
 
 
 def evaluation_70benchmarkset(times=1):
-    pathlist = [  # 'similarity_icod_umls_dcutoff006_triplet.tsv',
-                # 'similarity_suntopo_umls_dcutoff006_triplet.tsv',
-                # 'similarity_funsim_umls_dcutoff006.tsv',
-                'similarity_bog_umls_dcutoff006_triplet.tsv',
-                'similarity_bognew_umls_dcutoff006_triplet.tsv'
-                # 'similarity_module1_umls_dcutoff006.tsv',
-                # 'similarity_module3_umls_dcutoff006.tsv',
-                # 'similarity_module4_umls_dcutoff006.tsv',
-                # 'similarity_module5_umls_dcutoff006.tsv'
+    pathlist = ['similarity_icod_umls_dgcutoff006_triplet.tsv',
+                'similarity_suntopo_umls_dgcutoff006_triplet.tsv',
+                'similarity_funsim_umls_dgcutoff006.tsv',
+                'similarity_bognew_umls_dgcutoff006_triplet.tsv',
+                'similarity_hamaneh_interactomenumls_dgcuff006.tsv',
+                # 'similarity_module1_umls_dgcutoff006.tsv',
+                # 'similarity_module3_umls_dgcutoff006.tsv',
+                # 'similarity_module4_umls_dgcutoff006.tsv',
+                'similarity_module5_umls_dgcutoff006.tsv'
                 ]
 
     benchmarkpairs = read_assos("data/ground_truth_68_disease_pairs_umlsid.tsv")
@@ -549,27 +551,6 @@ def disease_gene_network_hamaneh():
             f.write(d+'\n')
 
 
-def check_dgnetwork():
-    samec = 0
-    diffd = {}
-    with open("data/graph_edges.txt", mode='r') as f:
-        for line in f:
-            words = line.strip().split("\t")
-            if words[0] == words[1]:
-                samec += 1
-                if not (words[2] == "4.0" or words[2] == "0.0"):
-                    print(line, end='')
-            else:
-                if words[2] != "1.0":
-                    print(line, end='')
-                if not (words[1] in diffd.keys() and words[0] in diffd[words[1]]):
-                    if words[0] not in diffd.keys():
-                        diffd[words[0]] = set()
-                    diffd[words[0]].add(words[1])
-    print("self loops:", samec)
-    stat_assos(diffd)
-
-
 def get_disease_correlations_hamaneh():
     disease_included = set(read_one_col("data/hamaneh_included_diseases", 1))
     print(type(disease_included), len(disease_included))
@@ -587,5 +568,36 @@ def get_disease_correlations_hamaneh():
     stat_sims(newdisease_cors)
     write_sims(newdisease_cors, "similarity_hamaneh_interactomenumls_dgcuff006.tsv")
 
+
+def get_rwr_input():
+    g = similarity_module.read_interactome("data/DataS1_interactome_rmslpe.tsv", False, False)
+    print("number of vertices:", g.vcount())
+    gvs = set(g.vs['name'])
+
+    disease2gene_entrez = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
+                                                             0.06, True, True)
+    print("disease gene assos: ", end='')
+    stat_assos(disease2gene_entrez)
+
+    dgassos_new = {}
+    for d in disease2gene_entrez.keys():
+        dgleft = gvs.intersection(disease2gene_entrez[d])
+        if len(dgleft) >= 1:
+            dgassos_new[d] = dgleft
+    print("disease gene assos left: ", end='')
+    stat_assos(dgassos_new)
+
+
+def experiment():
+    disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
+                                                             0.06, True, True)
+    # ---graphlet-------------------------------------------------------
+    gene2sig = experiments.read_gene_signature("data/test/graphlet_interactome_maxcc.tsv")
+    sim_gene2gene = experiments.sim_gene2gene_graphlet(gene2sig)
+    sim_d2d = experiments.sim_geneset2geneset(disease2gene_entrez, sim_gene2gene)
+    write_sims(sim_d2d, "outputs/similarity_experiments_graphlet_umls_dgcutoff006.tsv")
+    # ------------------------------------------------------------------
+
+
 if __name__ == "__main__":
-    evaluation_70benchmarkset(3)
+    experiment()
