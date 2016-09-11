@@ -70,18 +70,22 @@ def evaluation_groundtruth():
 
 
 def evaluation_70benchmarkset(times=1):
-    pathlist = ['similarity_icod_umls_dgcutoff006_triplet.tsv',
-                'similarity_suntopo_umls_dgcutoff006_triplet.tsv',
-                'similarity_funsim_umls_dgcutoff006.tsv',
-                'similarity_bognew_umls_dgcutoff006_triplet.tsv',
-                'similarity_hamaneh_interactomenumls_dgcuff006.tsv',
-                # 'similarity_module1_umls_dgcutoff006.tsv',
-                # 'similarity_module3_umls_dgcutoff006.tsv',
-                # 'similarity_module4_umls_dgcutoff006.tsv',
-                'similarity_module5_umls_dgcutoff006.tsv'
+    pathlist = [  # 'outputs/similarity_icod_umls_dgcutoff006_triplet.tsv',
+                # 'outputs/similarity_suntopo_umls_dgcutoff006_triplet.tsv',
+                'outputs/similarity_funsim_umls_dgcutoff006.tsv',
+                # 'outputs/similarity_bognew_umls_dgcutoff006_triplet.tsv',
+                # 'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
+                # 'outputs/similarity_module1_umls_dgcutoff006.tsv',
+                # 'outputs/similarity_module3_umls_dgcutoff006.tsv',
+                # 'outputs/similarity_module4_umls_dgcutoff006.tsv',
+                'outputs/similarity_experiments_graphlet_umls_dgcutoff006.tsv',
+                'outputs/similarity_experiments_rwrzrq_umls_dgcutoff006.tsv',
+                'outputs/similarity_experiments_shortestpath_divide_umls_dgcutoff006.tsv',
+                'outputs/similarity_experiments_shortestpath_transformed_umls_dgcutoff006.tsv',
+                'outputs/similarity_module5_umls_dgcutoff006.tsv'
                 ]
 
-    benchmarkpairs = read_assos("data/ground_truth_68_disease_pairs_umlsid.tsv")
+    benchmarkpairs = read_assos("data/benchmarkset_funsim/ground_truth_68_disease_pairs_umlsid.tsv")
     stat_assos(benchmarkpairs)
     bmptuple = []
     for p in benchmarkpairs.keys():
@@ -591,13 +595,30 @@ def get_rwr_input():
 def experiment():
     disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
                                                              0.06, True, True)
-    # ---graphlet-------------------------------------------------------
-    gene2sig = experiments.read_gene_signature("data/test/graphlet_interactome_maxcc.tsv")
-    sim_gene2gene = experiments.sim_gene2gene_graphlet(gene2sig)
-    sim_d2d = experiments.sim_geneset2geneset(disease2gene_entrez, sim_gene2gene)
-    write_sims(sim_d2d, "outputs/similarity_experiments_graphlet_umls_dgcutoff006.tsv")
-    # ------------------------------------------------------------------
+    # # ---graphlet-------------------------------------------------------
+    # gene2sig = experiments.read_gene_signature("data/test/graphlet_interactome_maxcc.tsv")
+    # sim_gene2gene = experiments.sim_gene2gene_graphlet(gene2sig)
+    # sim_d2d = experiments.sim_geneset2geneset(disease2gene_entrez, sim_gene2gene)
+    # write_sims(sim_d2d, "outputs/similarity_experiments_graphlet_umls_dgcutoff006.tsv")
+    # # ------------------------------------------------------------------
+
+    # # ---bmc rwr------------------------------------------------------------
+    # sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2gene_score.tsv")
+    # sim_d2d = experiments.sim_geneset2geneset_rwr(disease2gene_entrez, sim_gene2geneset)
+    # write_sims(sim_d2d, "outputs/similarity_experiments_rwrzrq_umls_dgcutoff006.tsv")
+    # # ----------------------------------------------------------------------
+
+    # ---shortest path------------------------------------------------------
+    g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome_rmslpe.tsv", False, False)
+    print("number of vertices:", g.vcount())
+    sps_norm = experiments.sim_gene2gene_shortestpath(g)
+    sim_d2d = experiments.sim_geneset2geneset(disease2gene_entrez, sps_norm)
+    write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_transformed_umls_dgcutoff006.tsv")
+    sps_normdivide = experiments.sim_gene2gene_shortestpath(g, False)
+    sim_d2d = experiments.sim_geneset2geneset(disease2gene_entrez, sps_normdivide)
+    write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_divide_umls_dgcutoff006.tsv")
+    # ----------------------------------------------------------------------
 
 
 if __name__ == "__main__":
-    experiment()
+    evaluation_70benchmarkset(3)

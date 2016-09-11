@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 import math
 import time
+from files import stat_sims
 
 graphlet_weight = [1, 0.838444532557004, 0.838444532557004, 0.838444532557004, 0.743940642316373, 0.676889065114007,
                    0.743940642316373, 0.743940642316373, 0.676889065114007, 0.743940642316373, 0.676889065114007,
@@ -17,6 +18,29 @@ graphlet_weight = [1, 0.838444532557004, 0.838444532557004, 0.838444532557004, 0
                    0.582385174873377, 0.582385174873377, 0.515333597671011, 0.546456463288587, 0.582385174873377,
                    0.546456463288587, 0.546456463288587, 0.515333597671011, 0.624879821261446, 0.582385174873377,
                    0.582385174873377, 0.676889065114007]
+
+
+def sim_gene2gene_shortestpath(graph, transformdistance=True):
+    nodenames = graph.vs['name']
+    sps = graph.shortest_paths(source=nodenames, target=nodenames, weights=None, mode=3)
+    result = {}
+    for n in nodenames:
+        result[n] = {}
+    if transformdistance is True:
+        for i in range(0, len(nodenames)):
+            for j in range(i, len(nodenames)):
+                result[nodenames[i]][nodenames[j]] = transformed_distance(sps[i][j])
+                result[nodenames[j]][nodenames[i]] = result[nodenames[i]][nodenames[j]]
+    else:
+        for i in range(0, len(nodenames)):
+            for j in range(i, len(nodenames)):
+                result[nodenames[i]][nodenames[j]] = 1 / (sps[i][j] + 1)
+                result[nodenames[j]][nodenames[i]] = result[nodenames[i]][nodenames[j]]
+    return result
+
+
+def transformed_distance(shortestpathdis=0, a=1, b=1):
+    return a*math.exp(-b*shortestpathdis)
 
 
 def read_gene_signature(filepath):
@@ -56,8 +80,32 @@ def sim_geneset2gene_max(g, gset, sim_gene2gene):
     return result
 
 
-def sim_geneset2geneset_rwr(d2g, sim_geneset2gene):
-    pass
+def sim_geneset2gene_rwr(g, d, d2g, sim_gene2geneset):
+    if g in sim_gene2geneset.keys() and d in sim_gene2geneset[g].keys():
+        return sim_gene2geneset[g][d]
+    elif d in sim_gene2geneset.keys() and g in sim_gene2geneset[d].keys():
+        return sim_gene2geneset[d][g]
+    elif g in d2g[d]:
+        return 1.0
+    else:
+        return 0.0
+
+
+def sim_geneset2geneset_rwr(d2g, sim_gene2geneset):
+    stat_sims(sim_gene2geneset)
+    ds = list(d2g.keys())
+    result = {}
+    for i in range(0, len(ds)):
+        result[ds[i]] = {}
+        for j in range(i, len(ds)):
+            simsum = 0.0
+            for m in d2g[ds[i]]:
+                simsum += sim_geneset2gene_rwr(m, ds[j], d2g, sim_gene2geneset)
+            for m in d2g[ds[j]]:
+                simsum += sim_geneset2gene_rwr(m, ds[i], d2g, sim_gene2geneset)
+            result[ds[i]][ds[j]] = simsum / (len(d2g[ds[i]]) + len(d2g[ds[j]]))
+        print("sim_geneset2geneset():", i, "dg len:", len(d2g[ds[i]]), "done..")
+    return result
 
 
 def sim_geneset2geneset(d2g, sim_gene2gene):

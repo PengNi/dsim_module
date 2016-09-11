@@ -306,7 +306,7 @@ def stat_sims(sims):
     :return: None
     """
     nkeys = len(sims)
-    entities = set(sims.keys())
+    entities = set()
     assos = 0
     for p in sims.keys():
         for q in sims[p].keys():
