@@ -28,6 +28,7 @@ from evaluation import eva_readsims
 from evaluation import eva_70benchmarkpairs
 from evaluation import eva_ranking
 from evaluation import eva_tprfprs
+from evaluation import eva_aucs
 from evaluation import eva_groundtruth
 import experiments
 
@@ -35,53 +36,82 @@ namespaces = ("biological_process", "molecular_function", "cellular_component")
 
 
 def evaluation_groundtruth():
-    pathlist = ['similarity_icod_umls_dgcutoff006_triplet.tsv',
-                'similarity_suntopo_umls_dgcutoff006_triplet.tsv',
-                'similarity_funsim_umls_dgcutoff006.tsv',
-                'similarity_bog_umls_dgcutoff006_triplet.tsv',
-                'similarity_hamaneh_interactomenumls_dgcuff006.tsv',
-                # 'similarity_module1_umls_dgcutoff006.tsv',
-                'similarity_module1_umls_dgcutoff006.tsv'
+    pathlist = ['outputs/similarity_icod_umls_dgcutoff006_triplet.tsv',
+                'outputs/similarity_suntopo_umls_dgcutoff006_triplet.tsv',
+                'outputs/similarity_funsim_umls_dgcutoff006.tsv',
+                'outputs/similarity_bognew_umls_dgcutoff006_triplet.tsv',
+                'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
+                'outputs/similarity_experiments_shortestpath_transformed_less_umls_dgcutoff006.tsv',
+                'outputs/similarity_experiments_rwrzrq_umls_dgcutoff006.tsv',
+                # 'outputs/similarity_module1_umls_dgcutoff006.tsv',
+                'outputs/similarity_module5_umls_dgcutoff006.tsv'
                 ]
-    gtpathlist = ['similarity_go_bp_umls_dgcutoff006.tsv',
-                  'similarity_go_cc_umls_dgcutoff006.tsv',
-                  'similarity_go_mf_umls_dgcutoff006.tsv',
-                  'similarity_coexp_umls_dgcutoff006.tsv',
-                  'similarity_symptom_1445umlsid.tsv',
-                  'similarity_symptom_1736umlsid.tsv']
+    gtpathlist = ['outputs/similarity_go_bp_umls_dgcutoff006.tsv',
+                  'outputs/similarity_go_cc_umls_dgcutoff006.tsv',
+                  'outputs/similarity_go_mf_umls_dgcutoff006.tsv',
+                  'outputs/similarity_coexp_umls_dgcutoff006.tsv',
+                  'outputs/similarity_symptom_1445umlsid.tsv',
+                  'outputs/similarity_symptom_1736umlsid.tsv']
 
     msims = eva_readsims(pathlist)
 
-    n = 1000000
-    for g in [0, 4]:
-        evagtres = eva_groundtruth(msims, gtpathlist[g], topn=n)
+    for g in [0, 1, 2, 3, 4]:
+        evagtres = eva_groundtruth(msims, gtpathlist[g])
         print(gtpathlist[g]+"----------------------------")
         mnames = list(evagtres.keys())
-        for mn in mnames:
-            print(mn+"\t\t\t\t", end='')
+        sumtemp = {}
+        for i in range(0, len(mnames)):
+            if i == 0:
+                print("rank"+"\t"+mnames[i], end='')
+            else:
+                print("\t"+mnames[i], end='')
+            sumtemp[mnames[i]] = 0.0
         print()
-        for i in range(0, n):
-            if len(evagtres[mnames[0]]) > i:
+
+        section = []
+        for i in range(0, 10):
+            section.append(10**i)
+        printpoints = []
+        for i in range(0, len(section)-1):
+            if section[i] < 100:
+                istep = section[i]
+            else:
+                istep = 100
+            for j in range(section[i], section[i+1], istep):
+                printpoints.append(j)
+
+        index = 0
+        for i in range(0, len(evagtres[mnames[0]])):
+            for mn in mnames:
+                sumtemp[mn] += evagtres[mn][i][3]
+            if i+1 == printpoints[index]:
+                index += 1
+                print(i+1, end='')
                 for mn in mnames:
-                    tupletemp = evagtres[mn][i]
-                    for x in tupletemp:
-                        print(str(x)+"\t", end='')
+                    print("\t" + str(sumtemp[mn]), end='')
+                print()
+            elif i == len(evagtres[mnames[0]])-1:
+                print(i+1, end='')
+                for mn in mnames:
+                    print("\t" + str(sumtemp[mn]), end='')
                 print()
 
 
 def evaluation_70benchmarkset(times=1):
-    pathlist = [  # 'outputs/similarity_icod_umls_dgcutoff006_triplet.tsv',
-                # 'outputs/similarity_suntopo_umls_dgcutoff006_triplet.tsv',
+    pathlist = ['outputs/similarity_icod_umls_dgcutoff006_triplet.tsv',
+                'outputs/similarity_suntopo_umls_dgcutoff006_triplet.tsv',
                 'outputs/similarity_funsim_umls_dgcutoff006.tsv',
-                # 'outputs/similarity_bognew_umls_dgcutoff006_triplet.tsv',
-                # 'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
+                'outputs/similarity_bognew_umls_dgcutoff006_triplet.tsv',
+                'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
                 # 'outputs/similarity_module1_umls_dgcutoff006.tsv',
                 # 'outputs/similarity_module3_umls_dgcutoff006.tsv',
                 # 'outputs/similarity_module4_umls_dgcutoff006.tsv',
-                'outputs/similarity_experiments_graphlet_umls_dgcutoff006.tsv',
+                # 'outputs/similarity_experiments_graphlet_umls_dgcutoff006.tsv',
+                # 'outputs/similarity_experiments_graphlet_less_umls_dgcutoff006.tsv',
                 'outputs/similarity_experiments_rwrzrq_umls_dgcutoff006.tsv',
-                'outputs/similarity_experiments_shortestpath_divide_umls_dgcutoff006.tsv',
-                'outputs/similarity_experiments_shortestpath_transformed_umls_dgcutoff006.tsv',
+                # 'outputs/similarity_experiments_shortestpath_divide_umls_dgcutoff006.tsv',
+                # 'outputs/similarity_experiments_shortestpath_transformed_umls_dgcutoff006.tsv',
+                'outputs/similarity_experiments_shortestpath_transformed_less_umls_dgcutoff006.tsv',
                 'outputs/similarity_module5_umls_dgcutoff006.tsv'
                 ]
 
@@ -94,47 +124,68 @@ def evaluation_70benchmarkset(times=1):
     msims = eva_readsims(pathlist)
     evaress = eva_70benchmarkpairs(msims, bmptuple, times)
     print("------------scores and lable---------------------------------------------------")
+    t = 0
     for er in evaress:
-        print("-----------------time------------------------------------------------------")
-        d1 = list(er.keys())[0]
-        d2 = list(er[d1].keys())[0]
-        methodnames = list(er[d1][d2].keys())
-        methodnames.remove('label')
-        print("d1\td2\tlabel", end='')
-        for m in methodnames:
-            print("\t"+m, end='')
-        print()
-        for d1 in er.keys():
-            for d2 in er[d1].keys():
-                print(d1+'\t'+d2+'\t' + str(er[d1][d2]['label']), end='')
-                for m in methodnames:
-                    print("\t"+str(er[d1][d2][m]), end='')
-                print()
-    print("-ranking disease pairs---------------------------------------------------------")
-    for er in evaress:
-        print("---------------time--------------------------------------------------------")
-        ranktemp = eva_ranking(er)
-        ms = list(ranktemp.keys())
-        for m in ms:
-            print(m+"\t\t\t", end="")
-        print()
-        llen = len(ranktemp[ms[0]])
-        for i in range(0, llen):
-            for m in ms:
-                for j in range(0, 4):
-                    print(str(ranktemp[m][i][j])+"\t", end="")
+        if t < 3:
+            t += 1
+            print("-----------------time------------------------------------------------------")
+            d1 = list(er.keys())[0]
+            d2 = list(er[d1].keys())[0]
+            methodnames = list(er[d1][d2].keys())
+            methodnames.remove('label')
+            print("d1\td2\tlabel", end='')
+            for m in methodnames:
+                print("\t"+m, end='')
             print()
+            for d1 in er.keys():
+                for d2 in er[d1].keys():
+                    print(d1+'\t'+d2+'\t' + str(er[d1][d2]['label']), end='')
+                    for m in methodnames:
+                        print("\t"+str(er[d1][d2][m]), end='')
+                    print()
+    print("-ranking disease pairs---------------------------------------------------------")
+    t = 0
+    for er in evaress:
+        if t < 3:
+            t += 1
+            print("---------------time--------------------------------------------------------")
+            ranktemp = eva_ranking(er)
+            ms = list(ranktemp.keys())
+            for m in ms:
+                print(m+"\t\t\t", end="")
+            print()
+            llen = len(ranktemp[ms[0]])
+            for i in range(0, llen):
+                for m in ms:
+                    for j in range(0, 4):
+                        print(str(ranktemp[m][i][j])+"\t", end="")
+                print()
     print("-tpr--fpr----------------------------------------------------------------------")
     tpfprs = eva_tprfprs(evaress)
+    t = 0
     for tpfpr in tpfprs:
-        print("-----------------time------------------------------------------------------")
-        methodnames = list(tpfpr.keys())
-        llen = len(tpfpr[methodnames[0]])
-        for i in range(0, llen):
-            for name in methodnames:
-                for j in range(0, 2):
-                    print(str(tpfpr[name][i][j])+"\t", end="")
+        if t < 3:
+            t += 1
+            print("-----------------time------------------------------------------------------")
+            methodnames = list(tpfpr.keys())
+            for m in methodnames:
+                print(m+"_fpr\t"+m+"_tpr\t", end='')
             print()
+            llen = len(tpfpr[methodnames[0]])
+            for i in range(0, llen):
+                for name in methodnames:
+                    for j in range(0, 2):
+                        print(str(tpfpr[name][i][j])+"\t", end="")
+                print()
+    print("---avg auc values------------------------------------------------------------------")
+    aucs = eva_aucs(tpfprs)
+    auclen = len(aucs)
+    mns = list(aucs[0].keys())
+    for mn in mns:
+        avgauc = 0.0
+        for auc in aucs:
+            avgauc += auc[mn]
+        print(mn+"\t"+str(avgauc / auclen))
 
 
 def similarity_cal_go():
@@ -593,13 +644,33 @@ def get_rwr_input():
 
 
 def experiment():
+    g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome_rmslpe.tsv", False, False)
+    print("number of vertices:", g.vcount())
+    gvs = set(g.vs['name'])
     disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
                                                              0.06, True, True)
+    stat_assos(disease2gene_entrez)
+    dgassos_new = {}
+    for d in disease2gene_entrez.keys():
+        dgleft = gvs.intersection(disease2gene_entrez[d])
+        if len(dgleft) >= 1:
+            dgassos_new[d] = dgleft
+    print("disease gene assos left: ", end='')
+    stat_assos(dgassos_new)
+
     # # ---graphlet-------------------------------------------------------
-    # gene2sig = experiments.read_gene_signature("data/test/graphlet_interactome_maxcc.tsv")
-    # sim_gene2gene = experiments.sim_gene2gene_graphlet(gene2sig)
-    # sim_d2d = experiments.sim_geneset2geneset(disease2gene_entrez, sim_gene2gene)
-    # write_sims(sim_d2d, "outputs/similarity_experiments_graphlet_umls_dgcutoff006.tsv")
+    gene2sig = experiments.read_gene_signature("data/test/graphlet_interactome_maxcc.tsv")
+    calgenes = set(gene2sig.keys())
+    dgassos_graphlet = {}
+    for d in disease2gene_entrez.keys():
+        dgleft = calgenes.intersection(disease2gene_entrez[d])
+        if len(dgleft) >= 1:
+            dgassos_graphlet[d] = dgleft
+    print("disease gene assos left graphlet: ", end='')
+    stat_assos(dgassos_graphlet)
+    sim_gene2gene = experiments.sim_gene2gene_graphlet(gene2sig)
+    sim_d2d = experiments.sim_geneset2geneset(dgassos_graphlet, sim_gene2gene)
+    write_sims(sim_d2d, "outputs/similarity_experiments_graphlet_less_umls_dgcutoff006.tsv")
     # # ------------------------------------------------------------------
 
     # # ---bmc rwr------------------------------------------------------------
@@ -609,16 +680,14 @@ def experiment():
     # # ----------------------------------------------------------------------
 
     # ---shortest path------------------------------------------------------
-    g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome_rmslpe.tsv", False, False)
-    print("number of vertices:", g.vcount())
     sps_norm = experiments.sim_gene2gene_shortestpath(g)
-    sim_d2d = experiments.sim_geneset2geneset(disease2gene_entrez, sps_norm)
-    write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_transformed_umls_dgcutoff006.tsv")
-    sps_normdivide = experiments.sim_gene2gene_shortestpath(g, False)
-    sim_d2d = experiments.sim_geneset2geneset(disease2gene_entrez, sps_normdivide)
-    write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_divide_umls_dgcutoff006.tsv")
+    sim_d2d = experiments.sim_geneset2geneset(dgassos_new, sps_norm)
+    write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_transformed_less_umls_dgcutoff006.tsv")
+    # sps_normdivide = experiments.sim_gene2gene_shortestpath(g, False)
+    # sim_d2d = experiments.sim_geneset2geneset(disease2gene_entrez, sps_normdivide)
+    # write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_divide_umls_dgcutoff006.tsv")
     # ----------------------------------------------------------------------
 
 
 if __name__ == "__main__":
-    evaluation_70benchmarkset(3)
+    evaluation_70benchmarkset(100)

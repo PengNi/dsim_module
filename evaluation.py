@@ -21,15 +21,15 @@ def eva_readsims(methodfilepaths):
     return sims
 
 
-def eva_groundtruth(sims, groundtruthfilepath, topn=5000):
+def eva_groundtruth(sims, groundtruthfilepath):
     """
     evaluate disease sim methods from methodfilepaths based on the disease sim
     scores in groundtruthfilepath
     :param sims: got from method eva_readsims(), contains sims of methods need
     to be evaluated
     :param groundtruthfilepath: file path of ground truth disease sim scores
-    :param topn: get topn pairs have the highest scores for evaluating
-    :return: to be decided
+    :return: dict of tuples, each tuple contains ranked disease pairs by each
+    similarity method in sims with their groundtruth sim scores respectively
     """
     groundtruth_sim = read_sims(groundtruthfilepath)
     print("reading groundtrthfile completed!")
@@ -61,21 +61,20 @@ def eva_groundtruth(sims, groundtruthfilepath, topn=5000):
         simtemp = []
         for d in dpairs.keys():
             for p in dpairs[d]:
-                simtemp.append((d, p, findsimvalue(d, p, sims[fp])))
+                simtemp.append((d, p, findsimvalue(d, p, sims[fp]), findsimvalue(d, p, groundtruth_sim)))
+        # ---sort strategy------------------------------------------
+        simtemp = sorted(simtemp, key=itemgetter(3))
         simtemp = sorted(simtemp, key=itemgetter(2), reverse=True)
-        topnpairs[fp] = []
-        if len(simtemp) < topn:
-            topn = len(simtemp)
-        for i in range(0, topn):
-            topnpairs[fp].append((simtemp[i][0], simtemp[i][1], simtemp[i][2],
-                                  findsimvalue(simtemp[i][0], simtemp[i][1], groundtruth_sim)))
+        # ----------------------------------------------------------
+        topnpairs[fp] = simtemp
     return topnpairs
 
 
 def eva_tprfprs(scoredicts):
     """
     transform scores and labels to tprs and fprs
-    :param scoredicts: a list of dicts, one dict contains one result,
+    :param scoredicts: a list of dicts, each dict represents one experiment and
+    contains the result of the experiment,
     dict: {disease1: {disease2:{method1: simvalue, method2: simvalue, ..., label: 0/1}, }, }
     (from eva_70benchmarkpairs())
     :return: a list of dicts, each dict contains tpr and tpr for one or more methods
@@ -84,6 +83,33 @@ def eva_tprfprs(scoredicts):
     for scoredict in scoredicts:
         ress.append(eva_tprfpr(eva_ranking(scoredict)))
     return ress
+
+
+def eva_tprfpr(scorenlabel):
+    """
+    based on all kind of scores and label in scoredict, calculate the tpr and fpr
+    of each kind of score
+    :param scorenlabel: a dict which each value is a sorted list based on a sort strategy,
+    {method1: [(disease1, disease2, simscore, label), ], method2: [], } (from method eva_ranking())
+    :return: dict, {method1: [(float1, float2), ], method2: [], } (float1 is fpr, float2 is tpr)
+    """
+    tpfp = {}
+    methodnames = set(scorenlabel.keys())
+    for m in methodnames:
+        tpfp[m] = []
+        sltemp = scorenlabel[m]
+        slable = []
+        for i in range(0, len(sltemp)):
+            slable.append(sltemp[i][3])
+        conditionp = sum(slable)
+        conditionf = len(slable) - conditionp
+        tp = 0
+        tpfp[m].append((0.0, 0.0))
+        for i in range(0, len(slable)):
+            tp += slable[i]
+            fp = i+1-tp
+            tpfp[m].append((fp/conditionf, tp/conditionp))
+    return tpfp
 
 
 def eva_ranking(scoredict):
@@ -115,31 +141,33 @@ def eva_ranking(scoredict):
     return scorenlabel
 
 
-def eva_tprfpr(scorenlabel):
+def eva_aucs(tprfprs):
     """
-    based on all kind of scores and label in scoredict, calculate the tpr and fpr
-    of each kind of score
-    :param scorenlabel: a dict which each value is a sorted list based on a sort strategy,
-    {method1: [(disease1, disease2, simscore, label), ], method2: [], }
-    :return: dict, {method1: [(float1, float2), ], method2: [], } (float1 is fpr, float2 is tpr)
+    based on tprs and fprs, calculating aucs
+    :param tprfprs: a list of dicts, get from method eva_tprfprs()
+    :return: a list of dicts, each dict contains auc values for one or more methods
     """
-    tpfp = {}
-    methodnames = set(scorenlabel.keys())
-    for m in methodnames:
-        tpfp[m] = []
-        sltemp = scorenlabel[m]
-        slable = []
-        for i in range(0, len(sltemp)):
-            slable.append(sltemp[i][3])
-        conditionp = sum(slable)
-        conditionf = len(slable) - conditionp
-        tp = 0
-        tpfp[m].append((0.0, 0.0))
-        for i in range(0, len(slable)):
-            tp += slable[i]
-            fp = i+1-tp
-            tpfp[m].append((fp/conditionf, tp/conditionp))
-    return tpfp
+    ress = []
+    for m in tprfprs:
+        ress.append(eva_auc(m))
+    return ress
+
+
+def eva_auc(tprfpr):
+    """
+    based on tpr and fpr, calculating the auc value
+    :param tprfpr: get from method eva_tprfpr(), dict, {method1: [(float1, float2), ], method2: [], }
+    (float1 is fpr, float2 is tpr) (from method eva_tprfpr())
+    :return: dict, keys are methodnames and values are auc values for each method respectively
+    """
+    auc = {}
+    for m in tprfpr.keys():
+        mauc = 0.0
+        mtpfp = tprfpr[m]
+        for i in range(0, len(mtpfp)-1):
+            mauc += (mtpfp[i+1][0] - mtpfp[i][0]) * (mtpfp[i+1][1] + mtpfp[i+1][1])
+        auc[m] = mauc/2
+    return auc
 
 
 def eva_70benchmarkpairs(sims, benchmarkpairs, times=1):
