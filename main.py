@@ -6,6 +6,7 @@ from files import read_assos
 from files import stat_assos
 from files import stat_maps
 from files import stat_sims
+from files import stat_network
 from files import write_assos
 from files import write_mappings
 from files import write_sims
@@ -31,6 +32,7 @@ from evaluation import eva_tprfprs
 from evaluation import eva_aucs
 from evaluation import eva_groundtruth
 import experiments
+import mapping
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
 
@@ -180,6 +182,7 @@ def evaluation_70benchmarkset(times=1):
     print("---avg auc values------------------------------------------------------------------")
     aucs = eva_aucs(tpfprs)
     auclen = len(aucs)
+    print("replicated times:", auclen)
     mns = list(aucs[0].keys())
     for mn in mns:
         avgauc = 0.0
@@ -689,5 +692,227 @@ def experiment():
     # ----------------------------------------------------------------------
 
 
+def rwr_bmc_ppi():
+    ppi_hprd = {}
+    with open("data/rwr_bmc_bioinfo/ppi/BINARY_PROTEIN_PROTEIN_INTERACTIONS.txt", mode='r') as f:
+        next(f)
+        for line in f:
+            words = line.strip().split('\t')
+            p1 = words[0].strip()
+            p2 = words[3].strip()
+            if p1 != '-' and p2 != '-':
+                if (p1 in ppi_hprd.keys() and p2 in ppi_hprd[p1]) or (p2 in ppi_hprd.keys() and p1 in ppi_hprd[p2]):
+                    # print(words, "replicated!")
+                    pass
+                else:
+                    if p1 not in ppi_hprd.keys():
+                        ppi_hprd[p1] = set()
+                    ppi_hprd[p1].add(p2)
+    stat_assos(ppi_hprd)
+    # for p in ppi_hprd.keys():
+    #     ppi_hprd[p].discard(p)
+    # stat_assos(ppi_hprd)
+    # write_assos(ppi_hprd, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_hprd_withselfloop.tab")
+
+    ppi_biogrid = {}
+    with open("data/rwr_bmc_bioinfo/ppi/BIOGRID-ORGANISM-Homo_sapiens-3.4.140.tab2.txt", mode='r') as f:
+        next(f)
+        for line in f:
+            words = line.strip().split('\t')
+            if words[15].strip() == '9606' and words[16].strip() == '9606' and words[12].strip() == 'physical':
+                p1 = words[7].strip()
+                p2 = words[8].strip()
+                if (p1 in ppi_biogrid.keys() and p2 in ppi_biogrid[p1]) or \
+                        (p2 in ppi_biogrid.keys() and p1 in ppi_biogrid[p2]):
+                    # print(words, "replicated!")
+                    pass
+                else:
+                    if p1 not in ppi_biogrid.keys():
+                        ppi_biogrid[p1] = set()
+                    ppi_biogrid[p1].add(p2)
+    stat_assos(ppi_biogrid)
+    # for p in ppi_biogrid.keys():
+    #     ppi_biogrid[p].discard(p)
+    # stat_assos(ppi_biogrid)
+    # write_assos(ppi_biogrid, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_biogrid_withselfloop.tab")
+
+    # ppi_homomint = {}
+    # mg = mygene.MyGeneInfo()
+    # uniprot2symbol = {}
+    # with open("data/rwr_bmc_bioinfo/ppi/dump-homomint.txt", mode='r') as f:
+    #     for line in f:
+    #         words = line.strip().split('|')
+    #         p1 = words[2].strip()
+    #         p2 = words[5].strip()
+    #         if p1 == words[1].strip():
+    #             if p1 in uniprot2symbol.keys():
+    #                 p1 = uniprot2symbol[p1]
+    #             else:
+    #                 p1 = ''
+    #                 gmapping = mg.query(words[1].strip())
+    #                 if gmapping['total'] == 1 and 'symbol' in gmapping['hits'][0]:
+    #                     p1 = gmapping['hits'][0]['symbol']
+    #                 uniprot2symbol[words[1].strip()] = p1
+    #             print(line.strip(), p1)
+    #         if p2 == words[4].strip():
+    #             if p2 in uniprot2symbol.keys():
+    #                 p2 = uniprot2symbol[p2]
+    #             else:
+    #                 p2 = ''
+    #                 gmapping = mg.query(words[4].strip())
+    #                 if gmapping['total'] == 1 and 'symbol' in gmapping['hits'][0]:
+    #                     p2 = gmapping['hits'][0]['symbol']
+    #                 uniprot2symbol[words[4].strip()] = p2
+    #             print(line.strip(), p2)
+    #         if p1 != '' and p2 != '':
+    #             if (p1 in ppi_homomint.keys() and p2 in ppi_homomint[p1]) or \
+    #                     (p2 in ppi_homomint.keys() and p1 in ppi_homomint[p2]):
+    #                 # print(words, "replicated!")
+    #                 pass
+    #             else:
+    #                 if p1 not in ppi_homomint.keys():
+    #                     ppi_homomint[p1] = set()
+    #                 ppi_homomint[p1].add(p2)
+    # stat_assos(ppi_homomint)
+    # # for p in ppi_homomint.keys():
+    # #     ppi_homomint[p].discard(p)
+    # # stat_assos(ppi_homomint)
+    # # write_assos(ppi_homomint, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_homomint1_withselfloop.tab")
+
+    ppi_homomint = {}
+    with open("data/rwr_bmc_bioinfo/ppi/dump-homomint.txt", mode='r') as f:
+        for line in f:
+            words = line.strip().split('|')
+            p1 = words[1].strip()
+            p2 = words[4].strip()
+            if (p1 in ppi_homomint.keys() and p2 in ppi_homomint[p1]) or \
+                    (p2 in ppi_homomint.keys() and p1 in ppi_homomint[p2]):
+                # print(words, "replicated!")
+                pass
+            else:
+                if p1 not in ppi_homomint.keys():
+                    ppi_homomint[p1] = set()
+                ppi_homomint[p1].add(p2)
+    alluniprots = set()
+    alluniprots |= set(ppi_homomint.keys())
+    for p in ppi_homomint.keys():
+        alluniprots |= ppi_homomint[p]
+    uni2sym = mapping.geneida2geneidb('uniprot', 'symbol', list(alluniprots))
+    ppi_homomint_t = {}
+    for p in ppi_homomint.keys():
+        if p in uni2sym.keys() and len(uni2sym[p]) == 1:
+            ppi_homomint_t[list(uni2sym[p])[0]] = set()
+            for q in ppi_homomint[p]:
+                if q in uni2sym.keys() and len(uni2sym[q]) == 1:
+                    ppi_homomint_t[list(uni2sym[p])[0]].add(list(uni2sym[q])[0])
+    stat_assos(ppi_homomint_t)
+    # for p in ppi_homomint_t.keys():
+    #     ppi_homomint_t[p].discard(p)
+    # stat_assos(ppi_homomint_t)
+    # write_assos(ppi_homomint_t, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_homomint2_withselfloop.tab")
+
+    ppi_intact = {}
+    # interactiontypes = set(read_one_col("data/rwr_bmc_bioinfo/ppi/intact.txt", 11))
+    # pprint(interactiontypes)
+    taxidhuman = 'taxid:9606(human)|taxid:9606(Homo sapiens)'
+    with open("data/rwr_bmc_bioinfo/ppi/intact.txt", mode='r', encoding='utf-8') as f:
+        next(f)
+        for line in f:
+            words = line.strip().split('\t')
+            if words[9].strip() == taxidhuman and words[10].strip() == taxidhuman:
+                p1s = words[4].strip().split('|')
+                p2s = words[5].strip().split('|')
+                p1 = ''
+                p2 = ''
+                for p in p1s:
+                    if p.startswith("uniprotkb:") and p.endswith("(gene name)"):
+                        p1 = p.split(':')[1].split('(')[0]
+                        break
+                for p in p2s:
+                    if p.startswith("uniprotkb:") and p.endswith("(gene name)"):
+                        p2 = p.split(':')[1].split('(')[0]
+                        break
+                if p1 != '' and p2 != '':
+                    if (p1 in ppi_intact.keys() and p2 in ppi_intact[p1]) or \
+                            (p2 in ppi_intact.keys() and p1 in ppi_intact[p2]):
+                        # print(words, "replicated!")
+                        pass
+                    else:
+                        if p1 not in ppi_intact.keys():
+                            ppi_intact[p1] = set()
+                        ppi_intact[p1].add(p2)
+    stat_assos(ppi_intact)
+    # for p in ppi_intact.keys():
+    #     ppi_intact[p].discard(p)
+    # stat_assos(ppi_intact)
+    # write_assos(ppi_intact, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_intact_withselfloop.tab")
+
+
+def rwr_bmc_ppi_combine():
+    ppi_hprd = read_assos("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hprd_withselfloop.tab")
+    print("hprd: ", end='')
+    stat_network(ppi_hprd)
+    ppi_biogrid = read_assos('data/rwr_bmc_bioinfo/ppi/rwr_ppi_biogrid_withselfloop.tab')
+    print("biogrid: ", end='')
+    stat_network(ppi_biogrid)
+    ppi_intact = read_assos('data/rwr_bmc_bioinfo/ppi/rwr_ppi_intact_withselfloop.tab')
+    print('intact: ', end='')
+    stat_network(ppi_intact)
+    ppi_homomint = read_assos('data/rwr_bmc_bioinfo/ppi/rwr_ppi_homomint2_withselfloop.tab')
+    print('homomint: ', end='')
+    stat_network(ppi_homomint)
+
+    ppi_all = deepcopy(ppi_hprd)
+    for p in ppi_biogrid.keys():
+        for q in ppi_biogrid[p]:
+            if not ((p in ppi_all.keys() and q in ppi_all[p]) or
+                    (q in ppi_all.keys() and p in ppi_all[q])):
+                if p not in ppi_all.keys():
+                    ppi_all[p] = set()
+                ppi_all[p].add(q)
+    stat_network(ppi_all)
+    for p in ppi_intact.keys():
+        for q in ppi_intact[p]:
+            if not ((p in ppi_all.keys() and q in ppi_all[p]) or
+                    (q in ppi_all.keys() and p in ppi_all[q])):
+                if p not in ppi_all.keys():
+                    ppi_all[p] = set()
+                ppi_all[p].add(q)
+    stat_network(ppi_all)
+    for p in ppi_homomint.keys():
+        for q in ppi_homomint[p]:
+            if not ((p in ppi_all.keys() and q in ppi_all[p]) or
+                    (q in ppi_all.keys() and p in ppi_all[q])):
+                if p not in ppi_all.keys():
+                    ppi_all[p] = set()
+                ppi_all[p].add(q)
+    stat_network(ppi_all)
+    # write_assos(ppi_all, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab")
+    for p in ppi_all.keys():
+        ppi_all[p].discard(p)
+    stat_network(ppi_all)
+    # write_assos(ppi_all, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withoutselfloop.tab")
+
+
+def rwr_bmc_dgassos():
+    dg_sidd = {}
+    with open("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.txt", mode='r') as f:
+        next(f)
+        for line in f:
+            words = line.strip().split('\t')
+            dg_sidd[words[1].strip()] = set(words[3].strip().split('|'))
+    stat_assos(dg_sidd)
+    # write_assos(dg_sidd, "data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
+
+    dg_disgenet = {}
+    with open("data/rwr_bmc_bioinfo/dg/rwr_dgassos_disgenet.txt", mode='r') as f:
+        next(f)
+        for line in f:
+            words = line.strip().split('\t')
+            dg_disgenet[words[1].strip()] = set(words[3].strip().split('|'))
+    stat_assos(dg_disgenet)
+    # write_assos(dg_disgenet, "data/rwr_bmc_bioinfo/dg/rwr_dgassos_disgenet.tab")
+
+
 if __name__ == "__main__":
-    evaluation_70benchmarkset(100)
+    rwr_bmc_ppi_combine()

@@ -405,6 +405,36 @@ integrating semantic and gene functional association[J]. PloS one, 2014, 9(6): e
 computation[J]. BMC bioinformatics, 2016, 17(1): 326.
 #-------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------
+13. bmc bioinformatics rwr 文章所用数据统计
+reference: Li P, Nie Y, Yu J. Fusing literature and full network data improves disease 
+similarity computation[J]. BMC bioinformatics, 2016, 17(1): 326.
+(1) disease-gene
+    a. sidd
+        文章中的统计：2,427 diseases and 104,052 gene-disease associations
+        自己统计它在suppl提供的数据：dsiease: 2427 genes: 11847 assos: 104059
+    b. disgenet
+        文章中的统计：3,259 disease terms and 206,403 gene-disease associations
+        自己统计它在suppl提供的数据：dsiease: 3259 genes: 14849 assos: 206361
+(2) ppi
+    a. HumanNet
+        476,399 functional linkages among 16,243 human genes
+    b. hPPIN (hprd, biogrid, intact, homomint)
+        文章中的统计：15,710 human genes (symbol) and 143,237 interactions
+        由于该文章没有提供其所用ppi数据，而且不知道该文章所用四种数据集的版本和其处理细节，
+        所以自己重新收集数据集并处理统计如下：
+            hprd: nodes: 9607 edges: 39001 (geneid为symbol, 有自环, 版本为Release9_041310)
+            biogrid: nodes: 16014 edges: 217652 (geneid为symbol, 有自环, Experimental System Type为'physical', 
+                organism interactor A/B都为'9606', 版本为BIOGRID-ORGANISM-Homo_sapiens-3.4.140.tab2.txt)
+            intact: nodes: 13734 edges: 123822 (geneid为symbol (通过Alias(es) interactor A/B中的gene_name得到)), 
+                有自环, Taxid interactor A/B都为'taxid:9606(human)|taxid:9606(Homo sapiens)', 2016/9/18下载)
+            homomint: nodes: 3352 edges: 7450 (geneid为symbol (用mygene转换uniprotid得到), 有自环)
+            integrate四种数据集的网络：
+                nodes: 17507 edges: 284478 (有自环)
+                nodes: 17507 edges: 280378 (无自环)
+#-------------------------------------------------------------------------
+
+
 
 
 

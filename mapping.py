@@ -3,6 +3,8 @@
 import mygene
 from copy import deepcopy
 
+fields = ['entrezgene', 'symbol', 'uniprot', 'reporter']
+
 
 def doid2umlsid(umlsdiseases):
     """
@@ -178,6 +180,27 @@ def entrezid2symbol(entrezid_list, species="human"):
             if str(r['entrezgene']) in mapping.keys():
                 print(str(r['entrezgene']), ": the key has duplicate values")
             mapping[str(r['entrezgene'])] = r['symbol']
+    return mapping
+
+
+def geneida2geneidb(geneida, geneidb, geneida_list, species='human'):
+    """
+    convert geneida to geneidb
+    :param geneida_list: a list of geneidas
+    :param geneida: type of geneida, string
+    :param geneidb: type of geneidb, string
+    :param species: species, default 'human'
+    :return: a dict which keys are geneidas (string) and values are sets of geneidbs
+    """
+    mg = mygene.MyGeneInfo()
+    result = mg.querymany(geneida_list, scope=geneida,
+                          fields=geneidb, species=species)
+    mapping = {}
+    for r in result:
+        if 'notfound' not in r.keys():
+            if r['query'] not in mapping.keys():
+                mapping[r['query']] = set()
+            mapping[r['query']].add(r[geneidb])
     return mapping
 
 

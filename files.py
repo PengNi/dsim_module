@@ -3,19 +3,20 @@
 import copy
 
 
-def read_one_col(filepath, col, header=False, sep="\t"):
+def read_one_col(filepath, col, header=False, encoding='utf-8', sep="\t"):
     """
     read a column from a table file
     :param filepath: a path of a table file which contains at least two columns
     :param header: a boolean variable indicates if the first row is a head or not,
     default False
+    :param encoding: encoding
     :param sep: delimiter, a string, default "\t"
     :param col: the number of col needs to be extracted
     :return: a list contains elements from the extracted column
     """
     eles = []
     col -= 1
-    with open(filepath, mode='r') as f:
+    with open(filepath, mode='r', encoding=encoding) as f:
         if header:
             next(f)
         for line in f:
@@ -313,6 +314,23 @@ def stat_sims(sims):
             entities.add(q)
             assos += 1
     print("stat_sims: keys:", nkeys, "entities:", len(entities), "assos:", assos)
+
+
+def stat_network(assos):
+    """
+    print stats of node assos of network
+    :param assos: a dict (key-value: string-set<string>), a key means a node
+    and the key's value is a set of its associated nodes
+    :return: None
+    """
+    nodes = set()
+    edgenum = 0
+    for p in assos.keys():
+        nodes.add(p)
+        for q in assos[p]:
+            nodes.add(q)
+            edgenum += 1
+    print("stat_network: nodes:", len(nodes), "edges:", edgenum)
 
 
 def combine_two_assos(dict1, dict2):
