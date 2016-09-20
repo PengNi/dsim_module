@@ -409,3 +409,19 @@ def lambda_module(dgassos, graph):
         else:
             dlambda[name] = din/dout
     return dlambda
+
+
+def get_lcc(graphfile):
+    """
+    given a graph ncol file path, return the largest connected component
+    :param graphfile: path of a graph ncol file
+    :return: a igraph.Graph object, the lcc
+    """
+    with open(graphfile, 'r') as f:
+        g = Graph.Read_Ncol(f, names=True, weights=False, directed=False)
+    print('nodes:', len(g.vs))
+    print('edges:', len(g.es))
+    glcc = g.clusters(mode='WEAK').giant()
+    print('lcc nodes:', len(glcc.vs))
+    print('lcc edges:', len(glcc.es))
+    return glcc

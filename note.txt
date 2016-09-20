@@ -426,12 +426,12 @@ similarity computation[J]. BMC bioinformatics, 2016, 17(1): 326.
             hprd: nodes: 9607 edges: 39001 (geneid为symbol, 有自环, 版本为Release9_041310)
             biogrid: nodes: 16014 edges: 217652 (geneid为symbol, 有自环, Experimental System Type为'physical', 
                 organism interactor A/B都为'9606', 版本为BIOGRID-ORGANISM-Homo_sapiens-3.4.140.tab2.txt)
-            intact: nodes: 13734 edges: 123822 (geneid为symbol (通过Alias(es) interactor A/B中的gene_name得到)), 
+            intact: nodes: 13733 edges: 123821 (geneid为symbol (通过Alias(es) interactor A/B中的gene_name得到)), 
                 有自环, Taxid interactor A/B都为'taxid:9606(human)|taxid:9606(Homo sapiens)', 2016/9/18下载)
             homomint: nodes: 3352 edges: 7450 (geneid为symbol (用mygene转换uniprotid得到), 有自环)
             integrate四种数据集的网络：
-                nodes: 17507 edges: 284478 (有自环)
-                nodes: 17507 edges: 280378 (无自环)
+                nodes: 17506 edges: 284476 (有自环)
+                nodes: 17473 edges: 280376 (无自环)
 #-------------------------------------------------------------------------
 
 

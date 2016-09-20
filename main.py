@@ -3,6 +3,8 @@ import similarity_module
 from files import read_one_col
 from files import read_mappings
 from files import read_assos
+from files import read_sims
+from files import read_simmatrix
 from files import stat_assos
 from files import stat_maps
 from files import stat_sims
@@ -10,7 +12,7 @@ from files import stat_network
 from files import write_assos
 from files import write_mappings
 from files import write_sims
-from files import read_sims
+from files import write_slist
 from copy import deepcopy
 from umls_disease import read_all_gene_disease_associations
 from umls_disease import read_umls_disease_info
@@ -99,25 +101,27 @@ def evaluation_groundtruth():
                 print()
 
 
-def evaluation_70benchmarkset(times=1):
-    pathlist = ['outputs/similarity_icod_umls_dgcutoff006_triplet.tsv',
-                'outputs/similarity_suntopo_umls_dgcutoff006_triplet.tsv',
-                'outputs/similarity_funsim_umls_dgcutoff006.tsv',
-                'outputs/similarity_bognew_umls_dgcutoff006_triplet.tsv',
-                'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
+def evaluation_70benchmarkset(times=1,
+                              bmkpfile="data/benchmarkset_funsim/ground_truth_68_disease_pairs_umlsid.tsv"):
+    pathlist = [  # 'outputs/similarity_icod_umls_dgcutoff006_triplet.tsv',
+                # 'outputs/similarity_suntopo_umls_dgcutoff006_triplet.tsv',
+                # 'outputs/similarity_funsim_umls_dgcutoff006.tsv',
+                # 'outputs/similarity_bognew_umls_dgcutoff006_triplet.tsv',
+                # 'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
                 # 'outputs/similarity_module1_umls_dgcutoff006.tsv',
                 # 'outputs/similarity_module3_umls_dgcutoff006.tsv',
                 # 'outputs/similarity_module4_umls_dgcutoff006.tsv',
                 # 'outputs/similarity_experiments_graphlet_umls_dgcutoff006.tsv',
                 # 'outputs/similarity_experiments_graphlet_less_umls_dgcutoff006.tsv',
-                'outputs/similarity_experiments_rwrzrq_umls_dgcutoff006.tsv',
+                # 'outputs/similarity_experiments_rwrzrq_umls_dgcutoff006.tsv',
                 # 'outputs/similarity_experiments_shortestpath_divide_umls_dgcutoff006.tsv',
                 # 'outputs/similarity_experiments_shortestpath_transformed_umls_dgcutoff006.tsv',
-                'outputs/similarity_experiments_shortestpath_transformed_less_umls_dgcutoff006.tsv',
-                'outputs/similarity_module5_umls_dgcutoff006.tsv'
+                # 'outputs/similarity_experiments_shortestpath_transformed_less_umls_dgcutoff006.tsv',
+                # 'outputs/similarity_module5_umls_dgcutoff006.tsv'
+                'outputs/similarity_bognew_rwr_sidd_triplet.tsv'
                 ]
 
-    benchmarkpairs = read_assos("data/benchmarkset_funsim/ground_truth_68_disease_pairs_umlsid.tsv")
+    benchmarkpairs = read_assos(bmkpfile, header=False)
     stat_assos(benchmarkpairs)
     bmptuple = []
     for p in benchmarkpairs.keys():
@@ -566,25 +570,27 @@ def gene_neighbor_info():
 
 
 def disease_gene_network_hamaneh():
-    g = similarity_module.read_interactome("data/DataS1_interactome.tsv", False, False)
+    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
+                                           False, False)
     print("number of vertices:", g.vcount())
     gvs = set(g.vs['name'])
 
-    disease2gene_entrez = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
-                                                             0.06, True, True)
+    # disease2gene_entrez = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
+    #                                                          0.06, True, True)
+    disease2gene_rwrsidd = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
     print("disease gene assos: ", end='')
-    stat_assos(disease2gene_entrez)
+    stat_assos(disease2gene_rwrsidd)
 
     dgassos_new = {}
-    for d in disease2gene_entrez.keys():
-        dgleft = gvs.intersection(disease2gene_entrez[d])
+    for d in disease2gene_rwrsidd.keys():
+        dgleft = gvs.intersection(disease2gene_rwrsidd[d])
         if len(dgleft) >= 1:
             dgassos_new[d] = dgleft
     print("disease gene assos left: ", end='')
     stat_assos(dgassos_new)
 
     selfloop = set()
-    with open("data/hamaneh_dgnetwrok_umlscutoff006_interactomewithselfloop", mode='w') as f:
+    with open("data/hamaneh/rwrsidd_hppin_withselfloop_hamaneh_dgnetwrok.tab", mode='w') as f:
         for e in g.es:
             ns = g.vs[e.source]['name']
             nt = g.vs[e.target]['name']
@@ -602,11 +608,12 @@ def disease_gene_network_hamaneh():
             for g in dgassos_new[d]:
                 f.write(d+'\t'+g+'\t1.0\n')
                 f.write(g + '\t' + d + '\t1.0\n')
-    with open("data/hamaneh_dgnetwork_nodes", mode='w') as f:
+    with open("data/hamaneh/rwrsidd_hppin_withselfloop_hamaneh_dgnetwork_nodes.tab", mode='w') as f:
         for g in gvs:
             f.write(g+'\n')
         for d in dgassos_new.keys():
             f.write(d+'\n')
+    write_slist(list(dgassos_new.keys()), "data/hamaneh/rwrsidd_hppin_withselfloop_boundary.tab")
 
 
 def get_disease_correlations_hamaneh():
@@ -708,10 +715,7 @@ def rwr_bmc_ppi():
                     if p1 not in ppi_hprd.keys():
                         ppi_hprd[p1] = set()
                     ppi_hprd[p1].add(p2)
-    stat_assos(ppi_hprd)
-    # for p in ppi_hprd.keys():
-    #     ppi_hprd[p].discard(p)
-    # stat_assos(ppi_hprd)
+    stat_network(ppi_hprd)
     # write_assos(ppi_hprd, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_hprd_withselfloop.tab")
 
     ppi_biogrid = {}
@@ -730,10 +734,7 @@ def rwr_bmc_ppi():
                     if p1 not in ppi_biogrid.keys():
                         ppi_biogrid[p1] = set()
                     ppi_biogrid[p1].add(p2)
-    stat_assos(ppi_biogrid)
-    # for p in ppi_biogrid.keys():
-    #     ppi_biogrid[p].discard(p)
-    # stat_assos(ppi_biogrid)
+    stat_network(ppi_biogrid)
     # write_assos(ppi_biogrid, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_biogrid_withselfloop.tab")
 
     # ppi_homomint = {}
@@ -773,10 +774,7 @@ def rwr_bmc_ppi():
     #                 if p1 not in ppi_homomint.keys():
     #                     ppi_homomint[p1] = set()
     #                 ppi_homomint[p1].add(p2)
-    # stat_assos(ppi_homomint)
-    # # for p in ppi_homomint.keys():
-    # #     ppi_homomint[p].discard(p)
-    # # stat_assos(ppi_homomint)
+    # stat_network(ppi_homomint)
     # # write_assos(ppi_homomint, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_homomint1_withselfloop.tab")
 
     ppi_homomint = {}
@@ -805,10 +803,7 @@ def rwr_bmc_ppi():
             for q in ppi_homomint[p]:
                 if q in uni2sym.keys() and len(uni2sym[q]) == 1:
                     ppi_homomint_t[list(uni2sym[p])[0]].add(list(uni2sym[q])[0])
-    stat_assos(ppi_homomint_t)
-    # for p in ppi_homomint_t.keys():
-    #     ppi_homomint_t[p].discard(p)
-    # stat_assos(ppi_homomint_t)
+    stat_network(ppi_homomint_t)
     # write_assos(ppi_homomint_t, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_homomint2_withselfloop.tab")
 
     ppi_intact = {}
@@ -826,25 +821,25 @@ def rwr_bmc_ppi():
                 p2 = ''
                 for p in p1s:
                     if p.startswith("uniprotkb:") and p.endswith("(gene name)"):
-                        p1 = p.split(':')[1].split('(')[0]
+                        # here has 'EIF4G1 variant protein' exception
+                        # here has exceptions such as 'MLL/AF6 fusion'
+                        # here has '"WUGSC:' exception （没有处理此异常，需人工修改结果）
+                        p1 = p.split(':')[1].split('(')[0].split(' ')[0]
                         break
                 for p in p2s:
                     if p.startswith("uniprotkb:") and p.endswith("(gene name)"):
-                        p2 = p.split(':')[1].split('(')[0]
+                        p2 = p.split(':')[1].split('(')[0].split(' ')[0]
                         break
                 if p1 != '' and p2 != '':
-                    if (p1 in ppi_intact.keys() and p2 in ppi_intact[p1]) or \
-                            (p2 in ppi_intact.keys() and p1 in ppi_intact[p2]):
+                    if ((p1 in ppi_intact.keys() and p2 in ppi_intact[p1]) or
+                            (p2 in ppi_intact.keys() and p1 in ppi_intact[p2])):
                         # print(words, "replicated!")
                         pass
                     else:
                         if p1 not in ppi_intact.keys():
                             ppi_intact[p1] = set()
                         ppi_intact[p1].add(p2)
-    stat_assos(ppi_intact)
-    # for p in ppi_intact.keys():
-    #     ppi_intact[p].discard(p)
-    # stat_assos(ppi_intact)
+    stat_network(ppi_intact)
     # write_assos(ppi_intact, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_intact_withselfloop.tab")
 
 
@@ -888,8 +883,11 @@ def rwr_bmc_ppi_combine():
                 ppi_all[p].add(q)
     stat_network(ppi_all)
     # write_assos(ppi_all, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab")
-    for p in ppi_all.keys():
+    pks = list(ppi_all.keys())
+    for p in pks:
         ppi_all[p].discard(p)
+        if len(ppi_all[p]) == 0:
+            del ppi_all[p]
     stat_network(ppi_all)
     # write_assos(ppi_all, "data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withoutselfloop.tab")
 
@@ -915,4 +913,4 @@ def rwr_bmc_dgassos():
 
 
 if __name__ == "__main__":
-    rwr_bmc_ppi_combine()
+    evaluation_70benchmarkset(100, 'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tab')

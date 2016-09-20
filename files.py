@@ -3,7 +3,7 @@
 import copy
 
 
-def read_one_col(filepath, col, header=False, encoding='utf-8', sep="\t"):
+def read_one_col(filepath, col, header=False, sep="\t", encoding='utf-8'):
     """
     read a column from a table file
     :param filepath: a path of a table file which contains at least two columns
@@ -16,7 +16,7 @@ def read_one_col(filepath, col, header=False, encoding='utf-8', sep="\t"):
     """
     eles = []
     col -= 1
-    with open(filepath, mode='r', encoding=encoding) as f:
+    with open(filepath, encoding=encoding, mode='r') as f:
         if header:
             next(f)
         for line in f:
