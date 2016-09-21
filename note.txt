@@ -412,7 +412,7 @@ similarity computation[J]. BMC bioinformatics, 2016, 17(1): 326.
 (1) disease-gene
     a. sidd
         文章中的统计：2,427 diseases and 104,052 gene-disease associations
-        自己统计它在suppl提供的数据：dsiease: 2427 genes: 11847 assos: 104059
+        自己统计它在suppl提供的数据：dsiease: 2427 genes: 11834 assos: 104057
     b. disgenet
         文章中的统计：3,259 disease terms and 206,403 gene-disease associations
         自己统计它在suppl提供的数据：dsiease: 3259 genes: 14849 assos: 206361
@@ -432,6 +432,7 @@ similarity computation[J]. BMC bioinformatics, 2016, 17(1): 326.
             integrate四种数据集的网络：
                 nodes: 17506 edges: 284476 (有自环)
                 nodes: 17473 edges: 280376 (无自环)
+                nodes: 17452 edges: 280364 (最大连通分支)
 #-------------------------------------------------------------------------
 
 

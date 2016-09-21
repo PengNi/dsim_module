@@ -617,9 +617,10 @@ def disease_gene_network_hamaneh():
 
 
 def get_disease_correlations_hamaneh():
-    disease_included = set(read_one_col("data/hamaneh_included_diseases", 1))
+    disease_included = set(read_one_col("data/hamaneh/rwrsidd_included_diseases", 1))
     print(type(disease_included), len(disease_included))
-    disease_cors = read_sims("data/hamaneh_correlations", True, '\t', 1, 2, 3)
+    disease_cors = read_sims("data/hamaneh/rwrsidd_hppin_withselfloop_hamaneh_disease_relations.txt",
+                             True, '\t', 1, 2, 3)
     stat_sims(disease_cors)
 
     newdisease_cors = {}
@@ -627,38 +628,46 @@ def get_disease_correlations_hamaneh():
         if d1 in disease_included:
             for d2 in disease_cors[d1].keys():
                 if d2 in disease_included:
-                    if ('umls:'+d1) not in newdisease_cors.keys():
-                        newdisease_cors['umls:'+d1] = {}
-                    newdisease_cors['umls:'+d1]['umls:'+d2] = disease_cors[d1][d2]
+                    if ('DOID:'+d1) not in newdisease_cors.keys():
+                        newdisease_cors['DOID:'+d1] = {}
+                    newdisease_cors['DOID:'+d1]['DOID:'+d2] = disease_cors[d1][d2]
     stat_sims(newdisease_cors)
-    write_sims(newdisease_cors, "similarity_hamaneh_interactomenumls_dgcuff006.tsv")
+    # write_sims(newdisease_cors, "data/hamaneh/similarity_hamaneh_rwrsidd_hppinwsl.tsv")
 
 
 def get_rwr_input():
-    g = similarity_module.read_interactome("data/DataS1_interactome_rmslpe.tsv", False, False)
+    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withoutselfloop.tab",
+                                           False, False)
     print("number of vertices:", g.vcount())
     gvs = set(g.vs['name'])
 
-    disease2gene_entrez = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
-                                                             0.06, True, True)
+    # disease2gene = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
+    #                                                   0.06, True, True)
+    disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
     print("disease gene assos: ", end='')
-    stat_assos(disease2gene_entrez)
+    stat_assos(disease2gene)
 
     dgassos_new = {}
-    for d in disease2gene_entrez.keys():
-        dgleft = gvs.intersection(disease2gene_entrez[d])
+    for d in disease2gene.keys():
+        dgleft = gvs.intersection(disease2gene[d])
         if len(dgleft) >= 1:
             dgassos_new[d] = dgleft
     print("disease gene assos left: ", end='')
     stat_assos(dgassos_new)
 
+    write_assos(dgassos_new, "data/rwr_bmc_bioinfo/rwr_dgassos_sidd_inhppinwosl.tsv")
+    write_slist(list(gvs), "data/rwr_bmc_bioinfo/rwr_ppi_hppinwosl_nodes.tsv")
+    write_slist(list(dgassos_new.keys()), "data/rwr_bmc_bioinfo/rwr_dgassos_sidd_inhppinwosl_diseases.tsv")
+
 
 def experiment():
-    g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome_rmslpe.tsv", False, False)
+    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withoutselfloop.tab",
+                                           False, False)
     print("number of vertices:", g.vcount())
     gvs = set(g.vs['name'])
-    disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
-                                                             0.06, True, True)
+    # disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
+    #                                                          0.06, True, True)
+    disease2gene_entrez = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
     stat_assos(disease2gene_entrez)
     dgassos_new = {}
     for d in disease2gene_entrez.keys():
@@ -669,18 +678,18 @@ def experiment():
     stat_assos(dgassos_new)
 
     # # ---graphlet-------------------------------------------------------
-    gene2sig = experiments.read_gene_signature("data/test/graphlet_interactome_maxcc.tsv")
-    calgenes = set(gene2sig.keys())
-    dgassos_graphlet = {}
-    for d in disease2gene_entrez.keys():
-        dgleft = calgenes.intersection(disease2gene_entrez[d])
-        if len(dgleft) >= 1:
-            dgassos_graphlet[d] = dgleft
-    print("disease gene assos left graphlet: ", end='')
-    stat_assos(dgassos_graphlet)
-    sim_gene2gene = experiments.sim_gene2gene_graphlet(gene2sig)
-    sim_d2d = experiments.sim_geneset2geneset(dgassos_graphlet, sim_gene2gene)
-    write_sims(sim_d2d, "outputs/similarity_experiments_graphlet_less_umls_dgcutoff006.tsv")
+    # gene2sig = experiments.read_gene_signature("data/test/graphlet_interactome_maxcc.tsv")
+    # calgenes = set(gene2sig.keys())
+    # dgassos_graphlet = {}
+    # for d in disease2gene_entrez.keys():
+    #     dgleft = calgenes.intersection(disease2gene_entrez[d])
+    #     if len(dgleft) >= 1:
+    #         dgassos_graphlet[d] = dgleft
+    # print("disease gene assos left graphlet: ", end='')
+    # stat_assos(dgassos_graphlet)
+    # sim_gene2gene = experiments.sim_gene2gene_graphlet(gene2sig)
+    # sim_d2d = experiments.sim_geneset2geneset(dgassos_graphlet, sim_gene2gene)
+    # write_sims(sim_d2d, "outputs/similarity_experiments_graphlet_less_umls_dgcutoff006.tsv")
     # # ------------------------------------------------------------------
 
     # # ---bmc rwr------------------------------------------------------------
@@ -692,7 +701,7 @@ def experiment():
     # ---shortest path------------------------------------------------------
     sps_norm = experiments.sim_gene2gene_shortestpath(g)
     sim_d2d = experiments.sim_geneset2geneset(dgassos_new, sps_norm)
-    write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_transformed_less_umls_dgcutoff006.tsv")
+    write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwosl.tsv")
     # sps_normdivide = experiments.sim_gene2gene_shortestpath(g, False)
     # sim_d2d = experiments.sim_geneset2geneset(disease2gene_entrez, sps_normdivide)
     # write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_divide_umls_dgcutoff006.tsv")
@@ -898,7 +907,13 @@ def rwr_bmc_dgassos():
         next(f)
         for line in f:
             words = line.strip().split('\t')
-            dg_sidd[words[1].strip()] = set(words[3].strip().split('|'))
+            genes = words[3].strip().split('|')
+            d = words[1].strip()
+            dg_sidd[d] = set()
+            for g in genes:
+                gtemp = g.strip().split(" ")
+                for gt in gtemp:
+                    dg_sidd[d].add(gt.strip(";").strip())
     stat_assos(dg_sidd)
     # write_assos(dg_sidd, "data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
 
@@ -907,10 +922,17 @@ def rwr_bmc_dgassos():
         next(f)
         for line in f:
             words = line.strip().split('\t')
-            dg_disgenet[words[1].strip()] = set(words[3].strip().split('|'))
+            genes = words[3].strip().split('|')
+            d = words[1].strip()
+            dg_disgenet[d] = set()
+            for g in genes:
+                gtemp = g.strip().split(" ")
+                for gt in gtemp:
+                    dg_disgenet[d].add(gt.strip(";").strip())
     stat_assos(dg_disgenet)
     # write_assos(dg_disgenet, "data/rwr_bmc_bioinfo/dg/rwr_dgassos_disgenet.tab")
 
 
 if __name__ == "__main__":
-    evaluation_70benchmarkset(100, 'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tab')
+    # evaluation_70benchmarkset(100, 'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tab')
+    experiment()
