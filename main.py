@@ -118,7 +118,13 @@ def evaluation_70benchmarkset(times=1,
                 # 'outputs/similarity_experiments_shortestpath_transformed_umls_dgcutoff006.tsv',
                 # 'outputs/similarity_experiments_shortestpath_transformed_less_umls_dgcutoff006.tsv',
                 # 'outputs/similarity_module5_umls_dgcutoff006.tsv'
-                'outputs/similarity_bognew_rwr_sidd_triplet.tsv'
+                'outputs/similarity_funsim_rwrsidd.tsv',
+                'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
+                'outputs/similarity_module5_rwrsidd_hppinwosl.tsv',
+                'outputs/similarity_experiments_rwrzrq_rwrsidd_hppinwosl.tsv',
+                'outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwosl.tsv',
+                'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
+                'outputs/similarity_bognew_rwrsidd_triplet.tsv'
                 ]
 
     benchmarkpairs = read_assos(bmkpfile, header=False)
@@ -332,12 +338,15 @@ def geneid_convert_coexpression():
 
 
 def similarity_cal_module():
-    disease2gene_entrez = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
-                                                             0.06, True, True)
+    # disease2gene_entrez = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
+    #                                                          0.06, True, True)
+    disease2gene_entrez = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
     print("disease gene assos: ", end='')
     stat_assos(disease2gene_entrez)
 
-    g = similarity_module.read_interactome("data/DataS1_interactome_rmslpe.tsv", False, False)
+    # g = similarity_module.read_interactome("data/DataS1_interactome_rmslpe.tsv", False, False)
+    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withoutselfloop.tab",
+                                           False, False)
     print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
 
     # sims = similarity_module.similarity_cal_module_1(disease2gene_entrez, g)
@@ -349,7 +358,7 @@ def similarity_cal_module():
     # sims = similarity_module.similarity_cal_module_4(disease2gene_entrez, g)
     # write_sims(sims, "similarity_module4_umls_dcutoff006.tsv")
     sims = similarity_module.similarity_cal_module_5(disease2gene_entrez, g)
-    write_sims(sims, "similarity_module5_umls_dcutoff006.tsv")
+    write_sims(sims, "outputs/similarity_module5_rwrsidd_hppinwosl.tsv")
 
 
 def do2umls_mapping():
@@ -693,15 +702,15 @@ def experiment():
     # # ------------------------------------------------------------------
 
     # # ---bmc rwr------------------------------------------------------------
-    # sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2gene_score.tsv")
+    # sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2gene_score_rwrsidd_hppin.tsv")
     # sim_d2d = experiments.sim_geneset2geneset_rwr(disease2gene_entrez, sim_gene2geneset)
-    # write_sims(sim_d2d, "outputs/similarity_experiments_rwrzrq_umls_dgcutoff006.tsv")
+    # write_sims(sim_d2d, "outputs/similarity_experiments_rwrzrq_rwrsidd_hppinwosl.tsv")
     # # ----------------------------------------------------------------------
 
     # ---shortest path------------------------------------------------------
-    sps_norm = experiments.sim_gene2gene_shortestpath(g)
-    sim_d2d = experiments.sim_geneset2geneset(dgassos_new, sps_norm)
-    write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwosl.tsv")
+    # sps_norm = experiments.sim_gene2gene_shortestpath(g)
+    # sim_d2d = experiments.sim_geneset2geneset(dgassos_new, sps_norm)
+    # write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwosl.tsv")
     # sps_normdivide = experiments.sim_gene2gene_shortestpath(g, False)
     # sim_d2d = experiments.sim_geneset2geneset(disease2gene_entrez, sps_normdivide)
     # write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_divide_umls_dgcutoff006.tsv")
@@ -934,5 +943,4 @@ def rwr_bmc_dgassos():
 
 
 if __name__ == "__main__":
-    # evaluation_70benchmarkset(100, 'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tab')
-    experiment()
+    evaluation_70benchmarkset(100, 'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tab')
