@@ -199,11 +199,11 @@ umlsname: Prostatitis ; prostatitis
 4. 疾病基因关系，基因网络统计
 (1) all_gene_disease_associations.tsv
 取score的cuttoff为0（取全部的关系）时
-	diseases: 15093 genes: 17381 associations: 429036
+    diseases: 15093 genes: 17381 associations: 429036
 取cutoff为0.06时
-	diseases: 7887 genes: 9696 associations: 41261
+    diseases: 7887 genes: 9696 associations: 41261
 取cutoff为0.08时
-	diseases: 7879 genes: 9694 associations: 41122
+    diseases: 7879 genes: 9694 associations: 41122
 
 (2) curated_gene_disease_associations.tsv 
 diseases: 7607 genes: 9362 associations: 32834
@@ -211,7 +211,7 @@ diseases: 7607 genes: 9362 associations: 32834
 (3) Menche J, Sharma A, Kitsak M, et al. Uncovering disease-disease relationships through 
 the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
 这篇文章用到的疾病基因关系：
-diseases: 299 genes: 3173 associations: 29775
+ diseases: 299 genes: 3173 associations: 29775
 这篇文章用到的interactome：
  nodes: 13460 edges: 141296
  去掉自环和重复边后：
@@ -412,10 +412,10 @@ similarity computation[J]. BMC bioinformatics, 2016, 17(1): 326.
 (1) disease-gene
     a. sidd
         文章中的统计：2,427 diseases and 104,052 gene-disease associations
-        自己统计它在suppl提供的数据：dsiease: 2427 genes: 11834 assos: 104057
+        自己统计它在suppl提供的数据：disease: 2427 genes: 11834 assos: 104057
     b. disgenet
         文章中的统计：3,259 disease terms and 206,403 gene-disease associations
-        自己统计它在suppl提供的数据：dsiease: 3259 genes: 14849 assos: 206361
+        自己统计它在suppl提供的数据：disease: 3259 genes: 14849 assos: 206361
 (2) ppi
     a. HumanNet
         476,399 functional linkages among 16,243 human genes
@@ -434,6 +434,7 @@ similarity computation[J]. BMC bioinformatics, 2016, 17(1): 326.
                 nodes: 17473 edges: 280376 (无自环)
                 nodes: 17452 edges: 280364 (最大连通分支)
 #-------------------------------------------------------------------------
+
 
 
 

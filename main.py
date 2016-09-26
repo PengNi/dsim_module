@@ -4,7 +4,6 @@ from files import read_one_col
 from files import read_mappings
 from files import read_assos
 from files import read_sims
-from files import read_simmatrix
 from files import stat_assos
 from files import stat_maps
 from files import stat_sims
@@ -33,7 +32,6 @@ from evaluation import eva_ranking
 from evaluation import eva_tprfprs
 from evaluation import eva_aucs
 from evaluation import eva_groundtruth
-import experiments
 import mapping
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
@@ -124,6 +122,7 @@ def evaluation_70benchmarkset(times=1,
                 'outputs/similarity_experiments_rwrzrq_rwrsidd_hppinwosl.tsv',
                 'outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwosl.tsv',
                 'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
+                'outputs/similarity_icod_rwrsidd_hppinwosl_triplet.tsv',
                 'outputs/similarity_bognew_rwrsidd_triplet.tsv'
                 ]
 
@@ -943,4 +942,4 @@ def rwr_bmc_dgassos():
 
 
 if __name__ == "__main__":
-    evaluation_70benchmarkset(100, 'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tab')
+    evaluation_70benchmarkset(1000, 'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tab')
