@@ -70,6 +70,76 @@ def eva_groundtruth(sims, groundtruthfilepath):
     return topnpairs
 
 
+def eva_roc_getvalidationpairs(sims, validationpairsnlabels):
+    """
+    get the similarity scores and labels of the validation pairs in sims
+    :param sims: got from method eva_readsims(), contains sims of methods need
+    to be evaluated
+    :param validationpairsnlabels: dict, contains validation pairs and their lables, can be got
+    from method eva_get_validationpairsnlabels_comorbidity()
+    :return: dict, dict pattern is
+    {disease1: {disease2:{method1: simvalue, method2: simvalue, ..., label: 0/1}, }, }
+    """
+    dpairs = {}
+    for dk in validationpairsnlabels.keys():
+        dpairs[dk] = set(validationpairsnlabels[dk].keys())
+    methodfilepaths = list(sims.keys())
+    for i in range(0, len(methodfilepaths)):
+        simtemp = sims[methodfilepaths[i]]
+        for dpk in dpairs.keys():
+            scopy = deepcopy(dpairs[dpk])
+            for s in scopy:
+                if not ((dpk in simtemp.keys() and s in simtemp[dpk].keys()) or
+                        (s in simtemp.keys() and dpk in simtemp[s].keys())):
+                    dpairs[dpk].remove(s)
+    ds = list(dpairs.keys())
+    for d in ds:
+        dpairs[d].discard(d)
+        if len(dpairs[d]) == 0:
+            del dpairs[d]
+    print("number of disease pairs which all methods can cal: ", end='')
+    stat_assos(dpairs)
+
+    res = {}
+    for d1 in dpairs.keys():
+        res[d1] = {}
+        for d2 in dpairs[d1]:
+            res[d1][d2] = {}
+            for m in sims.keys():
+                res[d1][d2][m] = findsimvalue(d1, d2, sims[m])
+            res[d1][d2]['label'] = findsimvalue(d1, d2, validationpairsnlabels)
+    return res
+
+
+def eva_get_validationpairsnlabels_comorbidity(comorbidityfilepath, phi_cutoff=0, ttest_cutoff=1.96):
+    """
+    based on comorbidity info, get disease pairs needed validation and the pairs' labels (0/1,
+    0 represents two diseases have no significant correlation, 1 means they have)
+    :param comorbidityfilepath: path of the comorbidity file
+    :param phi_cutoff: phi value cutoff to be used to judge a dsiease pair
+    :param ttest_cutoff: ttest value cutoff
+    :return: dict, string-dict<string-0/1>, {disease1: { disease2: 0/1, }, }
+    """
+    pairs = {}
+    tfcount = 0
+    tcount = 0
+    with open(comorbidityfilepath, mode='r') as rf:
+        for line in rf:
+            tfcount += 1
+            words = line.strip().split('\t')
+            d1 = words[0].strip()
+            d2 = words[1].strip()
+            if d1 not in pairs.keys():
+                pairs[d1] = {}
+            if float(words[8].strip()) > phi_cutoff and float(words[9].strip()) >= ttest_cutoff:
+                pairs[d1][d2] = 1
+                tcount += 1
+            else:
+                pairs[d1][d2] = 0
+    print("labels sum:", tfcount, "true labels sum:", tcount)
+    return pairs
+
+
 def eva_tprfprs(scoredicts):
     """
     transform scores and labels to tprs and fprs
@@ -225,7 +295,7 @@ def findsimvalue(d1, d2, dsims):
     find d1 and d2's simvalue in dsims
     :param d1: string
     :param d2: string
-    :param dsims: dict, key-value: string-dict<string-value> ({entity1: {entity2: sim, }, }
+    :param dsims: dict, key-value: string-dict<string-value> ({entity1: {entity2: simvalue, }, }
     :return: float
     """
     if d1 in dsims.keys() and d2 in dsims[d1].keys():
