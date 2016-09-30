@@ -22,11 +22,13 @@ from umls_disease import read_umls_disease_info
 from similarity_coexpression import read_probeid_expfile
 from similarity_coexpression import probeexp2geneexp
 from similarity_coexpression import diseases_similarity_coexp
+from similarity_go import diseases_similarity_go
+from similarity_pathway import combine_pathway_data
+from similarity_pathway import get_disease_pathway_assos
 from gene_ontology import read_go_annotation_file
 from gene_ontology import GeneOntology
 from gene_ontology import invert_dict
 from gene_ontology import add_implicit_annotations
-from similarity_go import diseases_similarity_go
 from evaluation import eva_readsims
 from evaluation import eva_70benchmarkpairs
 from evaluation import eva_ranking
@@ -70,6 +72,18 @@ def evaluation_validationpairs():
             for m in methodnames:
                 print("\t" + str(vpairsinfo[d1][d2][m]), end='')
             print()
+    print("------------pair ranks---------------------------------------------------------")
+    vpairs_rank = eva_ranking(vpairsinfo)
+    ms = list(vpairs_rank.keys())
+    for m in ms:
+        print(str(m) + "\t\t\t", end="")
+    print()
+    llen = len(vpairs_rank[ms[0]])
+    for i in range(0, llen):
+        for m in ms:
+            for j in range(0, 4):
+                print(str(vpairs_rank[m][i][j]) + "\t", end="")
+        print()
     print("------------tpr and fpr--------------------------------------------------------")
     vpairs_tprfpr = eva_tprfpr(eva_ranking(vpairsinfo))
     methodnames = list(vpairs_tprfpr.keys())
@@ -152,10 +166,10 @@ def evaluation_groundtruth():
 
 def evaluation_70benchmarkset(times=1,
                               bmkpfile="data/benchmarkset_funsim/ground_truth_68_disease_pairs_umlsid.tsv"):
-    pathlist = [  # 'outputs/similarity_icod_umls_dgcutoff006_triplet.tsv',
-                'outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc_triplet.tsv',
+    pathlist = ['outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc_triplet.tsv',
                 'outputs/similarity_funsim_disgenet_dgcutoff006.tsv',
                 'outputs/similarity_bog_disgenet_dgcutoff006_triplet.tsv',
+                'outputs/similarity_icod_disgenet_dgcutoff006_interactome_triplet.tsv',
                 'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
                 'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv',
                 'outputs/similarity_experiments_shortestpath_transformed_less_disgenet_dgcutoff006_interactome.tsv',
@@ -404,6 +418,26 @@ def similarity_cal_module():
     write_sims(sims, "outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv")
 
 
+def combine_pathway_data_gsea():
+    paths = ['data/pathway_gsea/c2.cp.biocarta.v5.1.symbols.gmt',
+             'data/pathway_gsea/c2.cp.kegg.v5.1.symbols.gmt',
+             'data/pathway_gsea/c2.cp.reactome.v5.1.symbols.gmt', ]
+    # paths = ['data/pathway_gsea/c2.cp.v5.1.symbols.gmt', ]
+    pgassos = combine_pathway_data(paths)
+    stat_assos(pgassos)
+    # write_assos(pgassos, 'data/pathway_gsea/pgassos.c2.cp.bkr.v5.1.symbols.tsv')
+
+
+def get_disease_pathway_associations():
+    disease2gene = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
+                                                      0.06, True, True)
+    pathway2gene = read_assos("data/pathway_gsea/pgassos.c2.cp.v5.1.entrez.tsv")
+    dpassos = get_disease_pathway_assos(disease2gene, pathway2gene)
+    stat_assos(dpassos)
+    # write_assos(dpassos,
+    #             "data/pathway_gsea/dpassos.c2.cp.v5.1.entrez.disgenet.dgcutoff006.bh005.tsv")
+
+
 def do2umls_mapping():
     uds = read_umls_disease_info(0)
     do2umls = mapping.doid2umlsid(uds)
@@ -643,7 +677,7 @@ def disease_gene_network_hamaneh():
     print("number of vertices:", g.vcount())
     gvs = set(g.vs['name'])
 
-    # disease2gene_entrez = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
+    # disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
     #                                                          0.06, True, True)
     disease2gene_rwrsidd = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
     print("disease gene assos: ", end='')
@@ -1003,5 +1037,4 @@ def rwr_bmc_dgassos():
 
 
 if __name__ == "__main__":
-    # evaluation_70benchmarkset(1000)
-    evaluation_validationpairs()
+    get_disease_pathway_associations()

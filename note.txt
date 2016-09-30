@@ -372,6 +372,7 @@ the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
 (2) 按照一种貌似是通用的做法：
 	对于相似性值相同的疾病对，把label为真的往后排，label为假的往前排，即画出最坏情况的
 ROC曲线。
+    ***通用做法好像不是画出最坏的情况，而是画一条中间的斜直线表示最好和最坏的中间值***
 个人倾向于用(2)
 #------------------------------------------------------------------------
 
@@ -436,6 +437,46 @@ similarity computation[J]. BMC bioinformatics, 2016, 17(1): 326.
                 nodes: 17473 edges: 280376 (无自环)
                 nodes: 17452 edges: 280364 (最大连通分支)
 #-------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------
+14. hypergeometric test 如何计算的问题
+(1) 现需要通过hypergeometric test (one-tailed Fisher's exact test)来计算疾病D和GO (或pathway) 之间的关系，举例：
+      某疾病Di关联基因数m,
+      所有GO的关联基因总数为N,
+      某GOj关联基因数为n,
+      Di的基因与GOj个基因的交集个数为x.
+那么计算p-value的公式为 pvalue = 1-sum(choose(n, k)*choose(N-n, m-k)/choose(N, m)) <k=0:(x-1)>
+
+***问题是：如果疾病Di的m个基因不全在GO的N个基因里怎么办?***
+
+超几何分布的概率公式为 choose(n, k)*choose(N-n, m-k)/choose(N, m),
+在次品率的例子里，公式是指假设在N个物品里有m个次品，那么随机抽n个样品，里面有k个次品的概率
+那么按这样理解，这m个必须都在这N个里。
+
+***在写dSimer R包时并没有考虑到这个问题***
+现在倾向于：
+    在计算疾病与GO (pathway) 关联时，用N个基因与m个基因的交集作为疾病Di的关联基因集。计算公式变为：
+        m1 = |intersect(gene(N), gene(m))|
+        pvalue = 1-sum(choose(n, k)*choose(N-n, m1-k)/choose(N, m1)) <k=0:(x-1)>
+
+(2) ***在dSimer R包里考虑到的另外一个问题***
+问题是：计算GO (pathway)与disease有没有关系时，选哪些GO (pathway) 作为候选？
+dSimer里的处理方案是：如果某GO (pathway)的关联基因与该疾病的关联基因没有交集 (即 (1)的例子中 x=0), 那么
+该GO (pathway) 将不作为候选，即在多重校验时不考虑该GO (pathway)。
+
+在寻找某疾病的关联GO (pathway)时，首先将有可能的GO (pathway)选出来作为候选 (以x != 0作为筛选条件),
+然后再用hypergeometric test和multiple tests计算候选GO (pathway)的p-value, 进而选出有显著性意义的
+GO (pathway)。
+感觉这种处理方式比较合理。
+#-------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 
 
 
