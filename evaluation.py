@@ -178,21 +178,16 @@ def eva_tprfpr(scorenlabel):
         conditionf = len(slable) - conditionp
         tpfp[m].append((0.0, 0.0))
         tp = 0
-        # ----calculate the 1st node----
-        tp += slable[0]
-        fp = 1-tp
-        tpfp[m].append((fp / conditionf, tp / conditionp))
-        # ----calculate the middle nodes
-        for i in range(1, len(slable)-1):
+        # ----calculate nodes except the last one----
+        for i in range(0, len(slable)-1):
             tp += slable[i]
             fp = i+1-tp
-            if not (sscore[i] == sscore[i+1] and sscore[i] == sscore[i-1]):
+            if sscore[i] != sscore[i+1]:
                 tpfp[m].append((fp/conditionf, tp/conditionp))
-        # ----calculate the last node---
+        # ----calculate the last node----------------
         tp += slable[len(slable)-1]
         fp = len(slable)-tp
         tpfp[m].append((fp / conditionf, tp / conditionp))
-        # ------------------------------
         # -------------------------------------------------
     return tpfp
 
@@ -250,7 +245,7 @@ def eva_auc(tprfpr):
         mauc = 0.0
         mtpfp = tprfpr[m]
         for i in range(0, len(mtpfp)-1):
-            mauc += (mtpfp[i+1][0] - mtpfp[i][0]) * (mtpfp[i+1][1] + mtpfp[i+1][1])
+            mauc += (mtpfp[i+1][0] - mtpfp[i][0]) * (mtpfp[i+1][1] + mtpfp[i][1])
         auc[m] = mauc/2
     return auc
 
