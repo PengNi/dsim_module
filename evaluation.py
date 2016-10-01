@@ -169,16 +169,31 @@ def eva_tprfpr(scorenlabel):
         tpfp[m] = []
         sltemp = scorenlabel[m]
         slable = []
+        sscore = []
         for i in range(0, len(sltemp)):
             slable.append(sltemp[i][3])
+            sscore.append(sltemp[i][2])
+        # ----tpr fpr calculating strategy-----------------
         conditionp = sum(slable)
         conditionf = len(slable) - conditionp
-        tp = 0
         tpfp[m].append((0.0, 0.0))
-        for i in range(0, len(slable)):
+        tp = 0
+        # ----calculate the 1st node----
+        tp += slable[0]
+        fp = 1-tp
+        tpfp[m].append((fp / conditionf, tp / conditionp))
+        # ----calculate the middle nodes
+        for i in range(1, len(slable)-1):
             tp += slable[i]
             fp = i+1-tp
-            tpfp[m].append((fp/conditionf, tp/conditionp))
+            if not (sscore[i] == sscore[i+1] and sscore[i] == sscore[i-1]):
+                tpfp[m].append((fp/conditionf, tp/conditionp))
+        # ----calculate the last node---
+        tp += slable[len(slable)-1]
+        fp = len(slable)-tp
+        tpfp[m].append((fp / conditionf, tp / conditionp))
+        # ------------------------------
+        # -------------------------------------------------
     return tpfp
 
 

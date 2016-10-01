@@ -4,6 +4,27 @@ from statsmodels.sandbox.stats.multicomp import multipletests
 from files import stat_assos
 
 
+def diseases_similarity_pathway_jaccard(diseases, disease2pathway):
+    """
+    calculate simialrity of disease pairs based on disease-pathway
+    associations, use jaccard index formula.
+    :param diseases:
+    :param disease2pathway:
+    :return:
+    """
+    diseases = list(set(diseases).intersection(set(disease2pathway.keys())))
+    sims = {}
+    n = len(diseases)
+    for i in range(0, n):
+        sims[diseases[i]] = {}
+        pathwaysi = disease2pathway[diseases[i]]
+        for j in range(i, n):
+            pathwaysj = disease2pathway[diseases[j]]
+            sims[diseases[i]][diseases[j]] = (len(pathwaysi.intersection(pathwaysj)) /
+                                              len(pathwaysi.union(pathwaysj)))
+    return sims
+
+
 def combine_pathway_data(orifilepaths):
     """
     paths of pathway file get from gsea

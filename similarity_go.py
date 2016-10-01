@@ -30,9 +30,9 @@ def diseases_similarity_go(diseases, disease2gene, gene2go, go2gene):
         print(i, diseases[i], "gene number:", len(disease2gene_new[diseases[i]]))
         sim_result[diseases[i]] = {}
         for j in range(i, n):
-            simvalue = disease_pair_similarity_go(diseases[i], diseases[j],
-                                                  disease2gene_new, gene2go, go2gene)
-            sim_result[diseases[i]][diseases[j]] = simvalue
+            sim_result[diseases[i]][diseases[j]] = disease_pair_similarity_go(diseases[i],
+                                                                              diseases[j],
+                                                                              disease2gene_new, gene2go, go2gene)
         print("------------------------------- cost time:", str(time.time() - t0))
     return sim_result
 

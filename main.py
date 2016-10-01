@@ -25,6 +25,7 @@ from similarity_coexpression import diseases_similarity_coexp
 from similarity_go import diseases_similarity_go
 from similarity_pathway import combine_pathway_data
 from similarity_pathway import get_disease_pathway_assos
+from similarity_pathway import diseases_similarity_pathway_jaccard
 from gene_ontology import read_go_annotation_file
 from gene_ontology import GeneOntology
 from gene_ontology import invert_dict
@@ -103,26 +104,34 @@ def evaluation_validationpairs():
 
 
 def evaluation_groundtruth():
-    pathlist = ['outputs/similarity_icod_umls_dgcutoff006_triplet.tsv',
-                'outputs/similarity_suntopo_umls_dgcutoff006_triplet.tsv',
-                'outputs/similarity_funsim_umls_dgcutoff006.tsv',
-                'outputs/similarity_bognew_umls_dgcutoff006_triplet.tsv',
+    pathlist = ['outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc_triplet.tsv',
+                'outputs/similarity_funsim_disgenet_dgcutoff006.tsv',
+                'outputs/similarity_bog_disgenet_dgcutoff006_triplet.tsv',
+                'outputs/similarity_icod_disgenet_dgcutoff006_interactome_triplet.tsv',
                 'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
-                'outputs/similarity_experiments_shortestpath_transformed_less_umls_dgcutoff006.tsv',
-                'outputs/similarity_experiments_rwrzrq_umls_dgcutoff006.tsv',
-                # 'outputs/similarity_module1_umls_dgcutoff006.tsv',
-                'outputs/similarity_module5_umls_dgcutoff006.tsv'
+                'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv',
+                'outputs/similarity_experiments_shortestpath_transformed_less_disgenet_dgcutoff006_interactome.tsv',
+                'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv',
+                # 'outputs/similarity_funsim_rwrsidd.tsv',
+                # 'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
+                # 'outputs/similarity_module5_rwrsidd_hppinwsl.tsv',
+                # 'outputs/similarity_experiments_rwr_rwrsidd_hppinwsl.tsv',
+                # 'outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwsl.tsv',
+                # 'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
+                # # 'outputs/similarity_icod_rwrsidd_hppinwosl_triplet.tsv',
+                # 'outputs/similarity_bognew_rwrsidd_triplet.tsv',
                 ]
     gtpathlist = ['outputs/similarity_go_bp_umls_dgcutoff006.tsv',
                   'outputs/similarity_go_cc_umls_dgcutoff006.tsv',
                   'outputs/similarity_go_mf_umls_dgcutoff006.tsv',
                   'outputs/similarity_coexp_umls_dgcutoff006.tsv',
                   'outputs/similarity_symptom_1445umlsid.tsv',
-                  'outputs/similarity_symptom_1736umlsid.tsv']
+                  'outputs/similarity_symptom_1736umlsid.tsv',
+                  "outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv", ]
 
     msims = eva_readsims(pathlist)
 
-    for g in [0, 1, 2, 3, 4]:
+    for g in [6]:
         evagtres = eva_groundtruth(msims, gtpathlist[g])
         print(gtpathlist[g]+"----------------------------")
         mnames = list(evagtres.keys())
@@ -181,7 +190,7 @@ def evaluation_70benchmarkset(times=1,
                 # 'outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwsl.tsv',
                 # 'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
                 # # 'outputs/similarity_icod_rwrsidd_hppinwosl_triplet.tsv',
-                # 'outputs/similarity_bognew_rwrsidd_triplet.tsv'
+                # 'outputs/similarity_bognew_rwrsidd_triplet.tsv',
                 ]
 
     benchmarkpairs = read_assos(bmkpfile, header=False)
@@ -237,14 +246,19 @@ def evaluation_70benchmarkset(times=1,
             t += 1
             print("-----------------time------------------------------------------------------")
             methodnames = list(tpfpr.keys())
-            for m in methodnames:
-                print(str(m)+"_fpr\t"+m+"_tpr\t", end='')
+            llens = []
+            for name in methodnames:
+                llens.append(len(tpfpr[name]))
+                print(str(name)+"_fpr\t"+str(name)+"_tpr\t", end='')
             print()
-            llen = len(tpfpr[methodnames[0]])
-            for i in range(0, llen):
+            mllen = max(llens)
+            for i in range(0, mllen):
                 for name in methodnames:
-                    for j in range(0, 2):
-                        print(str(tpfpr[name][i][j])+"\t", end="")
+                    if i < len(tpfpr[name]):
+                        for j in range(0, 2):
+                            print(str(tpfpr[name][i][j])+"\t", end="")
+                    else:
+                        print("\t\t", end='')
                 print()
     print("---avg auc values------------------------------------------------------------------")
     aucs = eva_aucs(tpfprs)
@@ -436,6 +450,15 @@ def get_disease_pathway_associations():
     stat_assos(dpassos)
     # write_assos(dpassos,
     #             "data/pathway_gsea/dpassos.c2.cp.v5.1.entrez.disgenet.dgcutoff006.bh005.tsv")
+
+
+def similarity_cal_pathway():
+    d2p = read_assos("data/pathway_gsea/dpassos.c2.cp.bkr.v5.1.entrez.disgenet.dgcutoff006.bh005.tsv")
+    print("disease-pathway assos: ", end='')
+    stat_assos(d2p)
+    sims = diseases_similarity_pathway_jaccard(list(d2p.keys()), d2p)
+    stat_sims(sims)
+    write_sims(sims, "outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv")
 
 
 def do2umls_mapping():
@@ -1037,4 +1060,4 @@ def rwr_bmc_dgassos():
 
 
 if __name__ == "__main__":
-    get_disease_pathway_associations()
+    evaluation_70benchmarkset(1000)
