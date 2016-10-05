@@ -1,76 +1,76 @@
 #--------------------------------------------------------------------------------
-1. diseaseµ½geneµÄÓ³ÉäÎÊÌâ
-±ÈÈçdisease AÓĞ30¸ögene(entrezid)£¬ entrezid mapping symbolÖ®ºóÓĞ25¸ögene(symbol),
-¶øÕâ25¸ögeneÀïÖ»ÓĞ20¸ö×¢ÊÍÁËGO
-ÎÊÌâ£º µ±ÓÃµ½GOÀ´¼ÆËãdisease similarityµÄÊ±ºò£¬Èç¹ûÓÃµ½»ùÒòµÄ¸öÊı£¬¸ÃÓÃÄÄÒ»¸ö
-²Î¿¼£ºMenche J, Sharma A, Kitsak M, et al. Uncovering disease-disease relationships through 
+1. diseaseåˆ°geneçš„æ˜ å°„é—®é¢˜
+æ¯”å¦‚disease Aæœ‰30ä¸ªgene(entrezid)ï¼Œ entrezid mapping symbolä¹‹åæœ‰25ä¸ªgene(symbol),
+è€Œè¿™25ä¸ªgeneé‡Œåªæœ‰20ä¸ªæ³¨é‡Šäº†GO
+é—®é¢˜ï¼š å½“ç”¨åˆ°GOæ¥è®¡ç®—disease similarityçš„æ—¶å€™ï¼Œå¦‚æœç”¨åˆ°åŸºå› çš„ä¸ªæ•°ï¼Œè¯¥ç”¨å“ªä¸€ä¸ª
+å‚è€ƒï¼šMenche J, Sharma A, Kitsak M, et al. Uncovering disease-disease relationships through 
 the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
 
 ####ans#####
-ÒòÎªÒªËãÆ½¾ùÖµ£¬ËùÒÔÓÃ20
+å› ä¸ºè¦ç®—å¹³å‡å€¼ï¼Œæ‰€ä»¥ç”¨20
 ############
 #--------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------
-2. probeid to entrezidµÄmappingÎÊÌâ
+2. probeid to entrezidçš„mappingé—®é¢˜
 reference: Su A I, Wiltshire T, Batalov S, et al. A gene atlas of the mouse and 
 human protein-encoding transcriptomes[J]. Proceedings of the National Academy of 
 Sciences of the United States of America, 2004, 101(16): 6062-6067.
 
 data downloding site: http://biogps.org/downloads/  dataset: human U133A/GNF1H
 
-Ò»¹²ÓĞ44775¸öprobeidĞèÒª×ömapping
+ä¸€å…±æœ‰44775ä¸ªprobeidéœ€è¦åšmapping
 
 #!!!!!!!!!!!!!-------------------------------------------------
-ÎÄÕÂÀïÌá¹©µÄÊı¾İÖĞÓĞ¹ØÓÚprobeidµÄannotation£¬annotationÀïÓĞ
-probeidµ½entrezidµÄmapping¡£
-mappingÍ³¼Æ½á¹û£º
+æ–‡ç« é‡Œæä¾›çš„æ•°æ®ä¸­æœ‰å…³äºprobeidçš„annotationï¼Œannotationé‡Œæœ‰
+probeidåˆ°entrezidçš„mappingã€‚
+mappingç»Ÿè®¡ç»“æœï¼š
 probeid: 29202 entrezid: 18608 associations: 31490
 #!!!!!!!!!!!!!-------------------------------------------------
 
-#-----------------------ÓÃµÚÈı·½mapping¹¤¾ßµÄ½á¹û--------------
-ÓÃmygene×ömapping£º
-ÓĞ29308¸öprobeid mappingµ½ÁË
+#-----------------------ç”¨ç¬¬ä¸‰æ–¹mappingå·¥å…·çš„ç»“æœ--------------
+ç”¨mygeneåšmappingï¼š
+æœ‰29308ä¸ªprobeid mappingåˆ°äº†
 stat: probeid: 29308 entrezid: 18473 associations: 31287
 
-ÓÃdavid×ömapping£º
-ÓĞ21722¸öprobeid mappingµ½ÁË
+ç”¨davidåšmappingï¼š
+æœ‰21722ä¸ªprobeid mappingåˆ°äº†
 stat: probeid: 21722 entrezid: 14097 associations: 24973
 
-mygeneÀïµÄ29308¸öÀï£º
-mapping½á¹ûÓëdavidÏàÍ¬µÄÓĞ18693¸ö
-mapping½á¹ûÓëdavid²»Í¬µÄÓĞ2158¸ö
-mygeneÀïÄÜmappingµ½¶ødavidÃ»ÓĞmappingµ½µÄÓĞ8457¸ö
+mygeneé‡Œçš„29308ä¸ªé‡Œï¼š
+mappingç»“æœä¸davidç›¸åŒçš„æœ‰18693ä¸ª
+mappingç»“æœä¸davidä¸åŒçš„æœ‰2158ä¸ª
+mygeneé‡Œèƒ½mappingåˆ°è€Œdavidæ²¡æœ‰mappingåˆ°çš„æœ‰8457ä¸ª
 
-davidÀïÄÜmappingµ½¶ømygeneÀïÃ»mappingµ½µÄÓĞ871¸ö
+davidé‡Œèƒ½mappingåˆ°è€Œmygeneé‡Œæ²¡mappingåˆ°çš„æœ‰871ä¸ª
 
-ÎÊÌâÊÇÕâÁ½ÖÖmapping½á¹ûÓÃÄÄ¸ö
+é—®é¢˜æ˜¯è¿™ä¸¤ç§mappingç»“æœç”¨å“ªä¸ª
 
-¾ö¶¨ºÏ²¢Á½¸ö½á¹û
-ºÏ²¢Ö®ºó£º
+å†³å®šåˆå¹¶ä¸¤ä¸ªç»“æœ
+åˆå¹¶ä¹‹åï¼š
 stat: probeid: 30179 entrezid: 19505 associations: 35201
 #--------------------------------------------------------------
 
-#-----Á½ÖÖ·½Ê½£¨ÎÄÕÂÌá¹©µÄÊı¾İ×¢ÊÍÀïµÄmappingºÍµÚÈı·½¹¤¾ßµÄmapping£©µÄ±È½Ï------
+#-----ä¸¤ç§æ–¹å¼ï¼ˆæ–‡ç« æä¾›çš„æ•°æ®æ³¨é‡Šé‡Œçš„mappingå’Œç¬¬ä¸‰æ–¹å·¥å…·çš„mappingï¼‰çš„æ¯”è¾ƒ------
 probeid2entrezid mapping result from mygene and david:	stat_assos: probeid: 30179 entrezid: 19505 associations: 35201
 probeid2entrezid mapping result from the paper:	stat_assos: probeid: 29202 entrezid: 18608 associations: 31490
-ÓÃÎÄÕÂÀïµÄmappingºÍµÚÈı·½¹¤¾ßmapping¶¼ÓĞ½á¹ûµÄprobeidÓĞ 28957 ¸ö
-Õâ¸ö28957¸öÀïÓĞ1836¸ö£¬Á½ÖÖ·½Ê½µÄmapping½á¹ûÊÇ²»Í¬µÄ
+ç”¨æ–‡ç« é‡Œçš„mappingå’Œç¬¬ä¸‰æ–¹å·¥å…·mappingéƒ½æœ‰ç»“æœçš„probeidæœ‰ 28957 ä¸ª
+è¿™ä¸ª28957ä¸ªé‡Œæœ‰1836ä¸ªï¼Œä¸¤ç§æ–¹å¼çš„mappingç»“æœæ˜¯ä¸åŒçš„
 #-------------------------------------------------------------------------------
 
-#---------½áÂÛ-------------------------------------------------
-(1) ÒÔÎÄÕÂÀïÌá¹©µÄmappingÎª×¼
-(2) ÏÈ²»½«µÚÈı·½¹¤¾ß£¨mygene, david£©µÄmapping½á¹û×÷Îª²¹³ä£¬
-    Ö»ÓÃÎÄÕÂÌá¹©µÄmapping½á¹û
+#---------ç»“è®º-------------------------------------------------
+(1) ä»¥æ–‡ç« é‡Œæä¾›çš„mappingä¸ºå‡†
+(2) å…ˆä¸å°†ç¬¬ä¸‰æ–¹å·¥å…·ï¼ˆmygene, davidï¼‰çš„mappingç»“æœä½œä¸ºè¡¥å……ï¼Œ
+    åªç”¨æ–‡ç« æä¾›çš„mappingç»“æœ
 #--------------------------------------------------------------
 #--------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------
-3. Reference: Zhou X Z, Menche J, Barab¨¢si A L, et al. Human symptoms¨Cdisease network[J].
+3. Reference: Zhou X Z, Menche J, BarabÃ¡si A L, et al. Human symptomsâ€“disease network[J].
 Nature communications, 2014, 5.
-ÕâÆªÎÄÕÂ¼ÆËãÁË1596¸ömesh termÖ®¼äµÄÏàËÆĞÔ£¬Ïê¼û "ncomms5212-s5.txt"
-1596¸ömesh term£¬ÓĞ1577¸öÍ¨¹ıÓÃ "MeshTreeHierarchy.csv" mapping¿ÉÒÔµÃµ½Æämesh unique ID£¬
-ÓĞ19¸öÃ»ÓĞunique ID£º
+è¿™ç¯‡æ–‡ç« è®¡ç®—äº†1596ä¸ªmesh termä¹‹é—´çš„ç›¸ä¼¼æ€§ï¼Œè¯¦è§ "ncomms5212-s5.txt"
+1596ä¸ªmesh termï¼Œæœ‰1577ä¸ªé€šè¿‡ç”¨ "MeshTreeHierarchy.csv" mappingå¯ä»¥å¾—åˆ°å…¶mesh unique IDï¼Œ
+æœ‰19ä¸ªæ²¡æœ‰unique IDï¼š
 Mycobacterium Infections, Atypical
 Intervertebral Disk Degeneration
 Epidermal Necrolysis, Toxic
@@ -92,19 +92,19 @@ Dengue Hemorrhagic Fever
 Intervertebral Disk Displacement
 #--------------------------------------------------------------------------------
 
-ÏÖÔÚĞèÒª½«1596¸ömesh term name ×ª»»³É DisGeNETÖĞ´æÔÚµÄumls id£º
-ÓĞÁ½ÖÖ·½Ê½£º
-(1) ÒòÎªDisGeNETÌá¹©ÁËumls id ¼°ÆäÏàÓ¦name£¬¶øÕâ¸önameÀ´¿´ÉÏÈ¥×ÔÓÚmesh£¬
-¼´¿ÉÒÔÖ±½ÓÓÃ¸ÃnameÓëumls idµÄÓ³ÉäÀ´×ömesh term nameµ½umls idµÄ×ª»»£º
-¼´ mesh term name->DisGeNET disease name->umls id
-(2) ÀûÓÃ´ÓMeSHÍøÕ¾ÉÏÏÂÔØµÄ"MeshTreeHierarchy.csv"ÎÄ¼şÀïmesh idºÍmesh term name
-µÄÓ³Éä¹ØÏµºÍDisGeNETÌá¹©µÄ¡°ls-umls2mesh-exactMatch.ttl¡±ÎÄ¼şÀïmesh idºÍumls idµÄ
-Ó³Éä¹ØÏµ×ö×ª»»£º
-¼´mesh term name->mesh id->umls id
+ç°åœ¨éœ€è¦å°†1596ä¸ªmesh term name è½¬æ¢æˆ DisGeNETä¸­å­˜åœ¨çš„umls idï¼š
+æœ‰ä¸¤ç§æ–¹å¼ï¼š
+(1) å› ä¸ºDisGeNETæä¾›äº†umls id åŠå…¶ç›¸åº”nameï¼Œè€Œè¿™ä¸ªnameæ¥çœ‹ä¸Šå»è‡ªäºmeshï¼Œ
+å³å¯ä»¥ç›´æ¥ç”¨è¯¥nameä¸umls idçš„æ˜ å°„æ¥åšmesh term nameåˆ°umls idçš„è½¬æ¢ï¼š
+å³ mesh term name->DisGeNET disease name->umls id
+(2) åˆ©ç”¨ä»MeSHç½‘ç«™ä¸Šä¸‹è½½çš„"MeshTreeHierarchy.csv"æ–‡ä»¶é‡Œmesh idå’Œmesh term name
+çš„æ˜ å°„å…³ç³»å’ŒDisGeNETæä¾›çš„â€œls-umls2mesh-exactMatch.ttlâ€æ–‡ä»¶é‡Œmesh idå’Œumls idçš„
+æ˜ å°„å…³ç³»åšè½¬æ¢ï¼š
+å³mesh term name->mesh id->umls id
 
 
-ÎÊÌâÊÇumls idºÍmesh idÖ®¼ä¿ÉÄÜ´æÔÚ¶à¶Ô¶à£¨ÖÁÉÙÊÇÒ»¶Ô¶à£©µÄ¹ØÏµ¡£
-ÒÔÏÂÊÇÀûÓÃÕâÁ½ÖÖ·½Ê½×ömapping½á¹ûµÄ¶Ô±È£º
+é—®é¢˜æ˜¯umls idå’Œmesh idä¹‹é—´å¯èƒ½å­˜åœ¨å¤šå¯¹å¤šï¼ˆè‡³å°‘æ˜¯ä¸€å¯¹å¤šï¼‰çš„å…³ç³»ã€‚
+ä»¥ä¸‹æ˜¯åˆ©ç”¨è¿™ä¸¤ç§æ–¹å¼åšmappingç»“æœçš„å¯¹æ¯”ï¼š
 using umlsnames to map got 0 result, using mesh ids to map got 0 result: 54
 using umlsnames to map got 0 result, using mesh ids to map got 1 result: 211
 using umlsnames to map got 0 result, using mesh ids to map got multi results: 97
@@ -114,36 +114,36 @@ using umlsnames to map got 1 result, using mesh ids to map got 1 result, and the
 using umlsnames to map got 1 result, using mesh ids to map got multi results, and 1 result by umlsnames is in multi results: 400
 using umlsnames to map got 1 result, using mesh ids to map got multi results, but 1 result by umlsnames is not in multi results: 0
 
-´ó·½ÏòÊÇÈç¹ûÁ½ÖÖ·½Ê½ÓĞ²»Í¬½á¹ûÒÔµÚÒ»ÖÖ·½Ê½Îª×¼
+å¤§æ–¹å‘æ˜¯å¦‚æœä¸¤ç§æ–¹å¼æœ‰ä¸åŒç»“æœä»¥ç¬¬ä¸€ç§æ–¹å¼ä¸ºå‡†
 
-ÄÜÓÃµÄmappingÊ×ÏÈÓĞ211+7+824+400=1442¸ö
+èƒ½ç”¨çš„mappingé¦–å…ˆæœ‰211+7+824+400=1442ä¸ª
 
-ÓÃÁ½ÖÖ·½Ê½µÃµ½²»Í¬µ¥Ò»½á¹ûµÄÓĞ3¸ö£¬Õâ3¸öµÄ½á¹ûÒÔµÚÒ»ÖÖ·½Ê½£¨umls name mapping£©µÄÎª×¼:
+ç”¨ä¸¤ç§æ–¹å¼å¾—åˆ°ä¸åŒå•ä¸€ç»“æœçš„æœ‰3ä¸ªï¼Œè¿™3ä¸ªçš„ç»“æœä»¥ç¬¬ä¸€ç§æ–¹å¼ï¼ˆumls name mappingï¼‰çš„ä¸ºå‡†:
 Osteomalacia umls:C0029442 {'umls:C3887650'}
 Macular Degeneration umls:C0024437 {'umls:C0242383'}
 Hearing Loss umls:C3887873 {'umls:C1384666'}
 
-ËùÒÔÄÜÓĞµ¥Ò»mapping½á¹ûµÄmesh term nameÓĞ1442+3=1445¸ö£¬Í¨¹ıÍ³¼ÆµÃµ½£º
-Õâ1445¸ömesh term name mappingµ½ÁË1445¸ö²»Í¬µÄumls id
+æ‰€ä»¥èƒ½æœ‰å•ä¸€mappingç»“æœçš„mesh term nameæœ‰1442+3=1445ä¸ªï¼Œé€šè¿‡ç»Ÿè®¡å¾—åˆ°ï¼š
+è¿™1445ä¸ªmesh term name mappingåˆ°äº†1445ä¸ªä¸åŒçš„umls id
 
-ÓÃµÚÒ»ÖÖ·½Ê½Ã»ÓĞ½á¹ûÇÒÓÃµÚ2ÖÖ·½Ê½ÓĞ¶àÖØ½á¹ûµÄÓĞ97¸ö£¬
-Õâ97¸öÔõÃ´´¦Àí£¬ÓĞÒÉÎÊ
-(¾­¹ıºÍÀÏÊ¦ÌÖÂÛ£¬´¦Àí·½Ê½Îª£º¾¡Á¿ÓÃÒ»¶ÔÒ»µÄmapping£¬µ«ÊµÔÚ²»ÄÜÒ»¶ÔÒ»µÄ»°£¬
-ÓĞ¶àÖØ½á¹ûµÄ¾ÍÓÃ¶àÖØ½á¹û£¬ËùÒÔÕâ97¸ö¾ÍÓÃµÚ¶şÖÖ·½Ê½mappingµÄ½á¹û)
+ç”¨ç¬¬ä¸€ç§æ–¹å¼æ²¡æœ‰ç»“æœä¸”ç”¨ç¬¬2ç§æ–¹å¼æœ‰å¤šé‡ç»“æœçš„æœ‰97ä¸ªï¼Œ
+è¿™97ä¸ªæ€ä¹ˆå¤„ç†ï¼Œæœ‰ç–‘é—®
+(ç»è¿‡å’Œè€å¸ˆè®¨è®ºï¼Œå¤„ç†æ–¹å¼ä¸ºï¼šå°½é‡ç”¨ä¸€å¯¹ä¸€çš„mappingï¼Œä½†å®åœ¨ä¸èƒ½ä¸€å¯¹ä¸€çš„è¯ï¼Œ
+æœ‰å¤šé‡ç»“æœçš„å°±ç”¨å¤šé‡ç»“æœï¼Œæ‰€ä»¥è¿™97ä¸ªå°±ç”¨ç¬¬äºŒç§æ–¹å¼mappingçš„ç»“æœ)
 
-Í¨¹ıÍ³¼ÆÓÖµÃµ½£º
-1445+97=1542¸ö£¬Õâ1542¸ömesh term name mappingµ½ÁË1736¸ö²»Í¬µÄumls id,
-¶øÇÒÃ»ÓĞ¶à¸ömesh term name mappingµ½ÏàÍ¬µÄumls idÕâÖÖÇé¿ö
-(°Ñ1542-1736µÄ¹ØÏµÈ«²¿±£Áô£¬ÕâÑùµ½Ê¹ÓÃÊ±¾Í¿ÉÒÔÓĞÑ¡Ôñ£¬¼È¿ÉÒÔÖ»ÓÃ1445-1445µÄ¹ØÏµ£¬ÓÖ¿ÉÒÔ
-È«²¿¶¼ÓÃ)
+é€šè¿‡ç»Ÿè®¡åˆå¾—åˆ°ï¼š
+1445+97=1542ä¸ªï¼Œè¿™1542ä¸ªmesh term name mappingåˆ°äº†1736ä¸ªä¸åŒçš„umls id,
+è€Œä¸”æ²¡æœ‰å¤šä¸ªmesh term name mappingåˆ°ç›¸åŒçš„umls idè¿™ç§æƒ…å†µ
+(æŠŠ1542-1736çš„å…³ç³»å…¨éƒ¨ä¿ç•™ï¼Œè¿™æ ·åˆ°ä½¿ç”¨æ—¶å°±å¯ä»¥æœ‰é€‰æ‹©ï¼Œæ—¢å¯ä»¥åªç”¨1445-1445çš„å…³ç³»ï¼Œåˆå¯ä»¥
+å…¨éƒ¨éƒ½ç”¨)
 
-Á½ÖÖ·½Ê½¶¼Ã»ÓĞmapping½á¹ûµÄÓĞ54¸ö
+ä¸¤ç§æ–¹å¼éƒ½æ²¡æœ‰mappingç»“æœçš„æœ‰54ä¸ª
 
 !!!!!!!------------------------------------
-ĞèÒª×¢ÒâµÄÊÇÓÉÓÚnameºÍnameÖ®¼ä±È½Ï£¬ÓĞ¿ÉÄÜÓĞÁ½¸ö×Ö·û´®×ÖÄ¸¶¼Ò»Ñùµ«´óĞ¡Ğ´²»Ò»ÑùµÄÎÊÌâ£¬
-±¾´ÎÓÃÕâÁ½ÖÖ·½Ê½½øĞĞmappingÊ±¶¼Í³Ò»ÏÈ°ÑnameµÄ×Ö·û´®½øĞĞÁËĞ¡Ğ´»¯£¨Python: tolower()),
-È»ºóÔÚ½øĞĞ±È½Ï¡£
-ÕâÊÇ²»½øĞĞĞ¡Ğ´»¯µÄmapping½á¹û£º
+éœ€è¦æ³¨æ„çš„æ˜¯ç”±äºnameå’Œnameä¹‹é—´æ¯”è¾ƒï¼Œæœ‰å¯èƒ½æœ‰ä¸¤ä¸ªå­—ç¬¦ä¸²å­—æ¯éƒ½ä¸€æ ·ä½†å¤§å°å†™ä¸ä¸€æ ·çš„é—®é¢˜ï¼Œ
+æœ¬æ¬¡ç”¨è¿™ä¸¤ç§æ–¹å¼è¿›è¡Œmappingæ—¶éƒ½ç»Ÿä¸€å…ˆæŠŠnameçš„å­—ç¬¦ä¸²è¿›è¡Œäº†å°å†™åŒ–ï¼ˆPython: tolower()),
+ç„¶ååœ¨è¿›è¡Œæ¯”è¾ƒã€‚
+è¿™æ˜¯ä¸è¿›è¡Œå°å†™åŒ–çš„mappingç»“æœï¼š
 using umlsnames to map got 0 result, using mesh ids to map got 0 result: 55
 using umlsnames to map got 0 result, using mesh ids to map got 1 result: 234
 using umlsnames to map got 0 result, using mesh ids to map got multi results: 111
@@ -153,7 +153,7 @@ using umlsnames to map got 1 result, using mesh ids to map got 1 result, and the
 using umlsnames to map got 1 result, using mesh ids to map got multi results, and 1 result by umlsnames is in multi results: 386
 using umlsnames to map got 1 result, using mesh ids to map got multi results, but 1 result by umlsnames is not in multi results: 0
 
-½øĞĞĞ¡Ğ´»¯ºóĞÂÔöµÄÄÜmappingµ½umls idµÄmesh term name£º
+è¿›è¡Œå°å†™åŒ–åæ–°å¢çš„èƒ½mappingåˆ°umls idçš„mesh term nameï¼š
 umlsname: Facial Paralysis ; facial paralysis
 umlsname: Liposarcoma ; liposarcoma
 umlsname: Erectile Dysfunction ; erectile dysfunction
@@ -196,13 +196,13 @@ umlsname: Prostatitis ; prostatitis
 #--------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------
-4. ¼²²¡»ùÒò¹ØÏµ£¬»ùÒòÍøÂçÍ³¼Æ
+4. ç–¾ç—…åŸºå› å…³ç³»ï¼ŒåŸºå› ç½‘ç»œç»Ÿè®¡
 (1) all_gene_disease_associations.tsv
-È¡scoreµÄcuttoffÎª0£¨È¡È«²¿µÄ¹ØÏµ£©Ê±
+å–scoreçš„cuttoffä¸º0ï¼ˆå–å…¨éƒ¨çš„å…³ç³»ï¼‰æ—¶
     diseases: 15093 genes: 17381 associations: 429036
-È¡cutoffÎª0.06Ê±
+å–cutoffä¸º0.06æ—¶
     diseases: 7887 genes: 9696 associations: 41261
-È¡cutoffÎª0.08Ê±
+å–cutoffä¸º0.08æ—¶
     diseases: 7879 genes: 9694 associations: 41122
 
 (2) curated_gene_disease_associations.tsv 
@@ -210,51 +210,51 @@ diseases: 7607 genes: 9362 associations: 32834
 
 (3) Menche J, Sharma A, Kitsak M, et al. Uncovering disease-disease relationships through 
 the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
-ÕâÆªÎÄÕÂÓÃµ½µÄ¼²²¡»ùÒò¹ØÏµ£º
+è¿™ç¯‡æ–‡ç« ç”¨åˆ°çš„ç–¾ç—…åŸºå› å…³ç³»ï¼š
  diseases: 299 genes: 3173 associations: 29775
-ÕâÆªÎÄÕÂÓÃµ½µÄinteractome£º
+è¿™ç¯‡æ–‡ç« ç”¨åˆ°çš„interactomeï¼š
  nodes: 13460 edges: 141296
- È¥µô×Ô»·ºÍÖØ¸´±ßºó£º
+ å»æ‰è‡ªç¯å’Œé‡å¤è¾¹åï¼š
  nodes: 13397 edges: 138427
- ×î´óÁ¬Í¨·ÖÖ§£º
+ æœ€å¤§è¿é€šåˆ†æ”¯ï¼š
  nodes: 13329 edges: 138356
 #--------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------
-5. at the last of last, Òª²»ÒªÊÔÊÔºÏ²¢PheGenIºÍDisGeNETµÄ¼²²¡»ùÒò¹ØÏµÀ´×ö£¬
-Èç¹ûDisGeNETµÄÊı¾İ²»¹»µÄ»°¡£
+5. at the last of last, è¦ä¸è¦è¯•è¯•åˆå¹¶PheGenIå’ŒDisGeNETçš„ç–¾ç—…åŸºå› å…³ç³»æ¥åšï¼Œ
+å¦‚æœDisGeNETçš„æ•°æ®ä¸å¤Ÿçš„è¯ã€‚
 #--------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------
-6. ÓÃGO»òco expressionÆÀ¼Û×Ô¼º·½·¨Ëã³öÀ´µÄ¼²²¡ÏàËÆĞÔÊ±£¬Ö»ÆÀ¼ÛGOÏàËÆĞÔ»òco expressionÏàËÆĞÔ·Ç0µÄ
-¼²²¡¶Ô£¿
-²Î¿¼£ºMenche J, Sharma A, Kitsak M, et al. Uncovering disease-disease relationships through 
+6. ç”¨GOæˆ–co expressionè¯„ä»·è‡ªå·±æ–¹æ³•ç®—å‡ºæ¥çš„ç–¾ç—…ç›¸ä¼¼æ€§æ—¶ï¼Œåªè¯„ä»·GOç›¸ä¼¼æ€§æˆ–co expressionç›¸ä¼¼æ€§é0çš„
+ç–¾ç—…å¯¹ï¼Ÿ
+å‚è€ƒï¼šMenche J, Sharma A, Kitsak M, et al. Uncovering disease-disease relationships through 
 the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
 
-Ö»¶Ô·Ç0µÄ¼²²¡¶Ô½øĞĞÆÀ¼ÛÃ²ËÆ±È½ÏºÏÀí
+åªå¯¹é0çš„ç–¾ç—…å¯¹è¿›è¡Œè¯„ä»·è²Œä¼¼æ¯”è¾ƒåˆç†
 #--------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------
-7. ¼²²¡IDÖÖÀàÌ«¶àÁË ÊÇ²»ÊÇ¿¼ÂÇ°ÑËùÓĞ²»Í¬ID mappingµ½Í¬Ò»ÖÖÉÏ
-±ÈÈç¼²²¡»ùÒò¹ØÏµÖĞµÄ¼²²¡ÓÃµÄUMLS ID;
-ÓÃÀ´×öÆÀ¼ÛµÄÎÄÕÂhuman symptom disease network (HSDN)ÀïÓÃµÄÊÇmesh term name£»
-comorbidityÀï¼²²¡ÓÃµÄÊÇICD9 id£»
-hamaneh2014ÄÇÆª¿ÉÄÜÒªÓÃÀ´±È½ÏµÄÎÄÕÂ£¬ÓÃµÄÊÇmesh id ¼ÓÉÏ omim id£»
+7. ç–¾ç—…IDç§ç±»å¤ªå¤šäº† æ˜¯ä¸æ˜¯è€ƒè™‘æŠŠæ‰€æœ‰ä¸åŒID mappingåˆ°åŒä¸€ç§ä¸Š
+æ¯”å¦‚ç–¾ç—…åŸºå› å…³ç³»ä¸­çš„ç–¾ç—…ç”¨çš„UMLS ID;
+ç”¨æ¥åšè¯„ä»·çš„æ–‡ç« human symptom disease network (HSDN)é‡Œç”¨çš„æ˜¯mesh term nameï¼›
+comorbidityé‡Œç–¾ç—…ç”¨çš„æ˜¯ICD9 idï¼›
+hamaneh2014é‚£ç¯‡å¯èƒ½è¦ç”¨æ¥æ¯”è¾ƒçš„æ–‡ç« ï¼Œç”¨çš„æ˜¯mesh id åŠ ä¸Š omim idï¼›
 
-ÄÇÃ´ÊÇ²»ÊÇÒª°ÑËùÓĞ²»Í¬µÄID¶¼Ó³Éäµ½ umls id ÉÏ£¬¶ø²»ÊÇÃ¿ÖÖ²»Í¬µÄÆÀ¼Û·½Ê½ÓÃ²»Í¬µÄID¡£
+é‚£ä¹ˆæ˜¯ä¸æ˜¯è¦æŠŠæ‰€æœ‰ä¸åŒçš„IDéƒ½æ˜ å°„åˆ° umls id ä¸Šï¼Œè€Œä¸æ˜¯æ¯ç§ä¸åŒçš„è¯„ä»·æ–¹å¼ç”¨ä¸åŒçš„IDã€‚
 
-¾ßÌå×ö·¨£º°ÑËùÓĞ²»Í¬id Í³Ò»×ª»»³Éumls id£¬¶ø²»ÊÇÕë¶Ô²»Í¬µÄÆÀ¼Û·½·¨ÓÃ²»Í¬µÄID¡£±ÈÈç£¬
-°ÑHSDNµÄ½á¹ûºÍcomorbidityµÄ½á¹ûÀïµÄ¼²²¡id¶¼×ª»»³Éumls id£¬È»ºóÔÙÓÃÕâÁ½¸ö×÷Îª±ê×¼È¥×ö
-ÆäËû·½·¨µÄÆÀ¼Û£»¶ø²»ÊÇ°ÑÆäËû·½·¨µÄ¼²²¡id×ª»»³Émesh term name£¬ÔÙÓÃHSDNÆÀ¼Û£¬¶ø°ÑÆäËû
-·½·¨µÄ¼²²¡id×ª»»³Éicd9 id£¬ÔÙÓÃcomorbidityÆÀ¼Û¡£
+å…·ä½“åšæ³•ï¼šæŠŠæ‰€æœ‰ä¸åŒid ç»Ÿä¸€è½¬æ¢æˆumls idï¼Œè€Œä¸æ˜¯é’ˆå¯¹ä¸åŒçš„è¯„ä»·æ–¹æ³•ç”¨ä¸åŒçš„IDã€‚æ¯”å¦‚ï¼Œ
+æŠŠHSDNçš„ç»“æœå’Œcomorbidityçš„ç»“æœé‡Œçš„ç–¾ç—…idéƒ½è½¬æ¢æˆumls idï¼Œç„¶åå†ç”¨è¿™ä¸¤ä¸ªä½œä¸ºæ ‡å‡†å»åš
+å…¶ä»–æ–¹æ³•çš„è¯„ä»·ï¼›è€Œä¸æ˜¯æŠŠå…¶ä»–æ–¹æ³•çš„ç–¾ç—…idè½¬æ¢æˆmesh term nameï¼Œå†ç”¨HSDNè¯„ä»·ï¼Œè€ŒæŠŠå…¶ä»–
+æ–¹æ³•çš„ç–¾ç—…idè½¬æ¢æˆicd9 idï¼Œå†ç”¨comorbidityè¯„ä»·ã€‚
 #--------------------------------------------------------------------------------
 
 #--------------------------------------------------------------------------------
-8. 70¶Ô¼²²¡×÷Îªground truth
+8. 70å¯¹ç–¾ç—…ä½œä¸ºground truth
 reference: Cheng L, Li J, Ju P, et al. SemFunSim: a new method for measuring disease similarity by 
 integrating semantic and gene functional association[J]. PloS one, 2014, 9(6): e99415.
 
-Õâ70¸ö¼²²¡¶ÔÊÇ47¸ödoidÖ®¼äµÄ£¬¸ù¾İ"ls-umls2do-exactMatch.ttl" mappingµ½umls idÉÏ½á¹ûÈçÏÂ£º
+è¿™70ä¸ªç–¾ç—…å¯¹æ˜¯47ä¸ªdoidä¹‹é—´çš„ï¼Œæ ¹æ®"ls-umls2do-exactMatch.ttl" mappingåˆ°umls idä¸Šç»“æœå¦‚ä¸‹ï¼š
 DOID:11612 {'umls:C0032460'}
 DOID:1459 {'umls:C0020676'}
 DOID:9120 {'umls:C0002726'}
@@ -303,32 +303,32 @@ DOID:1564 {'umls:C0026946'}
 DOID:2841 {'umls:C0004096'}
 DOID:12558 {'umls:C0162674'}
 
-ÓĞÒ»¸öÃ»ÓĞmapping½á¹û: DOID:83
-  Í¨¹ı²éÑ¯Disease Ontology (HumanDO.obo)µÃµ½
-    DOID:83¶ÔÓ¦umls:C0029531
-ÓĞÈı¸öÓĞ¶à¸ö½á¹û£º
+æœ‰ä¸€ä¸ªæ²¡æœ‰mappingç»“æœ: DOID:83
+  é€šè¿‡æŸ¥è¯¢Disease Ontology (HumanDO.obo)å¾—åˆ°
+    DOID:83å¯¹åº”umls:C0029531
+æœ‰ä¸‰ä¸ªæœ‰å¤šä¸ªç»“æœï¼š
 DOID:0050700 {'umls:C0033141', 'umls:C0036529', 'umls:C0878544'}
   DOID:0050700: cardiomyopathy
   umls:C0033141: Cardiomyopathies, Primary
   umls:C0036529: Myocardial Diseases, Secondary
   umls:C0878544: Cardiomyopathies
-  Ñ¡ DOID:0050700->umls:C0878544
+  é€‰ DOID:0050700->umls:C0878544
 DOID:3312 {'umls:C0024713', 'umls:C0005587', 'umls:C0005586'}
   DOID:3312: bipolar disorder
   umls:C0024713: Manic Disorder
   umls:C0005587: Depression, Bipolar
   umls:C0005586: Bipolar Disorder
-  Ñ¡ DOID:3312->umls:C0005586
+  é€‰ DOID:3312->umls:C0005586
 DOID:6132 {'umls:C0008677', 'umls:C0006277'}
   DOID:6132: bronchitis
   umls:C0008677: Bronchitis, Chronic
   umls:C0006277: Bronchitis
-  Ñ¡DOID:6132->umls:C0006277
+  é€‰DOID:6132->umls:C0006277
 #----------------------------------------------------------------------
 
 #----------------------------------------------------------------------
-9. go-gene(gene symbol)¹ØÏµÍ³¼Æ
-ÎÄ¼ş°æ±¾£º
+9. go-gene(gene symbol)å…³ç³»ç»Ÿè®¡
+æ–‡ä»¶ç‰ˆæœ¬ï¼š
 go.obo: 
 format-version: 1.2
 data-version: releases/2016-06-14
@@ -340,69 +340,69 @@ gene_association.goa_human:
 !Generated: 2016-05-09 09:17
 !GO-version: http://purl.obolibrary.org/obo/go/releases/2016-05-07/go.owl
 
-go.oboÀï¹²44937¸öterm, ÆäÖĞ²»Í¬ÀàĞÍµÄÍ³¼ÆÈçÏÂ£º
+go.oboé‡Œå…±44937ä¸ªterm, å…¶ä¸­ä¸åŒç±»å‹çš„ç»Ÿè®¡å¦‚ä¸‹ï¼š
 	bp: 29637 cc: 4121 mf: 11179
 
-°´ÕÕÏÂÃæÎÄÕÂµÄ×ö·¨ÌáÈ¡go-geneµÄ¹ØÏµ:
+æŒ‰ç…§ä¸‹é¢æ–‡ç« çš„åšæ³•æå–go-geneçš„å…³ç³»:
 Menche J, Sharma A, Kitsak M, et al. Uncovering disease-disease relationships through 
 the incomplete interactome[J]. Science, 2015, 347(6224): 1257601.
-(1) ´Ó"gene_association.goa_human"ÀïÌáÈ¡µÄ¹ØÏµÓĞ£º
+(1) ä»"gene_association.goa_human"é‡Œæå–çš„å…³ç³»æœ‰ï¼š
 	go2gene assos original: go: 12009 gene: 12575 associations: 89642
-	·ÖÈıÖÖÀàĞÍÍ³¼Æ£º
+	åˆ†ä¸‰ç§ç±»å‹ç»Ÿè®¡ï¼š
 	go2gene assos original bp: go: 8268 gene: 8629 associations: 44487
 	go2gene assos original cc: go: 1123 gene: 10749 associations: 30666
 	go2gene assos original mf: go: 2618 gene: 6893 associations: 14489
-(2) À©³ä×¢ÊÍ£¨Ò»¸ögeneÈç¹û×¢ÊÍÒ»¸öGO term£¬ÄÇÃ´Õâ¸ögeneÒ²»á×¢ÊÍÕâ¸öGO termµÄ×æÏÈ£©Ö®ºó¹ØÏµÓĞ£º
+(2) æ‰©å……æ³¨é‡Šï¼ˆä¸€ä¸ªgeneå¦‚æœæ³¨é‡Šä¸€ä¸ªGO termï¼Œé‚£ä¹ˆè¿™ä¸ªgeneä¹Ÿä¼šæ³¨é‡Šè¿™ä¸ªGO termçš„ç¥–å…ˆï¼‰ä¹‹åå…³ç³»æœ‰ï¼š
 	go2gene assos expanded: go: 16432 gene: 12575 associations: 705011
-	À©³äÖ®ºó·ÖÈıÖÖÀàĞÍµÄÍ³¼Æ£º
+	æ‰©å……ä¹‹ååˆ†ä¸‰ç§ç±»å‹çš„ç»Ÿè®¡ï¼š
 	go2gene assos expanded bp: go: 11860 gene: 8629 associations: 475292
 	go2gene assos expanded cc: go: 1373 gene: 10749 associations: 148237
 	go2gene assos expanded mf: go: 3199 gene: 6893 associations: 81482
 #------------------------------------------------------------------------
 
 #------------------------------------------------------------------------
-10. ¼ÆËãROC/AUC/TPR/FPRÊ±µÄÅÅĞòÎÊÌâ
-»­ROCÇúÏß£¬¼ÆËãTPR¡¢FPRÊ±ĞèÒª¶ÔÔªËØ½øĞĞÅÅĞò¡£
-Ê×ÏÈ¼²²¡¶Ô¶¼ÓĞÒ»¸öÏàËÆĞÔÖµ£¬È»ºóÓĞ±íÊ¾ÕâÒ»¼²²¡¶ÔÊÇ·ñÕæÕıÏà¹ØµÄlabel¡£
-»­ROC£¬ÓÅÏÈÏÈ¸ù¾İ¼²²¡¶ÔµÄÏàËÆĞÔÖµ½øĞĞÅÅĞò£¬µ«¶ÔÓÚÏàËÆĞÔÖµÏàÍ¬µÄ¼²²¡¶Ô£¬ÒªÔõÃ´ÅÅĞò¡£
-(1) ½â¾ö·½°¸Ö®Ò»£¨ÀÏÊ¦Ìá¹©µÄ½¨Òé£©£ºÉèÖÃ¶à¸öÅÅĞò¹æÔò¡£
-	ÓÚÊÇÉè¶¨ÒÔÏÂÅÅĞò¹æÔò£º
-	ÅÅĞò¹æÔòÓÅÏÈ¼¶£ºa>b>c>...
-	a. ¸ù¾İ¼²²¡¶ÔµÄÏàËÆĞÔÖµ½øĞĞÅÅĞò
-	b. ¸ù¾İÁ½¸ö¼²²¡¹²Ïí»ùÒòµÄ¸öÊı½øĞĞÅÅĞò
+10. è®¡ç®—ROC/AUC/TPR/FPRæ—¶çš„æ’åºé—®é¢˜
+ç”»ROCæ›²çº¿ï¼Œè®¡ç®—TPRã€FPRæ—¶éœ€è¦å¯¹å…ƒç´ è¿›è¡Œæ’åºã€‚
+é¦–å…ˆç–¾ç—…å¯¹éƒ½æœ‰ä¸€ä¸ªç›¸ä¼¼æ€§å€¼ï¼Œç„¶åæœ‰è¡¨ç¤ºè¿™ä¸€ç–¾ç—…å¯¹æ˜¯å¦çœŸæ­£ç›¸å…³çš„labelã€‚
+ç”»ROCï¼Œä¼˜å…ˆå…ˆæ ¹æ®ç–¾ç—…å¯¹çš„ç›¸ä¼¼æ€§å€¼è¿›è¡Œæ’åºï¼Œä½†å¯¹äºç›¸ä¼¼æ€§å€¼ç›¸åŒçš„ç–¾ç—…å¯¹ï¼Œè¦æ€ä¹ˆæ’åºã€‚
+(1) è§£å†³æ–¹æ¡ˆä¹‹ä¸€ï¼ˆè€å¸ˆæä¾›çš„å»ºè®®ï¼‰ï¼šè®¾ç½®å¤šä¸ªæ’åºè§„åˆ™ã€‚
+	äºæ˜¯è®¾å®šä»¥ä¸‹æ’åºè§„åˆ™ï¼š
+	æ’åºè§„åˆ™ä¼˜å…ˆçº§ï¼ša>b>c>...
+	a. æ ¹æ®ç–¾ç—…å¯¹çš„ç›¸ä¼¼æ€§å€¼è¿›è¡Œæ’åº
+	b. æ ¹æ®ä¸¤ä¸ªç–¾ç—…å…±äº«åŸºå› çš„ä¸ªæ•°è¿›è¡Œæ’åº
 	c. ...
-(2) °´ÕÕÒ»ÖÖÃ²ËÆÊÇÍ¨ÓÃµÄ×ö·¨£º
-	¶ÔÓÚÏàËÆĞÔÖµÏàÍ¬µÄ¼²²¡¶Ô£¬°ÑlabelÎªÕæµÄÍùºóÅÅ£¬labelÎª¼ÙµÄÍùÇ°ÅÅ£¬¼´»­³ö×î»µÇé¿öµÄ
-ROCÇúÏß¡£
-    ***Í¨ÓÃ×ö·¨ºÃÏñ²»ÊÇ»­³ö×î»µµÄÇé¿ö£¬¶øÊÇ»­Ò»ÌõÖĞ¼äµÄĞ±Ö±Ïß±íÊ¾×îºÃºÍ×î»µÇé¿öµÄÆ½¾ùÖµ***
-¸öÈËÇãÏòÓÚÓÃ(2)£º¶ÔÓÚscoreÏàÍ¬µÄµÄÔªËØ£¬Ö»È¡µÚÒ»¸öºÍ×îºóÒ»¸ö¼ÆËãtpr, fprÈ»ºóÁ¬Ïß£¬ÖĞ¼äµÄµã
-²»»­¡£
+(2) æŒ‰ç…§ä¸€ç§è²Œä¼¼æ˜¯é€šç”¨çš„åšæ³•ï¼š
+	å¯¹äºç›¸ä¼¼æ€§å€¼ç›¸åŒçš„ç–¾ç—…å¯¹ï¼ŒæŠŠlabelä¸ºçœŸçš„å¾€åæ’ï¼Œlabelä¸ºå‡çš„å¾€å‰æ’ï¼Œå³ç”»å‡ºæœ€åæƒ…å†µçš„
+ROCæ›²çº¿ã€‚
+    ***é€šç”¨åšæ³•å¥½åƒä¸æ˜¯ç”»å‡ºæœ€åçš„æƒ…å†µï¼Œè€Œæ˜¯ç”»ä¸€æ¡ä¸­é—´çš„æ–œç›´çº¿è¡¨ç¤ºæœ€å¥½å’Œæœ€åæƒ…å†µçš„å¹³å‡å€¼***
+ä¸ªäººå€¾å‘äºç”¨(2)ï¼šå¯¹äºscoreç›¸åŒçš„çš„å…ƒç´ ï¼Œåªå–ç¬¬ä¸€ä¸ªå’Œæœ€åä¸€ä¸ªè®¡ç®—tpr, fprç„¶åè¿çº¿ï¼Œä¸­é—´çš„ç‚¹
+ä¸ç”»ã€‚
 #------------------------------------------------------------------------
 
 #------------------------------------------------------------------------
-11. ¹ØÓÚhamanehÎÄÕÂ
+11. å…³äºhamanehæ–‡ç« 
 Reference: Hamaneh M B, Yu Y K. Relating diseases by integrating gene associations and 
 information flow through protein interaction network[J]. PloS one, 2014, 9(10): e110936.
-ÕâÆªÎÄÕÂ¼ÆËã¼²²¡Ö®¼äµÄ¹ØÏµ,ĞèÒª×¢Òâ£º
-(1) Ö»¼ÆËãÁË×îµ×²ãµÄ¼²²¡£¨CTD/MeSHÄ¿Â¼½á¹¹£©
-(2) Ö»¼ÆËãÁËÔÚËüµÄdisease-protein networkÖĞ´æÔÚÓÚ×î´óÁ¬Í¨·ÖÖ§ÖĞµÄ¼²²¡
-(3) ÔÚdisease-protein networkÖĞ£¬µãÊÇdisease»òprotein¡£input_graph.pkl½âÎö³öÀ´µÄÊı¾İÀï£¬
-ÓĞ²¿·ÖµãµÄ×Ô»·£¨»òÕßËµÁÚ½Ó¾ØÕóÀïµÄ¶Ô½ÇÏßÉÏ£©µÄÖµ/È¨ÖØÎª4.0£¬¶ø¶Ô½ÇÏßÉÏµÄÆäÓàÖµÎª0.0¡£
-    ²Â²â£¨Ã»ÓĞ¾­¹ıÑÏ½÷µÄÑéÖ¤£©£ºÈ¨ÖØÎª4.0µÄ×Ô»·Îªµ°°×ÖÊÍøÂçÀïÈ·Êµ´æÔÚµÄ×ÔÏà»¥×÷ÓÃ¡£
+è¿™ç¯‡æ–‡ç« è®¡ç®—ç–¾ç—…ä¹‹é—´çš„å…³ç³»,éœ€è¦æ³¨æ„ï¼š
+(1) åªè®¡ç®—äº†æœ€åº•å±‚çš„ç–¾ç—…ï¼ˆCTD/MeSHç›®å½•ç»“æ„ï¼‰
+(2) åªè®¡ç®—äº†åœ¨å®ƒçš„disease-protein networkä¸­å­˜åœ¨äºæœ€å¤§è¿é€šåˆ†æ”¯ä¸­çš„ç–¾ç—…
+(3) åœ¨disease-protein networkä¸­ï¼Œç‚¹æ˜¯diseaseæˆ–proteinã€‚input_graph.pklè§£æå‡ºæ¥çš„æ•°æ®é‡Œï¼Œ
+æœ‰éƒ¨åˆ†ç‚¹çš„è‡ªç¯ï¼ˆæˆ–è€…è¯´é‚»æ¥çŸ©é˜µé‡Œçš„å¯¹è§’çº¿ä¸Šï¼‰çš„å€¼/æƒé‡ä¸º4.0ï¼Œè€Œå¯¹è§’çº¿ä¸Šçš„å…¶ä½™å€¼ä¸º0.0ã€‚
+    çŒœæµ‹ï¼ˆæ²¡æœ‰ç»è¿‡ä¸¥è°¨çš„éªŒè¯ï¼‰ï¼šæƒé‡ä¸º4.0çš„è‡ªç¯ä¸ºè›‹ç™½è´¨ç½‘ç»œé‡Œç¡®å®å­˜åœ¨çš„è‡ªç›¸äº’ä½œç”¨ã€‚
 #------------------------------------------------------------------------
 
 #------------------------------------------------------------------------
-12. disease-gene assos ¹ıÂËÎÊÌâ
-(1) µ±ÓÃµ½»ùÒòÍøÂçµÄÊ±ºò£¬µ½µ×ÓÃ²»ÓÃ»ùÒòÍøÂçÀïµÄ»ùÒò¹ıÂË¼²²¡»ùÒò¹ØÏµ£¿
-    ±ÈÈçËµdisgenetdµÄall_gene_disease_associations.tsvÔÚscoreÈ¡cutoff (0.06) Ö®ºó£¬
-    ¼²²¡»ùÒò¹ØÏµÍ³¼ÆÎªdiseases: 7887 genes: 9696 associations: 41261;
-    Èç¹ûÓÃ»ùÒòÍøÂç (DataS1_interactome_rmslpe.tsv, 13397 vertices) µÄµã¹ıÂË£¬¹ØÏµ¾Í±äÎª
+12. disease-gene assos è¿‡æ»¤é—®é¢˜
+(1) å½“ç”¨åˆ°åŸºå› ç½‘ç»œçš„æ—¶å€™ï¼Œåˆ°åº•ç”¨ä¸ç”¨åŸºå› ç½‘ç»œé‡Œçš„åŸºå› è¿‡æ»¤ç–¾ç—…åŸºå› å…³ç³»ï¼Ÿ
+    æ¯”å¦‚è¯´disgenetdçš„all_gene_disease_associations.tsvåœ¨scoreå–cutoff (0.06) ä¹‹åï¼Œ
+    ç–¾ç—…åŸºå› å…³ç³»ç»Ÿè®¡ä¸ºdiseases: 7887 genes: 9696 associations: 41261;
+    å¦‚æœç”¨åŸºå› ç½‘ç»œ (DataS1_interactome_rmslpe.tsv, 13397 vertices) çš„ç‚¹è¿‡æ»¤ï¼Œå…³ç³»å°±å˜ä¸º
     diseases: 6643 genes: 6761 associations: 36133.
-    ÄÇÃ´£¬µ±¼ÆËã¼²²¡ÏàËÆĞÔÓÃµ½»ùÒòÍøÂçÊ±£¬¼²²¡»ùÒò¹ØÏµµ½µ×ÓÃ²»ÓÃ¹ıÂË£¿
-¸öÈËÇãÏòÓÚ¹ıÂË£¬ÓÈÆäÊÇµ±ÓÃÁ½Á½»ùÒòÏàËÆĞÔÖµ£¨»òÆäËûÁ¿»¯»ùÒòÓë»ùÒò¹ØÏµµÄÖµ£©µÄÆ½¾ùÖµ¼ÆËã¼²²¡
-¹ØÏµÊ±¡£
-(2) ´ËÎÊÌâ¿ÉÑÓÉìµ½ÆäËûÉúÎïÊı¾İ£¬±ÈÈçËµÓÃGO»òco-expËã¼²²¡¹ØÏµÊ±¡£(²Î¿¼ÎÊÌâ1)
-ÏÂÃæÎÄÕÂÀïµÄ·½·¨Ã»ÓĞ¹ıÂË£º
+    é‚£ä¹ˆï¼Œå½“è®¡ç®—ç–¾ç—…ç›¸ä¼¼æ€§ç”¨åˆ°åŸºå› ç½‘ç»œæ—¶ï¼Œç–¾ç—…åŸºå› å…³ç³»åˆ°åº•ç”¨ä¸ç”¨è¿‡æ»¤ï¼Ÿ
+ä¸ªäººå€¾å‘äºè¿‡æ»¤ï¼Œå°¤å…¶æ˜¯å½“ç”¨ä¸¤ä¸¤åŸºå› ç›¸ä¼¼æ€§å€¼ï¼ˆæˆ–å…¶ä»–é‡åŒ–åŸºå› ä¸åŸºå› å…³ç³»çš„å€¼ï¼‰çš„å¹³å‡å€¼è®¡ç®—ç–¾ç—…
+å…³ç³»æ—¶ã€‚
+(2) æ­¤é—®é¢˜å¯å»¶ä¼¸åˆ°å…¶ä»–ç”Ÿç‰©æ•°æ®ï¼Œæ¯”å¦‚è¯´ç”¨GOæˆ–co-expç®—ç–¾ç—…å…³ç³»æ—¶ã€‚(å‚è€ƒé—®é¢˜1)
+ä¸‹é¢æ–‡ç« é‡Œçš„æ–¹æ³•æ²¡æœ‰è¿‡æ»¤ï¼š
 1. Cheng L, Li J, Ju P, et al. SemFunSim: a new method for measuring disease similarity by
 integrating semantic and gene functional association[J]. PloS one, 2014, 9(6): e99415.
 2. Li P, Nie Y, Yu J. Fusing literature and full network data improves disease similarity
@@ -410,79 +410,79 @@ computation[J]. BMC bioinformatics, 2016, 17(1): 326.
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
-13. bmc bioinformatics rwr ÎÄÕÂËùÓÃÊı¾İÍ³¼Æ
+13. bmc bioinformatics rwr æ–‡ç« æ‰€ç”¨æ•°æ®ç»Ÿè®¡
 reference: Li P, Nie Y, Yu J. Fusing literature and full network data improves disease 
 similarity computation[J]. BMC bioinformatics, 2016, 17(1): 326.
 (1) disease-gene
     a. sidd
-        ÎÄÕÂÖĞµÄÍ³¼Æ£º2,427 diseases and 104,052 gene-disease associations
-        ×Ô¼ºÍ³¼ÆËüÔÚsupplÌá¹©µÄÊı¾İ£ºdiseases: 2427 genes: 11834 assos: 104057
+        æ–‡ç« ä¸­çš„ç»Ÿè®¡ï¼š2,427 diseases and 104,052 gene-disease associations
+        è‡ªå·±ç»Ÿè®¡å®ƒåœ¨supplæä¾›çš„æ•°æ®ï¼šdiseases: 2427 genes: 11834 assos: 104057
     b. disgenet
-        ÎÄÕÂÖĞµÄÍ³¼Æ£º3,259 disease terms and 206,403 gene-disease associations
-        ×Ô¼ºÍ³¼ÆËüÔÚsupplÌá¹©µÄÊı¾İ£ºdiseases: 3259 genes: 14849 assos: 206361
+        æ–‡ç« ä¸­çš„ç»Ÿè®¡ï¼š3,259 disease terms and 206,403 gene-disease associations
+        è‡ªå·±ç»Ÿè®¡å®ƒåœ¨supplæä¾›çš„æ•°æ®ï¼šdiseases: 3259 genes: 14849 assos: 206361
 (2) ppi
     a. HumanNet
         476,399 functional linkages among 16,243 human genes
-        (HumanNetËùÓÃ»ùÒòIDÎªentrezid, ÓÃmygene×öÓ³Éä£¬16243¸öentrezidÓĞ16153¸öÓ³ÉäÎªÎ¨Ò»µÄsymbol, ÓĞ90¸öÃ»ÓĞ
-        Ó³Éä½á¹û¡£Ó³ÉäÖ®ºóÍøÂçÍ³¼ÆÎª£ºnodes: 16138 edges: 474725)
+        (HumanNetæ‰€ç”¨åŸºå› IDä¸ºentrezid, ç”¨mygeneåšæ˜ å°„ï¼Œ16243ä¸ªentrezidæœ‰16153ä¸ªæ˜ å°„ä¸ºå”¯ä¸€çš„symbol, æœ‰90ä¸ªæ²¡æœ‰
+        æ˜ å°„ç»“æœã€‚æ˜ å°„ä¹‹åç½‘ç»œç»Ÿè®¡ä¸ºï¼šnodes: 16138 edges: 474725)
     b. hPPIN (hprd, biogrid, intact, homomint)
-        ÎÄÕÂÖĞµÄÍ³¼Æ£º15,710 human genes (symbol) and 143,237 interactions
-        ÓÉÓÚ¸ÃÎÄÕÂÃ»ÓĞÌá¹©ÆäËùÓÃppiÊı¾İ£¬¶øÇÒ²»ÖªµÀ¸ÃÎÄÕÂËùÓÃËÄÖÖÊı¾İ¼¯µÄ°æ±¾ºÍÆä´¦ÀíÏ¸½Ú£¬
-        ËùÒÔ×Ô¼ºÖØĞÂÊÕ¼¯Êı¾İ¼¯²¢´¦ÀíÍ³¼ÆÈçÏÂ£º
-            hprd: nodes: 9607 edges: 39001 (geneidÎªsymbol, ÓĞ×Ô»·, °æ±¾ÎªRelease9_041310)
-            biogrid: nodes: 16014 edges: 217652 (geneidÎªsymbol, ÓĞ×Ô»·, Experimental System TypeÎª'physical', 
-                organism interactor A/B¶¼Îª'9606', °æ±¾ÎªBIOGRID-ORGANISM-Homo_sapiens-3.4.140.tab2.txt)
-            intact: nodes: 13733 edges: 123821 (geneidÎªsymbol (Í¨¹ıAlias(es) interactor A/BÖĞµÄgene_nameµÃµ½)), 
-                ÓĞ×Ô»·, Taxid interactor A/B¶¼Îª'taxid:9606(human)|taxid:9606(Homo sapiens)', 2016/9/18ÏÂÔØ)
-            homomint: nodes: 3352 edges: 7450 (geneidÎªsymbol (ÓÃmygene×ª»»uniprotidµÃµ½), ÓĞ×Ô»·)
-            integrateËÄÖÖÊı¾İ¼¯µÄÍøÂç£º
-                nodes: 17506 edges: 284476 (ÓĞ×Ô»·)
-                nodes: 17473 edges: 280376 (ÎŞ×Ô»·)
-                nodes: 17452 edges: 280364 (×î´óÁ¬Í¨·ÖÖ§)
+        æ–‡ç« ä¸­çš„ç»Ÿè®¡ï¼š15,710 human genes (symbol) and 143,237 interactions
+        ç”±äºè¯¥æ–‡ç« æ²¡æœ‰æä¾›å…¶æ‰€ç”¨ppiæ•°æ®ï¼Œè€Œä¸”ä¸çŸ¥é“è¯¥æ–‡ç« æ‰€ç”¨å››ç§æ•°æ®é›†çš„ç‰ˆæœ¬å’Œå…¶å¤„ç†ç»†èŠ‚ï¼Œ
+        æ‰€ä»¥è‡ªå·±é‡æ–°æ”¶é›†æ•°æ®é›†å¹¶å¤„ç†ç»Ÿè®¡å¦‚ä¸‹ï¼š
+            hprd: nodes: 9607 edges: 39001 (geneidä¸ºsymbol, æœ‰è‡ªç¯, ç‰ˆæœ¬ä¸ºRelease9_041310)
+            biogrid: nodes: 16014 edges: 217652 (geneidä¸ºsymbol, æœ‰è‡ªç¯, Experimental System Typeä¸º'physical', 
+                organism interactor A/Béƒ½ä¸º'9606', ç‰ˆæœ¬ä¸ºBIOGRID-ORGANISM-Homo_sapiens-3.4.140.tab2.txt)
+            intact: nodes: 13733 edges: 123821 (geneidä¸ºsymbol (é€šè¿‡Alias(es) interactor A/Bä¸­çš„gene_nameå¾—åˆ°)), 
+                æœ‰è‡ªç¯, Taxid interactor A/Béƒ½ä¸º'taxid:9606(human)|taxid:9606(Homo sapiens)', 2016/9/18ä¸‹è½½)
+            homomint: nodes: 3352 edges: 7450 (geneidä¸ºsymbol (ç”¨mygeneè½¬æ¢uniprotidå¾—åˆ°), æœ‰è‡ªç¯)
+            integrateå››ç§æ•°æ®é›†çš„ç½‘ç»œï¼š
+                nodes: 17506 edges: 284476 (æœ‰è‡ªç¯)
+                nodes: 17473 edges: 280376 (æ— è‡ªç¯)
+                nodes: 17452 edges: 280364 (æœ€å¤§è¿é€šåˆ†æ”¯)
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
-14. hypergeometric test ÈçºÎ¼ÆËãµÄÎÊÌâ
-(1) ÏÖĞèÒªÍ¨¹ıhypergeometric test (one-tailed Fisher's exact test)À´¼ÆËã¼²²¡DºÍGO (»òpathway) Ö®¼äµÄ¹ØÏµ£¬¾ÙÀı£º
-      Ä³¼²²¡Di¹ØÁª»ùÒòÊım,
-      ËùÓĞGOµÄ¹ØÁª»ùÒò×ÜÊıÎªN,
-      Ä³GOj¹ØÁª»ùÒòÊıÎªn,
-      DiµÄ»ùÒòÓëGOj¸ö»ùÒòµÄ½»¼¯¸öÊıÎªx.
-ÄÇÃ´¼ÆËãp-valueµÄ¹«Ê½Îª pvalue = 1-sum(choose(n, k)*choose(N-n, m-k)/choose(N, m)) <k=0:(x-1)>
+14. hypergeometric test å¦‚ä½•è®¡ç®—çš„é—®é¢˜
+(1) ç°éœ€è¦é€šè¿‡hypergeometric test (one-tailed Fisher's exact test)æ¥è®¡ç®—ç–¾ç—…Då’ŒGO (æˆ–pathway) ä¹‹é—´çš„å…³ç³»ï¼Œä¸¾ä¾‹ï¼š
+      æŸç–¾ç—…Diå…³è”åŸºå› æ•°m,
+      æ‰€æœ‰GOçš„å…³è”åŸºå› æ€»æ•°ä¸ºN,
+      æŸGOjå…³è”åŸºå› æ•°ä¸ºn,
+      Diçš„åŸºå› ä¸GOjä¸ªåŸºå› çš„äº¤é›†ä¸ªæ•°ä¸ºx.
+é‚£ä¹ˆè®¡ç®—p-valueçš„å…¬å¼ä¸º pvalue = 1-sum(choose(n, k)*choose(N-n, m-k)/choose(N, m)) <k=0:(x-1)>
 
-***ÎÊÌâÊÇ£ºÈç¹û¼²²¡DiµÄm¸ö»ùÒò²»È«ÔÚGOµÄN¸ö»ùÒòÀïÔõÃ´°ì?***
+***é—®é¢˜æ˜¯ï¼šå¦‚æœç–¾ç—…Diçš„mä¸ªåŸºå› ä¸å…¨åœ¨GOçš„Nä¸ªåŸºå› é‡Œæ€ä¹ˆåŠ?***
 
-³¬¼¸ºÎ·Ö²¼µÄ¸ÅÂÊ¹«Ê½Îª choose(n, k)*choose(N-n, m-k)/choose(N, m),
-ÔÚ´ÎÆ·ÂÊµÄÀı×ÓÀï£¬¹«Ê½ÊÇÖ¸¼ÙÉèÔÚN¸öÎïÆ·ÀïÓĞm¸ö´ÎÆ·£¬ÄÇÃ´Ëæ»ú³én¸öÑùÆ·£¬ÀïÃæÓĞk¸ö´ÎÆ·µÄ¸ÅÂÊ
-ÄÇÃ´°´ÕâÑùÀí½â£¬Õâm¸ö±ØĞë¶¼ÔÚÕâN¸öÀï¡£
+è¶…å‡ ä½•åˆ†å¸ƒçš„æ¦‚ç‡å…¬å¼ä¸º choose(n, k)*choose(N-n, m-k)/choose(N, m),
+åœ¨æ¬¡å“ç‡çš„ä¾‹å­é‡Œï¼Œå…¬å¼æ˜¯æŒ‡å‡è®¾åœ¨Nä¸ªç‰©å“é‡Œæœ‰mä¸ªæ¬¡å“ï¼Œé‚£ä¹ˆéšæœºæŠ½nä¸ªæ ·å“ï¼Œé‡Œé¢æœ‰kä¸ªæ¬¡å“çš„æ¦‚ç‡
+é‚£ä¹ˆæŒ‰è¿™æ ·ç†è§£ï¼Œè¿™mä¸ªå¿…é¡»éƒ½åœ¨è¿™Nä¸ªé‡Œã€‚
 
-***ÔÚĞ´dSimer R°üÊ±²¢Ã»ÓĞ¿¼ÂÇµ½Õâ¸öÎÊÌâ***
-ÏÖÔÚÇãÏòÓÚ£º
-    ÔÚ¼ÆËã¼²²¡ÓëGO (pathway) ¹ØÁªÊ±£¬ÓÃN¸ö»ùÒòÓëm¸ö»ùÒòµÄ½»¼¯×÷Îª¼²²¡DiµÄ¹ØÁª»ùÒò¼¯¡£¼ÆËã¹«Ê½±äÎª£º
+***åœ¨å†™dSimer RåŒ…æ—¶å¹¶æ²¡æœ‰è€ƒè™‘åˆ°è¿™ä¸ªé—®é¢˜***
+ç°åœ¨å€¾å‘äºï¼š
+    åœ¨è®¡ç®—ç–¾ç—…ä¸GO (pathway) å…³è”æ—¶ï¼Œç”¨Nä¸ªåŸºå› ä¸mä¸ªåŸºå› çš„äº¤é›†ä½œä¸ºç–¾ç—…Diçš„å…³è”åŸºå› é›†ã€‚è®¡ç®—å…¬å¼å˜ä¸ºï¼š
         m1 = |intersect(gene(N), gene(m))|
         pvalue = 1-sum(choose(n, k)*choose(N-n, m1-k)/choose(N, m1)) <k=0:(x-1)>
 
-(2) ***ÔÚdSimer R°üÀï¿¼ÂÇµ½µÄÁíÍâÒ»¸öÎÊÌâ***
-ÎÊÌâÊÇ£º¼ÆËãGO (pathway)ÓëdiseaseÓĞÃ»ÓĞ¹ØÏµÊ±£¬Ñ¡ÄÄĞ©GO (pathway) ×÷ÎªºòÑ¡£¿
-dSimerÀïµÄ´¦Àí·½°¸ÊÇ£ºÈç¹ûÄ³GO (pathway)µÄ¹ØÁª»ùÒòÓë¸Ã¼²²¡µÄ¹ØÁª»ùÒòÃ»ÓĞ½»¼¯ (¼´ (1)µÄÀı×ÓÖĞ x=0), ÄÇÃ´
-¸ÃGO (pathway) ½«²»×÷ÎªºòÑ¡£¬¼´ÔÚ¶àÖØĞ£ÑéÊ±²»¿¼ÂÇ¸ÃGO (pathway)¡£
+(2) ***åœ¨dSimer RåŒ…é‡Œè€ƒè™‘åˆ°çš„å¦å¤–ä¸€ä¸ªé—®é¢˜***
+é—®é¢˜æ˜¯ï¼šè®¡ç®—GO (pathway)ä¸diseaseæœ‰æ²¡æœ‰å…³ç³»æ—¶ï¼Œé€‰å“ªäº›GO (pathway) ä½œä¸ºå€™é€‰ï¼Ÿ
+dSimeré‡Œçš„å¤„ç†æ–¹æ¡ˆæ˜¯ï¼šå¦‚æœæŸGO (pathway)çš„å…³è”åŸºå› ä¸è¯¥ç–¾ç—…çš„å…³è”åŸºå› æ²¡æœ‰äº¤é›† (å³ (1)çš„ä¾‹å­ä¸­ x=0), é‚£ä¹ˆ
+è¯¥GO (pathway) å°†ä¸ä½œä¸ºå€™é€‰ï¼Œå³åœ¨å¤šé‡æ ¡éªŒæ—¶ä¸è€ƒè™‘è¯¥GO (pathway)ã€‚
 
-ÔÚÑ°ÕÒÄ³¼²²¡µÄ¹ØÁªGO (pathway)Ê±£¬Ê×ÏÈ½«ÓĞ¿ÉÄÜµÄGO (pathway)Ñ¡³öÀ´×÷ÎªºòÑ¡ (ÒÔx != 0×÷ÎªÉ¸Ñ¡Ìõ¼ş),
-È»ºóÔÙÓÃhypergeometric testºÍmultiple tests¼ÆËãºòÑ¡GO (pathway)µÄp-value, ½ø¶øÑ¡³öÓĞÏÔÖøĞÔÒâÒåµÄ
-GO (pathway)¡£
-¸Ğ¾õÕâÖÖ´¦Àí·½Ê½±È½ÏºÏÀí¡£
+åœ¨å¯»æ‰¾æŸç–¾ç—…çš„å…³è”GO (pathway)æ—¶ï¼Œé¦–å…ˆå°†æœ‰å¯èƒ½çš„GO (pathway)é€‰å‡ºæ¥ä½œä¸ºå€™é€‰ (ä»¥x != 0ä½œä¸ºç­›é€‰æ¡ä»¶),
+ç„¶åå†ç”¨hypergeometric testå’Œmultiple testsè®¡ç®—å€™é€‰GO (pathway)çš„p-value, è¿›è€Œé€‰å‡ºæœ‰æ˜¾è‘—æ€§æ„ä¹‰çš„
+GO (pathway)ã€‚
+æ„Ÿè§‰è¿™ç§å¤„ç†æ–¹å¼æ¯”è¾ƒåˆç†ã€‚
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
-15. Disease Ontology Êı¾İÍ³¼Æ
-ÎÄ¼ş°æ±¾£ºHumanDO.obo
+15. Disease Ontology æ•°æ®ç»Ÿè®¡
+æ–‡ä»¶ç‰ˆæœ¬ï¼šHumanDO.obo
 format-version: 1.2
 data-version: releases/2016-05-27
 date: 27:05:2016 16:27
 saved-by: elvira
 auto-generated-by: OBO-Edit 2.3.1
 
-¹²9299¸öDOID
+å…±9299ä¸ªDOID
 #-------------------------------------------------------------------------
 
 
