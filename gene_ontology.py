@@ -78,23 +78,6 @@ def add_implicit_annotations(goannotationdict, geneontology):
     return assos
 
 
-def invert_dict(xy_dict):
-    """
-    construct a new dict upon the inputed dict, the new dict's key are the inputed
-    dict's values, values are sets of inputed dict's keys
-    :param xy_dict: a dict which keys are strings, values are sets of entities associated
-    with the key
-    :return: a dict (yx_dict)
-    """
-    yx_dict = {}
-    for x in xy_dict.keys():
-        for y in xy_dict[x]:
-            if y not in yx_dict.keys():
-                yx_dict[y] = set()
-            yx_dict[y].add(x)
-    return yx_dict
-
-
 class GeneOntology:
     """Gene Ontology"""
     def __init__(self):
@@ -141,11 +124,12 @@ class GeneOntology:
                             i += 1
                             continue
                         if key == "synonym":
-                            synonyms.add(info[1].strip())
+                            synonyms.add(info[1].strip().split("\"")[1].strip())
                             i += 1
                             continue
                         i += 1
-                    if goid in self._terms:
+                    if goid in self._terms.keys():
+                        self._terms[goid].setgoid(goid)
                         self._terms[goid].setname(name)
                         self._terms[goid].setnamespace(namespace)
                         self._terms[goid].setparents(parents)
@@ -159,7 +143,7 @@ class GeneOntology:
                         termtemp.setsynonyms(synonyms)
                         self._terms[goid] = termtemp
                     for p in parents:
-                        if p not in self._terms:
+                        if p not in self._terms.keys():
                             termtemp = GOTerm()
                             termtemp.setgoid(p)
                             self._terms[p] = termtemp

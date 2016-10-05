@@ -17,6 +17,7 @@ from files import write_assos
 from files import write_mappings
 from files import write_sims
 from files import write_slist
+from files import invert_dict
 from umls_disease import read_all_gene_disease_associations
 from umls_disease import read_umls_disease_info
 from similarity_coexpression import read_probeid_expfile
@@ -28,11 +29,11 @@ from similarity_pathway import get_disease_pathway_assos
 from similarity_pathway import diseases_similarity_pathway_jaccard
 from gene_ontology import read_go_annotation_file
 from gene_ontology import GeneOntology
-from gene_ontology import invert_dict
 from gene_ontology import add_implicit_annotations
 from evaluation import eva_readsims
 from evaluation import eva_70benchmarkpairs
 from evaluation import eva_ranking
+from evaluation import eva_cal_ranks
 from evaluation import eva_tprfpr
 from evaluation import eva_tprfprs
 from evaluation import eva_auc
@@ -40,6 +41,7 @@ from evaluation import eva_aucs
 from evaluation import eva_groundtruth
 from evaluation import eva_roc_getvalidationpairs
 from evaluation import eva_get_validationpairsnlabels_comorbidity
+from disease_ontology import DiseaseOntology
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
 
@@ -174,23 +176,23 @@ def evaluation_groundtruth():
 
 
 def evaluation_70benchmarkset(times=1,
-                              bmkpfile="data/benchmarkset_funsim/ground_truth_68_disease_pairs_umlsid.tsv"):
-    pathlist = ['outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc_triplet.tsv',
-                'outputs/similarity_funsim_disgenet_dgcutoff006.tsv',
-                'outputs/similarity_bog_disgenet_dgcutoff006_triplet.tsv',
-                'outputs/similarity_icod_disgenet_dgcutoff006_interactome_triplet.tsv',
-                'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
-                'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv',
-                'outputs/similarity_experiments_shortestpath_transformed_less_disgenet_dgcutoff006_interactome.tsv',
-                'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv',
-                # 'outputs/similarity_funsim_rwrsidd.tsv',
-                # 'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
-                # 'outputs/similarity_module5_rwrsidd_hppinwsl.tsv',
-                # 'outputs/similarity_experiments_rwr_rwrsidd_hppinwsl.tsv',
-                # 'outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwsl.tsv',
-                # 'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
-                # # 'outputs/similarity_icod_rwrsidd_hppinwosl_triplet.tsv',
-                # 'outputs/similarity_bognew_rwrsidd_triplet.tsv',
+                              bmkpfile="data/benchmarkset_funsim/ground_truth_70_disease_pairs_umlsid.tsv"):
+    pathlist = [  # 'outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc_triplet.tsv',
+                # 'outputs/similarity_funsim_disgenet_dgcutoff006.tsv',
+                # 'outputs/similarity_bog_disgenet_dgcutoff006_triplet.tsv',
+                # 'outputs/similarity_icod_disgenet_dgcutoff006_interactome_triplet.tsv',
+                # 'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
+                # 'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv',
+                # 'outputs/similarity_experiments_shortestpath_transformed_less_disgenet_dgcutoff006_interactome.tsv',
+                # 'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv',
+                'outputs/similarity_funsim_rwrsidd.tsv',
+                'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
+                'outputs/similarity_module5_rwrsidd_hppinwsl.tsv',
+                'outputs/similarity_experiments_rwr_rwrsidd_hppinwsl.tsv',
+                'outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwsl.tsv',
+                'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
+                'outputs/similarity_icod_rwrsidd_hppinwsl_triplet.tsv',
+                'outputs/similarity_bognew_rwrsidd_triplet.tsv',
                 ]
 
     benchmarkpairs = read_assos(bmkpfile, header=False)
@@ -201,75 +203,79 @@ def evaluation_70benchmarkset(times=1,
             bmptuple.append((p, q))
     msims = eva_readsims(pathlist)
     evaress = eva_70benchmarkpairs(msims, bmptuple, times)
-    print("------------scores and lable---------------------------------------------------")
-    t = 0
-    for er in evaress:
-        if t < 3:
-            t += 1
-            print("-----------------time------------------------------------------------------")
-            d1 = list(er.keys())[0]
-            d2 = list(er[d1].keys())[0]
-            methodnames = list(er[d1][d2].keys())
-            methodnames.remove('label')
-            print("d1\td2\tlabel", end='')
-            for m in methodnames:
-                print("\t"+m, end='')
-            print()
-            for d1 in er.keys():
-                for d2 in er[d1].keys():
-                    print(d1+'\t'+d2+'\t' + str(er[d1][d2]['label']), end='')
-                    for m in methodnames:
-                        print("\t"+str(er[d1][d2][m]), end='')
-                    print()
+    # print("------------scores and lable---------------------------------------------------")
+    # t = 0
+    # for er in evaress:
+    #     if t < 3:
+    #         t += 1
+    #         print("-----------------time------------------------------------------------------")
+    #         d1 = list(er.keys())[0]
+    #         d2 = list(er[d1].keys())[0]
+    #         methodnames = list(er[d1][d2].keys())
+    #         methodnames.remove('label')
+    #         print("d1\td2\tlabel", end='')
+    #         for m in methodnames:
+    #             print("\t"+m, end='')
+    #         print()
+    #         for d1 in er.keys():
+    #             for d2 in er[d1].keys():
+    #                 print(d1+'\t'+d2+'\t' + str(er[d1][d2]['label']), end='')
+    #                 for m in methodnames:
+    #                     print("\t"+str(er[d1][d2][m]), end='')
+    #                 print()
     print("-ranking disease pairs---------------------------------------------------------")
     t = 0
     for er in evaress:
         if t < 3:
             t += 1
             print("---------------time--------------------------------------------------------")
-            ranktemp = eva_ranking(er)
+            ranktemp = eva_cal_ranks(eva_ranking(er))
             ms = list(ranktemp.keys())
             for m in ms:
-                print(str(m) + "\t\t\t", end="")
+                print(str(m) + "\t\t\t\t\t", end="")
             print()
             llen = len(ranktemp[ms[0]])
             for i in range(0, llen):
                 for m in ms:
-                    for j in range(0, 4):
+                    for j in range(0, 5):
                         print(str(ranktemp[m][i][j])+"\t", end="")
                 print()
     print("-tpr--fpr----------------------------------------------------------------------")
     tpfprs = eva_tprfprs(evaress)
-    t = 0
-    for tpfpr in tpfprs:
-        if t < 3:
-            t += 1
-            print("-----------------time------------------------------------------------------")
-            methodnames = list(tpfpr.keys())
-            llens = []
-            for name in methodnames:
-                llens.append(len(tpfpr[name]))
-                print(str(name)+"_fpr\t"+str(name)+"_tpr\t", end='')
-            print()
-            mllen = max(llens)
-            for i in range(0, mllen):
-                for name in methodnames:
-                    if i < len(tpfpr[name]):
-                        for j in range(0, 2):
-                            print(str(tpfpr[name][i][j])+"\t", end="")
-                    else:
-                        print("\t\t", end='')
-                print()
+    # t = 0
+    # for tpfpr in tpfprs:
+    #     if t < 3:
+    #         t += 1
+    #         print("-----------------time------------------------------------------------------")
+    #         methodnames = list(tpfpr.keys())
+    #         llens = []
+    #         for name in methodnames:
+    #             llens.append(len(tpfpr[name]))
+    #             print(str(name)+"_fpr\t"+str(name)+"_tpr\t", end='')
+    #         print()
+    #         mllen = max(llens)
+    #         for i in range(0, mllen):
+    #             for name in methodnames:
+    #                 if i < len(tpfpr[name]):
+    #                     for j in range(0, 2):
+    #                         print(str(tpfpr[name][i][j])+"\t", end="")
+    #                 else:
+    #                     print("\t\t", end='')
+    #             print()
     print("---avg auc values------------------------------------------------------------------")
     aucs = eva_aucs(tpfprs)
     auclen = len(aucs)
     print("replicated times:", auclen)
     mns = list(aucs[0].keys())
+    avgaucs = []
     for mn in mns:
         avgauc = 0.0
         for auc in aucs:
             avgauc += auc[mn]
-        print(str(mn)+'\t'+str(avgauc / auclen))
+        avgaucs.append((str(mn), avgauc / auclen))
+    avgaucs = sorted(avgaucs, key=lambda a: a[1], reverse=True)
+    for x in avgaucs:
+        print(str(x[0])+"\t"+str(x[1]))
 
 
 def similarity_cal_go():
@@ -465,8 +471,8 @@ def do2umls_mapping():
     uds = read_umls_disease_info(0)
     do2umls = mapping.doid2umlsid(uds)
     stat_assos(do2umls)
-    doid1 = read_one_col("data/ground_truth_70_disease_pairs_doid.tab", 1, True)
-    doid2 = read_one_col("data/ground_truth_70_disease_pairs_doid.tab", 2, True)
+    doid1 = read_one_col("data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv", 1, True)
+    doid2 = read_one_col("data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv", 2, True)
     doids = set(doid1).union(doid2)
     print("doids:", len(doids))
     do2umls_map = {}
@@ -480,10 +486,13 @@ def do2umls_mapping():
                 do2umls_map[d] = "umls:C0005586"
             elif d == "DOID:6132":
                 do2umls_map[d] = "umls:C0006277"
-    write_mappings(do2umls_map, "ground_truth_doid2umlsid_46diseases.tsv")
-    with open("data/ground_truth_70_disease_pairs_doid.tab", mode='r') as rf:
-        next(rf)
-        with open("data/ground_truth_68_disease_pairs_umlsid.tsv", mode='w') as wf:
+            else:
+                print("do2umls_mapping():", d, "has mutiple mappings!")
+        elif d == "DOID:83":
+            do2umls_map[d] = "umls:C0029531"
+    write_mappings(do2umls_map, "data/benchmarkset_funsim/ground_truth_doid2umlsid_47diseases.tsv")
+    with open("data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv", mode='r') as rf:
+        with open("data/benchmarkset_funsim/ground_truth_70_disease_pairs_umlsid.tsv", mode='w') as wf:
             for line in rf:
                 ids = line.strip().split('\t')
                 id1 = ids[0].strip()
@@ -1059,5 +1068,13 @@ def rwr_bmc_dgassos():
     # write_assos(dg_disgenet, "data/rwr_bmc_bioinfo/dg/rwr_dgassos_disgenet.tab")
 
 
+def get_do_info():
+    do = DiseaseOntology()
+    do.readobofile('data/do/HumanDO.obo')
+    do.getterms()['DOID:0050026'].print()
+    do.getterms()['DOID:83'].print()
+
+
 if __name__ == "__main__":
-    evaluation_70benchmarkset(1000)
+    # evaluation_70benchmarkset(1, "data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv")
+    get_do_info()

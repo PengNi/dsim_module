@@ -333,6 +333,23 @@ def stat_network(assos):
     print("stat_network: nodes:", len(nodes), "edges:", edgenum)
 
 
+def invert_dict(xy_dict):
+    """
+    construct a new dict upon the inputed dict, the new dict's key are the inputed
+    dict's values, values are sets of inputed dict's keys
+    :param xy_dict: a dict which keys are strings, values are sets of entities associated
+    with the key
+    :return: a dict (yx_dict)
+    """
+    yx_dict = {}
+    for x in xy_dict.keys():
+        for y in xy_dict[x]:
+            if y not in yx_dict.keys():
+                yx_dict[y] = set()
+            yx_dict[y].add(x)
+    return yx_dict
+
+
 def combine_two_assos(dict1, dict2):
     """
     combine two dicts, each dict's key-value is string-set<string>

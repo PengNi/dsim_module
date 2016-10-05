@@ -304,6 +304,8 @@ DOID:2841 {'umls:C0004096'}
 DOID:12558 {'umls:C0162674'}
 
 有一个没有mapping结果: DOID:83
+  通过查询Disease Ontology (HumanDO.obo)得到
+    DOID:83对应umls:C0029531
 有三个有多个结果：
 DOID:0050700 {'umls:C0033141', 'umls:C0036529', 'umls:C0878544'}
   DOID:0050700: cardiomyopathy
@@ -469,6 +471,18 @@ dSimer里的处理方案是：如果某GO (pathway)的关联基因与该疾病的关联基因没有交集 (即
 然后再用hypergeometric test和multiple tests计算候选GO (pathway)的p-value, 进而选出有显著性意义的
 GO (pathway)。
 感觉这种处理方式比较合理。
+#-------------------------------------------------------------------------
+
+#-------------------------------------------------------------------------
+15. Disease Ontology 数据统计
+文件版本：HumanDO.obo
+format-version: 1.2
+data-version: releases/2016-05-27
+date: 27:05:2016 16:27
+saved-by: elvira
+auto-generated-by: OBO-Edit 2.3.1
+
+共9299个DOID
 #-------------------------------------------------------------------------
 
 
