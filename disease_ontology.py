@@ -1,5 +1,37 @@
 #! /usr/bin/env python3
 """defining a class for Disease Ontology"""
+from queue import Queue
+
+
+def get_terms_at_layern(n, do):
+    """
+    get all termids of terms at layer n
+    :param do: DiseaseOntology
+    :param n: integer
+    :return: set()
+    """
+    terms = do.getterms()
+    result = set()
+    for t in terms.keys():
+        layerstemp = terms[t].getlayers()
+        if len(layerstemp) != 0 and min(layerstemp) == n:
+            result.add(t)
+    return result
+
+
+def get_terms2offsprings(terms, do):
+    """
+    get terms-offsprings dict
+    :param terms: set()
+    :param do: DiseaseOntology
+    :return: dict
+    """
+    result = {}
+    for t in terms:
+        result[t] = set()
+        result[t].add(t)
+        result[t].update(do.get_termsoffspring(t))
+    return result
 
 
 class DiseaseOntology:
@@ -75,6 +107,33 @@ class DiseaseOntology:
                     line = None
         print("initialize terms size:", len(self._terms))
 
+    def settermslayers(self):
+        for t in self._terms.keys():
+            self._terms[t].setlayers(set())
+        self._terms['DOID:4'].addlayer(1)
+        q = Queue()
+        q.put('DOID:4')
+        while not q.empty():
+            parentid = q.get()
+            parentlayers = self._terms[parentid].getlayers()
+            for c in self._terms[parentid].getchildren():
+                ctemp = self._terms[c]
+                for pl in parentlayers:
+                    ctemp.addlayer(pl+1)
+                q.put(c)
+
+    def get_termsoffspring(self, termid):
+        offspring = set()
+        q = Queue()
+        for c in self._terms[termid].getchildren():
+            q.put(c)
+        while not q.empty():
+            nextc = q.get()
+            for ncc in self._terms[nextc].getchildren():
+                q.put(ncc)
+            offspring.add(nextc)
+        return offspring
+
 
 class DOTerm:
     """DO term"""
@@ -86,6 +145,7 @@ class DOTerm:
         self._xrefs = set()
         self._parents = set()
         self._children = set()
+        self._layers = set()
 
     def setdoid(self, doid):
         self._doid = doid
@@ -154,10 +214,20 @@ class DOTerm:
             raise ValueError("Invalid parent '{}'".format(parent))
         self._parents.add(parent)
 
+    def getlayers(self):
+        return self._layers
+
+    def setlayers(self, layers):
+        self._layers = layers
+
+    def addlayer(self, layer):
+        self._layers.add(layer)
+
     def print(self):
         print("[Term]")
         print("id:", self.getdoid())
         print("name:", self.getname())
+        print("layer:", self.getlayers())
         print("alt_id:", self.getaltids())
         print("synonyms:", self.getsynonyms())
         print("xref:", self.getxrefs())

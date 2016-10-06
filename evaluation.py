@@ -105,7 +105,7 @@ def eva_tprfprs(scoredicts):
     :param scoredicts: a list of dicts, each dict represents one experiment and
     contains the result of the experiment,
     dict: {disease1: {disease2:{method1: simvalue, method2: simvalue, ..., label: 0/1}, }, }
-    (from eva_70benchmarkpairs())
+    (can be got from eva_70benchmarkpairs())
     :return: a list of dicts, each dict contains tpr and tpr for one or more methods
     """
     ress = []
@@ -177,12 +177,28 @@ def eva_cal_ranks(sorted_scorenlabel):
     return sorted_rank
 
 
+def eva_rankings(scoredicts):
+    """
+    ranking disease pairs based on scores and labels
+    :param scoredicts: a list of dicts, each dict represents one experiment and
+    contains the result of the experiment,
+    dict: {disease1: {disease2:{method1: simvalue, method2: simvalue, ..., label: 0/1}, }, }
+    (can be got from eva_70benchmarkpairs())
+    :return: a list of dicts, each dict's value is a sorted list based on
+    a sort strategy, {method1: [(disease1, disease2, simscore, label), ], method2: [], }
+    """
+    ress = []
+    for scoredict in scoredicts:
+        ress.append(eva_ranking(scoredict))
+    return ress
+
+
 def eva_ranking(scoredict):
     """
-    based on scores and label in scoredict, ranking disease pairs in the purpose of
+    based on scores and labels in scoredict, ranking disease pairs in the purpose of
     calculating tpr and fpr
     :param scoredict: dict: {disease1: {disease2:{method1: simvalue, method2: simvalue, ...,
-    label: 0/1}, }, } (in this case, scoredict can be from eva_70benchmarkpairs_onetime())
+    label: 0/1}, }, } (in this case, scoredict can be get from eva_70benchmarkpairs_onetime())
     :return: a dict which each value is a sorted list based on a sort strategy,
     {method1: [(disease1, disease2, simscore, label), ], method2: [], }
     """
@@ -377,10 +393,88 @@ def eva_70benchmarkpairs_onetime(allsims, alldpairs, bencallist):
     return res
 
 
+def eva_test_pair_rankinfo_ranking(rankinfo, benchmarkmethod, comparemethods):
+    """
+    ranking
+    :param rankinfo: from metohd eva_test_pair_rankinfo()
+    :param benchmarkmethod: string
+    :param comparemethods: list of string
+    :return: dict, key-value: "tuplenames"-tuple(), "tuplelist"-list(),
+    """
+    ms = set(rankinfo[list(rankinfo.keys())[0]].keys())
+    if benchmarkmethod not in ms:
+        print("eva_test_pair_rankinfo_ranking() fatal error!")
+        return None
+    for cm in comparemethods:
+        if cm not in ms:
+            print("eva_test_pair_rankinfo_ranking() fatal error!")
+            return None
+    reslist = []
+    for kpair in rankinfo.keys():
+        ranks = (rankinfo[kpair][benchmarkmethod], )
+        for cm in comparemethods:
+            ranks += (rankinfo[kpair][cm], )
+        reslist.append(kpair + ranks)
+    reslist = sorted(reslist, key=itemgetter(2))
+    res = dict()
+    res['tuplenames'] = ('disease1', 'disease2', benchmarkmethod, )
+    for cm in comparemethods:
+        res['tuplenames'] += (cm, )
+    res['tuplelist'] = reslist
+    return res
+
+
+def eva_test_pair_rankinfos(sorted_sllist):
+    """
+    eva_test_pair_rankinfos
+    :param sorted_sllist: from method eva_rankings()
+    :return: dict
+    """
+    rankinfo_list = []
+    for ssl in sorted_sllist:
+        rankinfo_list.append(eva_test_pair_rankinfo(ssl))
+    rklen = len(rankinfo_list)
+    dpairs = list(rankinfo_list[0].keys())
+    ms = list(rankinfo_list[0][dpairs[0]].keys())
+
+    res = {}
+    for dp in dpairs:
+        res[dp] = {}
+        for m in ms:
+            ranksum = 0
+            for rk in rankinfo_list:
+                ranksum += rk[dp][m]
+            res[dp][m] = ranksum/rklen
+    return res
+
+
+def eva_test_pair_rankinfo(sorted_scorenlabel):
+    """
+    eva_test_pair_rankinfo
+    :param sorted_scorenlabel: from method eva_ranking()
+    :return:
+    """
+    ms = list(sorted_scorenlabel.keys())
+    tlpairs = []
+    for t in sorted_scorenlabel[ms[0]]:
+        if t[3] == 1:
+            tlpairs.append((t[0], t[1]))
+    res = {}
+    for pair in tlpairs:
+        res[pair] = {}
+        for m in ms:
+            ranklist = sorted_scorenlabel[m]
+            for i in range(0, len(ranklist)):
+                if (ranklist[i][0], ranklist[i][1]) == pair:
+                    res[pair][m] = i+1
+                    break
+    return res
+
+
 def eva_test_rankstats_multi(sorted_sl_list, topk, disease2classes):
     """
     eva_test_rankstats_multi
-    :param sorted_sl_list:
+    :param sorted_sl_list: from method eva_rankings()
     :param topk:
     :param disease2classes:
     :return:
@@ -429,7 +523,8 @@ def eva_test_rankstats(sorted_scorenlabel, topk, disease2classes):
         label_true = 0
         sameclass = 0
         for i in range(0, topk):
-            if len(disease2classes[ttemp[i][0]].intersection(disease2classes[ttemp[i][1]])) > 0:
+            if (ttemp[i][0] in disease2classes.keys()) and (ttemp[i][1] in disease2classes.keys()) and \
+                    (len(disease2classes[ttemp[i][0]].intersection(disease2classes[ttemp[i][1]])) > 0):
                 sameclass += 1
             if ttemp[i][3] == 1:
                 label_true += 1
