@@ -153,7 +153,7 @@ def evaluation_validationpairs(simpathlist):
         print(a+'\t'+str(vpairs_auc[a]))
 
 
-def evaluation_groundtruth(simpathlist, gtpaths):
+def evaluation_groundtruth(simpathlist, shortnames, gtpaths):
 
     msims = eva_readsims(simpathlist)
 
@@ -164,9 +164,9 @@ def evaluation_groundtruth(simpathlist, gtpaths):
         sumtemp = {}
         for i in range(0, len(mnames)):
             if i == 0:
-                print("rank"+"\t"+mnames[i], end='')
+                print("rank"+"\t"+shortnames[mnames[i]], end='')
             else:
-                print("\t"+mnames[i], end='')
+                print("\t"+shortnames[mnames[i]], end='')
             sumtemp[mnames[i]] = 0.0
         print()
 
@@ -199,7 +199,7 @@ def evaluation_groundtruth(simpathlist, gtpaths):
                 print()
 
 
-def evaluation_70benchmarkset(simpathlist, shortnames, times=1,
+def evaluation_70benchmarkset(simpathlist, shortnames, mysimloc=0, times=1,
                               bmkpfile="data/benchmarkset_funsim/ground_truth_70_disease_pairs_umlsid.tsv"):
 
     benchmarkpairs = read_assos(bmkpfile, header=False)
@@ -210,10 +210,10 @@ def evaluation_70benchmarkset(simpathlist, shortnames, times=1,
             bmptuple.append((p, q))
     msims = eva_readsims(simpathlist)
     evaress = eva_70benchmarkpairs(msims, bmptuple, times)
-    print("------------scores and lable---------------------------------------------------")
+    print("---scores and lable---------------------------------------------------------------")
     t = 0
     for er in evaress:
-        if t < 3:
+        if t < 2:
             t += 1
             print("-----------------time------------------------------------------------------")
             d1 = list(er.keys())[0]
@@ -230,10 +230,10 @@ def evaluation_70benchmarkset(simpathlist, shortnames, times=1,
                     for m in methodnames:
                         print("\t"+str(er[d1][d2][m]), end='')
                     print()
-    print("-ranking disease pairs---------------------------------------------------------")
+    print("---ranking disease pairs---------------------------------------------------------")
     t = 0
     for er in evaress:
-        if t < 3:
+        if t < 2:
             t += 1
             print("---------------time--------------------------------------------------------")
             ranktemp = eva_cal_ranks(eva_ranking(er))
@@ -247,11 +247,11 @@ def evaluation_70benchmarkset(simpathlist, shortnames, times=1,
                     for j in range(0, 5):
                         print(str(ranktemp[m][i][j])+"\t", end="")
                 print()
-    print("-tpr--fpr----------------------------------------------------------------------")
+    print("---tpr fpr----------------------------------------------------------------------")
     tpfprs = eva_tprfprs(evaress)
     t = 0
     for tpfpr in tpfprs:
-        if t < 3:
+        if t < 2:
             t += 1
             print("-----------------time------------------------------------------------------")
             methodnames = list(tpfpr.keys())
@@ -283,10 +283,8 @@ def evaluation_70benchmarkset(simpathlist, shortnames, times=1,
     avgaucs = sorted(avgaucs, key=lambda a: a[1], reverse=True)
     for x in avgaucs:
         print(str(shortnames[x[0]])+"\t"+str(x[1]))
-
-
-def evaluation_test_rankstats(simpathlist, shortnames, times=1,
-                              bmkpfile="data/benchmarkset_funsim/ground_truth_70_disease_pairs_umlsid.tsv"):
+    print("---rank stats---------------------------------------------------------------------")
+    evarankings = eva_rankings(evaress)
     # ------disease ontology----------------------------------
     do = DiseaseOntology()
     do.readobofile('data/do/HumanDO.obo')
@@ -303,7 +301,6 @@ def evaluation_test_rankstats(simpathlist, shortnames, times=1,
     # for u in umlsdiseases.keys():
     #     term2group[u] = umlsdiseases[u].getcategories()
     # ---------------------------------------------------------
-    benchmarkpairs = read_assos(bmkpfile, header=False)
     # ---same categories stats-----------------
     sameclass = 0
     for p in benchmarkpairs.keys():
@@ -313,15 +310,6 @@ def evaluation_test_rankstats(simpathlist, shortnames, times=1,
                 sameclass += 1
     print(sameclass, "benchamark pairs are in the same categories.")
     # -----------------------------------------
-    stat_assos(benchmarkpairs)
-    bmptuple = []
-    for p in benchmarkpairs.keys():
-        for q in benchmarkpairs[p]:
-            bmptuple.append((p, q))
-    msims = eva_readsims(simpathlist)
-    evaress = eva_70benchmarkpairs(msims, bmptuple, times)
-    evarankings = eva_rankings(evaress)
-
     print("replicated times:", times)
     for topn in [50, 100, 200, 300, 400, 500]:
         print('------ top', str(topn), '--------------------------')
@@ -333,20 +321,7 @@ def evaluation_test_rankstats(simpathlist, shortnames, times=1,
             print(shortnames[mn], truedict['min'], truedict['max'], truedict['avg'],
                   samedict['min'], samedict['max'], samedict['avg'], sep='\t')
         print('------------------------------------------------')
-
-
-def evaluation_test_rankcompare(simpathlist, shortnames, mysimloc=0, times=1,
-                                bmkpfile="data/benchmarkset_funsim/ground_truth_70_disease_pairs_umlsid.tsv"):
-    benchmarkpairs = read_assos(bmkpfile, header=False)
-    stat_assos(benchmarkpairs)
-    bmptuple = []
-    for p in benchmarkpairs.keys():
-        for q in benchmarkpairs[p]:
-            bmptuple.append((p, q))
-    msims = eva_readsims(simpathlist)
-    evaress = eva_70benchmarkpairs(msims, bmptuple, times)
-    evarankings = eva_rankings(evaress)
-
+    print("---rank info------------------------------------------------------------------")
     print("replicated times:", times)
     rankinfos = eva_test_pair_rankinfos(evarankings)
     compsims = []
@@ -356,13 +331,13 @@ def evaluation_test_rankcompare(simpathlist, shortnames, mysimloc=0, times=1,
     riprint = eva_test_pair_rankinfo_ranking(rankinfos, simpathlist[mysimloc], compsims)
     print('disease1', 'disease2', sep='\t', end='')
     for i in range(2, len(riprint['tuplenames'])):
-        print('\t'+shortnames[riprint['tuplenames'][i]], end='')
+        print('\t' + shortnames[riprint['tuplenames'][i]], end='')
     print()
     tuplelist = riprint['tuplelist']
     for t in tuplelist:
-        for i in range(0, len(t)-1):
-            print(str(t[i])+'\t', end='')
-        print(str(t[len(t)-1]))
+        for i in range(0, len(t) - 1):
+            print(str(t[i]) + '\t', end='')
+        print(str(t[len(t) - 1]))
 
 
 def similarity_cal_go():
@@ -856,34 +831,11 @@ def get_disease_correlations_hamaneh():
     # write_sims(newdisease_cors, "data/hamaneh/similarity_hamaneh_rwrsidd_hppinwsl.tsv")
 
 
-def get_rwr_input():
-    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withoutselfloop.tab",
-                                           False, False)
-    print("number of vertices:", g.vcount())
-    gvs = set(g.vs['name'])
-
-    # disease2gene = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
-    #                                                   0.06, True, True)
-    disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
-    print("disease gene assos: ", end='')
-    stat_assos(disease2gene)
-
-    dgassos_new = {}
-    for d in disease2gene.keys():
-        dgleft = gvs.intersection(disease2gene[d])
-        if len(dgleft) >= 1:
-            dgassos_new[d] = dgleft
-    print("disease gene assos left: ", end='')
-    stat_assos(dgassos_new)
-
-    write_assos(dgassos_new, "data/rwr_dgassos_sidd_inhppinwosl.tsv")
-    # write_slist(list(gvs), "data/rwr_bmc_bioinfo/rwr_ppi_hppinwsl_nodes.tsv")
-    # write_slist(list(dgassos_new.keys()), "data/rwr_bmc_bioinfo/rwr_dgassos_sidd_inhppinwsl_diseases.tsv")
-
-
 def experiment():
     g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv",
                                            False, False)
+    # g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
+    #                                        False, False)
     print("number of vertices:", g.vcount())
     gvs = set(g.vs['name'])
     disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
@@ -914,16 +866,29 @@ def experiment():
     # # ------------------------------------------------------------------
 
     # # ---bmc rwr------------------------------------------------------------
-    sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2genescore_disgenet_dgcutoff006_interactome.tsv")
-    sim_d2d = experiments.sim_geneset2geneset_rwr(disease2gene_entrez, sim_gene2geneset)
-    write_sims(sim_d2d, "outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv")
+    # sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2genescore_disgenet_dgcutoff006_interactome.tsv")
+    # sim_d2d = experiments.sim_geneset2geneset_rwr(disease2gene_entrez, sim_gene2geneset)
+    # write_sims(sim_d2d, "outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv")
     # # ----------------------------------------------------------------------
 
     # ---shortest path------------------------------------------------------
-    # sps_norm = experiments.sim_gene2gene_shortestpath(g)
+    sps_norm = experiments.sim_gene2gene_shortestpath(g)
+
+    sim_d2d_avg = experiments.sim_test_sp_avg(dgassos_new, sps_norm)
+    write_sims(sim_d2d_avg,
+               "outputs/similarity_experiments_spavg_trans_less_disgenet_dgcutoff006_interactome.tsv")
+
+    sim_d2d_avgb = experiments.sim_test_sp_normalize_avg(dgassos_new, sps_norm)
+    write_sims(sim_d2d_avgb,
+               "outputs/similarity_experiments_spavgb_trans_less_disgenet_dgcutoff006_interactome.tsv")
+
+    sim_d2d_maxb = experiments.sim_test_sp_normalize_max(dgassos_new, sps_norm)
+    write_sims(sim_d2d_maxb,
+               "outputs/similarity_experiments_spmaxb_trans_less_disgenet_dgcutoff006_interactome.tsv")
     # sim_d2d = experiments.sim_geneset2geneset(dgassos_new, sps_norm)
     # write_sims(sim_d2d,
     #            "outputs/similarity_experiments_shortestpath_transformed_less_disgenet_dgcutoff006_interactome.tsv")
+
     # sps_normdivide = experiments.sim_gene2gene_shortestpath(g, False)
     # sim_d2d = experiments.sim_geneset2geneset(disease2gene_entrez, sps_normdivide)
     # write_sims(sim_d2d, "outputs/similarity_experiments_shortestpath_divide_umls_dgcutoff006.tsv")
@@ -1156,5 +1121,4 @@ def rwr_bmc_dgassos():
 
 
 if __name__ == "__main__":
-    evaluation_test_rankcompare(evaluation_simfilepaths1, shortnames1, 0, 100,
-                                bmkpfile='data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
+    pass

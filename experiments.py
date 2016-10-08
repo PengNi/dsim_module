@@ -20,6 +20,95 @@ graphlet_weight = [1, 0.838444532557004, 0.838444532557004, 0.838444532557004, 0
                    0.582385174873377, 0.676889065114007]
 
 
+def sim_test_sp_avg(d2g, sim_gene2gene):
+    result = {}
+    ds = list(d2g.keys())
+    simgenes = set(sim_gene2gene.keys())
+    d2g_sim = {}
+    d2g_nsim = {}
+    for d in ds:
+        d2g_sim[d] = d2g[d].intersection(simgenes)
+        d2g_nsim[d] = d2g[d].difference(simgenes)
+    for i in range(0, len(ds)):
+        result[ds[i]] = {}
+        now = time.time()
+        print("sim_geneset2geneset():", i, "dg len:", len(d2g[ds[i]]))
+        for j in range(i, len(ds)):
+            simsum = 0.0
+            for m in d2g_sim[ds[i]]:
+                simsum += sim_geneset2gene_avg(m, d2g_sim[ds[j]], sim_gene2gene)
+            for m in d2g_sim[ds[j]]:
+                simsum += sim_geneset2gene_avg(m, d2g_sim[ds[i]], sim_gene2gene)
+            for m in d2g_nsim[ds[i]]:
+                if m in d2g_nsim[ds[j]]:
+                    simsum += 1
+            for m in d2g_nsim[ds[j]]:
+                if m in d2g_nsim[ds[i]]:
+                    simsum += 1
+            result[ds[i]][ds[j]] = simsum / (len(d2g[ds[i]]) + len(d2g[ds[j]]))
+        print("---------------------------------------cost time:", str(time.time() - now))
+    return result
+
+
+def sim_test_sp_normalize_avg(d2g, sim_gene2gene):
+    d_avg = {}
+    for d in d2g.keys():
+        avgv = 0.0
+        for g in d2g[d]:
+            avgv += sim_geneset2gene_avg(g, d2g[d], sim_gene2gene)
+        d_avg[d] = avgv/len(d2g[d])
+
+    result = {}
+    ds = list(d2g.keys())
+    for i in range(0, len(ds)):
+        result[ds[i]] = {}
+        now = time.time()
+        print("sim_geneset2geneset():", i, "dg len:", len(d2g[ds[i]]))
+        for j in range(i, len(ds)):
+            simsum = 0.0
+            for m in d2g[ds[i]]:
+                simsum += sim_geneset2gene_avg(m, d2g[ds[j]], sim_gene2gene)
+            for m in d2g[ds[j]]:
+                simsum += sim_geneset2gene_avg(m, d2g[ds[i]], sim_gene2gene)
+            avgg = (d_avg[ds[i]]+d_avg[ds[j]])/2
+            if avgg != 0.0:
+                result[ds[i]][ds[j]] = (simsum / (len(d2g[ds[i]]) + len(d2g[ds[j]])))/avgg
+            else:
+                result[ds[i]][ds[j]] = (simsum / (len(d2g[ds[i]]) + len(d2g[ds[j]]))) / 0.00001
+        print("---------------------------------------cost time:", str(time.time() - now))
+    return result
+
+
+def sim_test_sp_normalize_max(d2g, sim_gene2gene):
+    d_avg = {}
+    for d in d2g.keys():
+        avgv = 0.0
+        for g in d2g[d]:
+            ogs = set(d2g[d]).difference(set([g]))
+            avgv += sim_geneset2gene_max(g, ogs, sim_gene2gene)
+        d_avg[d] = avgv/len(d2g[d])
+
+    result = {}
+    ds = list(d2g.keys())
+    for i in range(0, len(ds)):
+        result[ds[i]] = {}
+        now = time.time()
+        print("sim_geneset2geneset():", i, "dg len:", len(d2g[ds[i]]))
+        for j in range(i, len(ds)):
+            simsum = 0.0
+            for m in d2g[ds[i]]:
+                simsum += sim_geneset2gene_max(m, d2g[ds[j]], sim_gene2gene)
+            for m in d2g[ds[j]]:
+                simsum += sim_geneset2gene_max(m, d2g[ds[i]], sim_gene2gene)
+            avgg = (d_avg[ds[i]]+d_avg[ds[j]])/2
+            if avgg != 0.0:
+                result[ds[i]][ds[j]] = (simsum / (len(d2g[ds[i]]) + len(d2g[ds[j]])))/avgg
+            else:
+                result[ds[i]][ds[j]] = (simsum / (len(d2g[ds[i]]) + len(d2g[ds[j]]))) / 0.00001
+        print("---------------------------------------cost time:", str(time.time() - now))
+    return result
+
+
 def sim_gene2gene_shortestpath(graph, transformdistance=True):
     nodenames = graph.vs['name']
     sps = graph.shortest_paths(source=nodenames, target=nodenames, weights=None, mode=3)
@@ -70,6 +159,16 @@ def sim_gene2gene_graphlet(gene2signature):
             result[genenames[j]][genenames[i]] = sigsim
         print("sim_gene2gene_graphlet(): ", i, "done..")
     return result
+
+
+def sim_geneset2gene_avg(g, gset, sim_gene2gene):
+    sims = []
+    for i in gset:
+        sims.append(sim_gene2gene[g][i])
+    if len(sims) > 0:
+        return sum(sims)/len(sims)
+    else:
+        return 0.0
 
 
 def sim_geneset2gene_max(g, gset, sim_gene2gene):
