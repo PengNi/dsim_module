@@ -6,11 +6,40 @@ from copy import deepcopy
 fields = ['entrezgene', 'symbol', 'uniprot', 'reporter']
 
 
+def doid2xref(regex, complete, do):
+    """
+    get doid2xref mapping
+    :param regex: "ICD9CM", "ICD10CM", "MSH", "UMLS_CUI" "OMIM" etc.
+    :param complete: True or False, get the complete id or not,
+    e.g. "OMIM:613376" or "613376"
+    :param do: DiseaseOntology
+    :return: dict, string-set<string>
+    """
+    doterms = do.getterms()
+    assos = {}
+    for d in doterms.keys():
+        xrefs = doterms[d].getxrefs()
+        for x in xrefs:
+            if str(x).startswith(regex):
+                if d not in assos.keys():
+                    assos[d] = set()
+                assos[d].add(str(x))
+    if complete:
+        return assos
+    else:
+        assosn = {}
+        for d in assos.keys():
+            assosn[d] = set()
+            for x in assos[d]:
+                assosn[d].add(str(x).split(':')[1].strip())
+        return assosn
+
+
 def doid2umlsid(umlsdiseases):
     """
     get mapping between doids and umls ids
     :param umlsdiseases: an UmlsDiseases object
-    :return: a dict, key-value: string(doid)-string(umls id)
+    :return: a dict, key-value: string(doid)-set<string>(umls id)
     """
     do2umls = {}
     umlsdis = umlsdiseases.getumlsdiseases()
@@ -27,7 +56,7 @@ def icd9cmid2umlsid_alldigit(umlsdiseases):
     get mapping between icd9cm ids (3 digit ids, 4 digit ids,
     5 digit ids) and umls ids
     :param umlsdiseases: an UmlsDiseases object
-    :return: a dict, key-value: string(icd9cmid)-string(umls id)
+    :return: a dict, key-value: string(icd9cmid)-set<string>(umls id)
     """
     icd92umls = {}
     umlsdis = umlsdiseases.getumlsdiseases()
@@ -44,7 +73,7 @@ def icd9cmid2umlsid_3digit(umlsdiseases):
     """
     get mapping between icd9cm 3 digit ids and umls ids
     :param umlsdiseases: an UmlsDiseases object
-    :return: a dict, key-value: string(icd9cmid_3digit)-string(umls id)
+    :return: a dict, key-value: string(icd9cmid_3digit)-set<string>(umls id)
     """
     icd92umls = {}
     umlsdis = umlsdiseases.getumlsdiseases()
