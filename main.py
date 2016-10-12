@@ -3,6 +3,7 @@ from copy import deepcopy
 from pprint import pprint
 import similarity_module
 import mapping
+import common_use
 import experiments
 from files import read_one_col
 from files import read_mappings
@@ -25,7 +26,6 @@ from similarity_coexpression import probeexp2geneexp
 from similarity_coexpression import diseases_similarity_coexp
 from similarity_go import diseases_similarity_go
 from similarity_pathway import combine_pathway_data
-from similarity_pathway import get_disease_pathway_assos
 from similarity_pathway import diseases_similarity_pathway_jaccard
 from gene_ontology import read_go_annotation_file
 from gene_ontology import GeneOntology
@@ -54,14 +54,14 @@ namespaces = ("biological_process", "molecular_function", "cellular_component")
 evaluation_simfilepaths1 = ['outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwsl.tsv',
                             'outputs/similarity_funsim_rwrsidd.tsv',
                             'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
-                            'outputs/similarity_module5_rwrsidd_hppinwsl.tsv',
+                            # 'outputs/similarity_module5_rwrsidd_hppinwsl.tsv',
                             'outputs/similarity_experiments_rwr_rwrsidd_hppinwsl.tsv',
                             'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
-                            'outputs/similarity_icod_rwrsidd_hppinwsl_triplet.tsv',
-                            'outputs/similarity_bognew_rwrsidd_triplet.tsv',
+                            # 'outputs/similarity_icod_rwrsidd_hppinwsl_triplet.tsv',
+                            # 'outputs/similarity_bognew_rwrsidd_triplet.tsv',
                             'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv',
-                            'outputs/similarity_spavgn_trans_less_rwrsidd_hppinwsl.tsv',
-                            'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv',
+                            # 'outputs/similarity_spavgn_trans_less_rwrsidd_hppinwsl.tsv',
+                            # 'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv',
                             ]
 
 shortnames1 = {'outputs/similarity_funsim_rwrsidd.tsv': 'funsim',
@@ -546,7 +546,7 @@ def get_disease_pathway_associations():
 
     stat_assos(disease2gene)
     stat_assos(pathway2gene)
-    dpassos = get_disease_pathway_assos(disease2gene, pathway2gene)
+    dpassos = common_use.hypergeometric_test(disease2gene, pathway2gene)
     stat_assos(dpassos)
     # write_assos(dpassos,
     #             "data/pathway_gsea/dpassos.c2.cp.v5.1.entrez.disgenet.dgcutoff006.bh005.tsv")
@@ -1185,5 +1185,11 @@ def rwr_bmc_dgassos():
     # write_assos(dg_disgenet, "data/rwr_bmc_bioinfo/dg/rwr_dgassos_disgenet.tab")
 
 
+def diseaseid_mapping_stats():
+    uds = read_umls_disease_info(0)
+    dionto = DiseaseOntology()
+    dionto.readobofile('data/do/HumanDO.obo')
+
+
 if __name__ == "__main__":
-    evaluation_70benchmarkset(evaluation_simfilepaths2, shortnames2, 0, 1000)
+    diseaseid_mapping_stats()
