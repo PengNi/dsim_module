@@ -48,6 +48,7 @@ from evaluation import eva_test_pair_rankinfo_ranking
 from disease_ontology import DiseaseOntology
 from disease_ontology import get_terms_at_layern
 from disease_ontology import get_terms2offsprings
+from human_phenotype_ontology import HumanPhenotypeOntology
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
 
@@ -1185,10 +1186,223 @@ def rwr_bmc_dgassos():
     # write_assos(dg_disgenet, "data/rwr_bmc_bioinfo/dg/rwr_dgassos_disgenet.tab")
 
 
+def parse_morbidmap(morbidmap):
+    mim = read_one_col(morbidmap, 1, True)
+    mimnumber = set()
+    for m in mim:
+        words = str(m).strip().split(',')
+        mtemp = words[len(words)-1].strip()
+        mtemp = mtemp.split('(')[0].strip()
+        if len(mtemp) == 6 and mtemp[0] in [str(i) for i in range(0, 10)]:
+            mimnumber.add(mtemp)
+    return mimnumber
+
+
 def diseaseid_mapping_stats():
     uds = read_umls_disease_info(0)
     dionto = DiseaseOntology()
     dionto.readobofile('data/do/HumanDO.obo')
+    hponto = HumanPhenotypeOntology()
+    hponto.readobofile('data/hpo/hp.obo')
+
+    allids_umls = []
+    udsterms = uds.getumlsdiseases()
+    for u in udsterms.keys():
+        kids = dict()
+        kids['umls'] = set()
+        kids['umls'].add(udsterms[u].getid())
+
+        meshids = udsterms[u].getmeshids()
+        if len(meshids) > 0:
+            kids['mesh'] = set()
+            kids['mesh'].update(meshids)
+
+        doids = udsterms[u].getdoids()
+        if len(doids) > 0:
+            kids['do'] = set()
+            kids['do'].update(doids)
+
+        omims = udsterms[u].getomimids()
+        if len(omims) > 0:
+            kids['omim'] = set()
+            kids['omim'].update(omims)
+
+        hpoids = udsterms[u].gethpoids()
+        if len(hpoids) > 0:
+            kids['hpo'] = set()
+            kids['hpo'].update(hpoids)
+
+        icd9cmids = udsterms[u].geticd9cmids()
+        if len(icd9cmids) > 0:
+            kids['icd9cm'] = set()
+            kids['icd9cm'].update(icd9cmids)
+
+        allids_umls.append(kids)
+    print(len(allids_umls))
+
+    allids_do = []
+    doterms = dionto.getterms()
+    for d in doterms.keys():
+        kids = dict()
+        kids['do'] = set()
+        kids['do'].add(doterms[d].getdoid())
+
+        xrefs = doterms[d].getxrefs()
+        for x in xrefs:
+            if str(x).startswith("ICD9:") or str(x).startswith("ICD9CM:"):
+                if 'icd9cm' not in kids.keys():
+                    kids['icd9cm'] = set()
+                kids['icd9cm'].add('icd9cm:' + str(x).split(':')[1])
+            elif str(x).startswith("MeSH:") or str(x).startswith("MSH:"):
+                if 'mesh' not in kids.keys():
+                    kids['mesh'] = set()
+                kids['mesh'].add('mesh:' + str(x).split(':')[1])
+            elif str(x).startswith("UMLS_CUI:") or str(x).startswith("UMLS:"):
+                if 'umls' not in kids.keys():
+                    kids['umls'] = set()
+                kids['umls'].add('umls:' + str(x).split(':')[1])
+            elif str(x).startswith("OMIM:") or str(x).startswith("OMM:"):
+                if 'omim' not in kids.keys():
+                    kids['omim'] = set()
+                kids['omim'].add('omim:' + str(x).split(':')[1])
+            elif str(x).startswith("HP:"):
+                if 'hpo' not in kids.keys():
+                    kids['hpo'] = set()
+                kids['hpo'].add('HP:' + str(x).split(':')[1])
+        allids_do.append(kids)
+    print(len(allids_do))
+
+    allids_hpo = []
+    hpoterms = hponto.getterms()
+    for h in hpoterms.keys():
+        kids = dict()
+        kids['hpo'] = set()
+        kids['hpo'].add(hpoterms[h].gethpoid())
+
+        xrefs = hpoterms[h].getxrefs()
+        for x in xrefs:
+            if str(x).startswith("MeSH:") or str(x).startswith("MESH:") or str(x).startswith("Mesh:"):
+                if 'mesh' not in kids.keys():
+                    kids['mesh'] = set()
+                kids['mesh'].add('mesh:' + str(x).split(':')[1])
+            if str(x).startswith("UMLS:") or str(x).startswith("UMLS_CUI:"):
+                if 'umls' not in kids.keys():
+                    kids['umls'] = set()
+                kids['umls'].add('umls:' + str(x).split(':')[1])
+            if str(x).startswith("DOID:"):
+                if 'do' not in kids.keys():
+                    kids['do'] = set()
+                kids['do'].add('DOID:' + str(x).split(':')[1])
+            if str(x).startswith("ICD-9:"):
+                if 'icd9cm' not in kids.keys():
+                    kids['icd9cm'] = set()
+                kids['icd9cm'].add('icd9cm:' + str(x).split(':')[1])
+        allids_hpo.append(kids)
+    print(len(allids_hpo))
+
+    allids = allids_do + allids_hpo + allids_umls
+    analyze_allids(allids, True)
+
+
+def analyze_allids(allids, one2one):
+    """
+    analyze allids
+    :param allids: a list of dicts
+    :param one2one: True or False
+    :return:
+    """
+    meshids = set(read_one_col("data/mesh/meshtreehierarchy_C_F123.txt", 2, True, '\t', "GBK"))
+    meshidscount = set()
+    for m in meshids:
+        meshidscount.add("mesh:" + m)
+    omimids = parse_morbidmap('data/morbidmap.txt')
+    omimidscount = set()
+    for o in omimids:
+        omimidscount.add("omim:" + o)
+
+    idtypes = ['umls', 'do', 'omim', 'hpo', 'icd9cm', 'mesh']
+    stats_matrix = {}
+    for i in range(0, len(idtypes)):
+        keyid = idtypes[i]
+        # ------------------------------
+        stats_matrix[keyid] = {}
+        stats_matrix[keyid][keyid] = '-'
+        # ------------------------------
+        for j in range(0, len(idtypes)):
+            if i != j:
+                valueid = idtypes[j]
+                ijassos = {}
+                for aid in allids:
+                    if keyid in aid.keys() and valueid in aid.keys():
+                        for kid in aid[keyid]:
+                            if kid not in ijassos.keys():
+                                ijassos[kid] = set()
+                            ijassos[kid].update(aid[valueid])
+                # ----特殊要求-----
+                if keyid == 'mesh':
+                    ks = list(ijassos.keys())
+                    for k in ks:
+                        if k not in meshidscount:
+                            del ijassos[k]
+                if valueid == 'mesh':
+                    ks = list(ijassos.keys())
+                    for k in ks:
+                        ijassos[k] = ijassos[k].intersection(meshidscount)
+                    if len(ijassos[k]) == 0:
+                        del ijassos[k]
+                if keyid == 'omim':
+                    ks = list(ijassos.keys())
+                    for k in ks:
+                        if k not in omimidscount:
+                            del ijassos[k]
+                if valueid == 'omim':
+                    ks = list(ijassos.keys())
+                    for k in ks:
+                        ijassos[k] = ijassos[k].intersection(omimidscount)
+                    if len(ijassos[k]) == 0:
+                        del ijassos[k]
+                # ---------------
+                if one2one:
+                    ks = list(ijassos.keys())
+                    for k in ks:
+                        if len(ijassos[k]) != 1:
+                            del ijassos[k]
+
+                    jiassos = invert_dict(ijassos)
+                    m21is = set()
+                    for k in jiassos.keys():
+                        if len(jiassos[k]) > 1:
+                            m21is.update(jiassos[k])
+                    ks = list(ijassos.keys())
+                    for k in ks:
+                        if k in m21is:
+                            del ijassos[k]
+                # ---------------
+                print(keyid, valueid, ' ', end='')
+                stat_assos(ijassos)
+                stats_matrix[keyid][valueid] = len(list(ijassos.keys()))
+    # ----print stats----------------------
+    for idt in idtypes:
+        print("\t"+idt, end='')
+    print()
+    for id1 in idtypes:
+        print(id1, end='')
+        for id2 in idtypes:
+            print("\t"+str(stats_matrix[id1][id2]), end='')
+        print()
+    countsum = {'umls': 15093, 'mesh': 5429, 'omim': 5856, 'do': 6930, 'icd9cm': 15000, 'hpo': 11813}
+    for idt in idtypes:
+        print("\t"+idt, end='')
+    print()
+    for id1 in idtypes:
+        print(id1, end='')
+        for id2 in idtypes:
+            if id1 == id2:
+                print("\t" + str(stats_matrix[id1][id2]), end='')
+            else:
+                print("\t"+str(stats_matrix[id1][id2]/countsum[id1])[0:6], end='')
+        print()
+    # -------------------------------------
 
 
 if __name__ == "__main__":

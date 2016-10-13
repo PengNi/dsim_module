@@ -21,12 +21,14 @@ def ttl_parser_umls2hpo_exact(filepath):
                 umls2hpo[umls] = set()
             if stripline.startswith("skos:exactMatch hpo"):
                 hpos = stripline.split(",")
-                umls2hpo[umls].add(hpos[0].strip().split(" ")[1].strip())
+                hpid = hpos[0].strip().split(" ")[1].strip().split(":")[1].split("_")[1]
+                umls2hpo[umls].add("HP:" + hpid)
                 length = len(hpos)
                 if length >= 2:
                     for i in range(1, length - 1):
-                        umls2hpo[umls].add(hpos[i].strip())
-                    umls2hpo[umls].add(hpos[length - 1].strip().split(".")[0].strip())
+                        umls2hpo[umls].add("HP:" + hpos[i].strip().split(":")[1].split("_")[1])
+                    umls2hpo[umls].add(
+                        "HP:" + hpos[length - 1].strip().split(".")[0].strip().split(":")[1].split("_")[1])
             line = f.readline()
     return umls2hpo
 

@@ -3,14 +3,14 @@
 from queue import Queue
 
 
-def get_terms_at_layern(n, do):
+def get_terms_at_layern(n, hpo):
     """
     get all termids of terms at layer n
-    :param do: DiseaseOntology
+    :param hpo: HumanPhenotypeOntology
     :param n: integer
     :return: set()
     """
-    terms = do.getterms()
+    terms = hpo.getterms()
     result = set()
     for t in terms.keys():
         layerstemp = terms[t].getlayers()
@@ -19,23 +19,23 @@ def get_terms_at_layern(n, do):
     return result
 
 
-def get_terms2offsprings(terms, do):
+def get_terms2offsprings(terms, hpo):
     """
     get terms-offsprings dict
     :param terms: set()
-    :param do: DiseaseOntology
+    :param hpo: HumanPhenotypeOntology
     :return: dict
     """
     result = {}
     for t in terms:
         result[t] = set()
         result[t].add(t)
-        result[t].update(do.get_termsoffspring(t))
+        result[t].update(hpo.get_termsoffspring(t))
     return result
 
 
-class DiseaseOntology:
-    """Disease Ontology"""
+class HumanPhenotypeOntology:
+    """Human Phenotype Ontology"""
     def __init__(self):
         self._terms = {}
 
@@ -44,15 +44,15 @@ class DiseaseOntology:
 
     def readobofile(self, filepath):
         """
-        read HumanDO.obo file
-        :param filepath: path of HumanDO.obo file
+        read hp.obo file
+        :param filepath: path of hp.obo file
         """
         with open(filepath, mode='r') as f:
             line = next(f)
             while line is not None:
                 line = line.strip()
                 if line == '[Term]':
-                    doid = ""
+                    hpoid = ""
                     name = ""
                     altids = set()
                     synonyms = set()
@@ -63,44 +63,40 @@ class DiseaseOntology:
                         words = line.split(':')
                         key = words[0].strip()
                         if key == 'id':
-                            doid = 'DOID:' + words[2].strip()
+                            hpoid = 'HP:' + words[2].strip()
                         elif key == 'name':
                             name = words[1].strip()
                         elif key == 'alt_id':
-                            altids.add('DOID:' + words[2].strip())
+                            altids.add('HP:' + words[2].strip())
                         elif key == 'synonym':
                             synonyms.add(words[1].strip().split('"')[1].strip())
                         elif key == 'xref':
-                            if len(words) < 3:
-                                print("readobofile exception line:", line)
-                                xrefs.add('OMIM:' + words[1].strip())  # for line = 'xref: 611644' exception
-                            else:
-                                xrefs.add(words[1].strip() + ':' + words[2].strip())
+                            xrefs.add(words[1].strip() + ':' + words[2].strip().split("\"")[0].strip())
                         elif key == 'is_a':
-                            parents.add('DOID:' + words[2].strip().split('!')[0].strip())
+                            parents.add('HP:' + words[2].strip().split('!')[0].strip())
                         line = next(f).strip()
-                    if doid in self._terms.keys():
-                        self._terms[doid].setdoid(doid)
-                        self._terms[doid].setname(name)
-                        self._terms[doid].setaltids(altids)
-                        self._terms[doid].setsynonyms(synonyms)
-                        self._terms[doid].setxrefs(xrefs)
-                        self._terms[doid].setparents(parents)
+                    if hpoid in self._terms.keys():
+                        self._terms[hpoid].sethpoid(hpoid)
+                        self._terms[hpoid].setname(name)
+                        self._terms[hpoid].setaltids(altids)
+                        self._terms[hpoid].setsynonyms(synonyms)
+                        self._terms[hpoid].setxrefs(xrefs)
+                        self._terms[hpoid].setparents(parents)
                     else:
-                        doterm = DOTerm()
-                        doterm.setdoid(doid)
-                        doterm.setname(name)
-                        doterm.setaltids(altids)
-                        doterm.setsynonyms(synonyms)
-                        doterm.setxrefs(xrefs)
-                        doterm.setparents(parents)
-                        self._terms[doid] = doterm
+                        hpoterm = HPOTerm()
+                        hpoterm.sethpoid(hpoid)
+                        hpoterm.setname(name)
+                        hpoterm.setaltids(altids)
+                        hpoterm.setsynonyms(synonyms)
+                        hpoterm.setxrefs(xrefs)
+                        hpoterm.setparents(parents)
+                        self._terms[hpoid] = hpoterm
                     for p in parents:
                         if p not in self._terms.keys():
-                            doterm = DOTerm()
-                            doterm.setdoid(p)
-                            self._terms[p] = doterm
-                        self._terms[p].addchild(doid)
+                            hpoterm = HPOTerm()
+                            hpoterm.sethpoid(p)
+                            self._terms[p] = hpoterm
+                        self._terms[p].addchild(hpoid)
                 try:
                     line = next(f)
                 except StopIteration:
@@ -110,9 +106,9 @@ class DiseaseOntology:
     def settermslayers(self):
         for t in self._terms.keys():
             self._terms[t].setlayers(set())
-        self._terms['DOID:4'].addlayer(1)
+        self._terms['HP:0000001'].addlayer(1)
         q = Queue()
-        q.put('DOID:4')
+        q.put('HP:0000001')
         while not q.empty():
             parentid = q.get()
             parentlayers = self._terms[parentid].getlayers()
@@ -135,10 +131,10 @@ class DiseaseOntology:
         return offspring
 
 
-class DOTerm:
-    """DO term"""
+class HPOTerm:
+    """HPO term"""
     def __init__(self):
-        self._doid = ""
+        self._hpoid = ""
         self._name = ""
         self._altids = set()
         self._synonyms = set()
@@ -147,11 +143,11 @@ class DOTerm:
         self._children = set()
         self._layers = set()
 
-    def setdoid(self, doid):
-        self._doid = doid
+    def sethpoid(self, hpoid):
+        self._hpoid = hpoid
 
-    def getdoid(self):
-        return self._doid
+    def gethpoid(self):
+        return self._hpoid
 
     def setname(self, name):
         self._name = name
@@ -225,7 +221,7 @@ class DOTerm:
 
     def print(self):
         print("[Term]")
-        print("id:", self.getdoid())
+        print("id:", self.gethpoid())
         print("name:", self.getname())
         print("layers:", self.getlayers())
         print("alt_ids:", self.getaltids())
