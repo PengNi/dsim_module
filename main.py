@@ -1301,7 +1301,7 @@ def diseaseid_mapping_stats():
     print(len(allids_hpo))
 
     allids = allids_do + allids_hpo + allids_umls
-    analyze_allids(allids, True)
+    analyze_allids(allids, False)
 
 
 def analyze_allids(allids, one2one):
@@ -1322,6 +1322,7 @@ def analyze_allids(allids, one2one):
 
     idtypes = ['umls', 'do', 'omim', 'hpo', 'icd9cm', 'mesh']
     stats_matrix = {}
+
     for i in range(0, len(idtypes)):
         keyid = idtypes[i]
         # ------------------------------
@@ -1348,8 +1349,8 @@ def analyze_allids(allids, one2one):
                     ks = list(ijassos.keys())
                     for k in ks:
                         ijassos[k] = ijassos[k].intersection(meshidscount)
-                    if len(ijassos[k]) == 0:
-                        del ijassos[k]
+                        if len(ijassos[k]) == 0:
+                            del ijassos[k]
                 if keyid == 'omim':
                     ks = list(ijassos.keys())
                     for k in ks:
@@ -1359,23 +1360,19 @@ def analyze_allids(allids, one2one):
                     ks = list(ijassos.keys())
                     for k in ks:
                         ijassos[k] = ijassos[k].intersection(omimidscount)
-                    if len(ijassos[k]) == 0:
-                        del ijassos[k]
+                        if len(ijassos[k]) == 0:
+                            del ijassos[k]
                 # ---------------
                 if one2one:
+                    invertij = invert_dict(ijassos)
+                    iks = list(invertij.keys())
+                    rmks = set()
+                    for ik in iks:
+                        if len(invertij[ik]) > 1:
+                            rmks.update(invertij[ik])
                     ks = list(ijassos.keys())
                     for k in ks:
-                        if len(ijassos[k]) != 1:
-                            del ijassos[k]
-
-                    jiassos = invert_dict(ijassos)
-                    m21is = set()
-                    for k in jiassos.keys():
-                        if len(jiassos[k]) > 1:
-                            m21is.update(jiassos[k])
-                    ks = list(ijassos.keys())
-                    for k in ks:
-                        if k in m21is:
+                        if len(ijassos[k]) > 1 or k in rmks:
                             del ijassos[k]
                 # ---------------
                 print(keyid, valueid, ' ', end='')
