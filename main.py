@@ -49,30 +49,31 @@ from disease_ontology import DiseaseOntology
 from disease_ontology import get_terms_at_layern
 from disease_ontology import get_terms2offsprings
 from human_phenotype_ontology import HumanPhenotypeOntology
+from plots import plot_roc
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
 
-evaluation_simfilepaths1 = ['outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwsl.tsv',
+evaluation_simfilepaths1 = [  # 'outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwsl.tsv',
                             'outputs/similarity_funsim_rwrsidd.tsv',
                             'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
                             # 'outputs/similarity_module5_rwrsidd_hppinwsl.tsv',
                             'outputs/similarity_experiments_rwr_rwrsidd_hppinwsl.tsv',
                             'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
-                            # 'outputs/similarity_icod_rwrsidd_hppinwsl_triplet.tsv',
-                            # 'outputs/similarity_bognew_rwrsidd_triplet.tsv',
+                            'outputs/similarity_icod_rwrsidd_hppinwsl_triplet.tsv',
+                            'outputs/similarity_bognew_rwrsidd_triplet.tsv',
                             'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv',
                             # 'outputs/similarity_spavgn_trans_less_rwrsidd_hppinwsl.tsv',
                             # 'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv',
                             ]
 
-shortnames1 = {'outputs/similarity_funsim_rwrsidd.tsv': 'funsim',
+shortnames1 = {'outputs/similarity_funsim_rwrsidd.tsv': 'FunSim',
                'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv': 'hamaneh',
                'outputs/similarity_module5_rwrsidd_hppinwsl.tsv': 'module',
-               'outputs/similarity_experiments_rwr_rwrsidd_hppinwsl.tsv': 'rwr',
+               'outputs/similarity_experiments_rwr_rwrsidd_hppinwsl.tsv': 'NetSim',
                'outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwsl.tsv': 'shortestpath',
-               'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv': 'suntopo',
-               'outputs/similarity_icod_rwrsidd_hppinwsl_triplet.tsv': 'icod',
-               'outputs/similarity_bognew_rwrsidd_triplet.tsv': 'bog',
+               'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv': 'Sun_topo',
+               'outputs/similarity_icod_rwrsidd_hppinwsl_triplet.tsv': 'ICod',
+               'outputs/similarity_bognew_rwrsidd_triplet.tsv': 'BOG',
                'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv': 'spavgn',
                'outputs/similarity_spavgn_trans_less_rwrsidd_hppinwsl.tsv': 'spavgnl',
                'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv': 'pathwayj',
@@ -81,26 +82,26 @@ shortnames1 = {'outputs/similarity_funsim_rwrsidd.tsv': 'funsim',
 gtpathlist1 = ['outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv',
                ]
 
-evaluation_simfilepaths2 = [str('outputs/similarity_experiments_shortestpath_transformed_less_disgenet_dgcut' +
-                                'off006_interactome.tsv'),
+evaluation_simfilepaths2 = [  # str('outputs/similarity_experiments_shortestpath_transformed_less_disgenet_dgcut' +
+                            #   'off006_interactome.tsv'),
                             'outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc_triplet.tsv',
                             'outputs/similarity_funsim_disgenet_dgcutoff006.tsv',
                             'outputs/similarity_bog_disgenet_dgcutoff006_triplet.tsv',
                             'outputs/similarity_icod_disgenet_dgcutoff006_interactome_triplet.tsv',
                             'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
                             'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv',
-                            'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv',
+                            # 'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv',
                             'outputs/similarity_spavgn_trans_disgenet_dgcutoff006_interactome.tsv',
-                            'outputs/similarity_spavgn_trans_less_disgenet_dgcutoff006_interactome.tsv',
+                            # 'outputs/similarity_spavgn_trans_less_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv',
                             ]
 
-shortnames2 = {'outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc_triplet.tsv': 'suntopo',
-               'outputs/similarity_funsim_disgenet_dgcutoff006.tsv': 'funsim',
-               'outputs/similarity_bog_disgenet_dgcutoff006_triplet.tsv': 'bog',
-               'outputs/similarity_icod_disgenet_dgcutoff006_interactome_triplet.tsv': 'icod',
+shortnames2 = {'outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc_triplet.tsv': 'Sun_topo',
+               'outputs/similarity_funsim_disgenet_dgcutoff006.tsv': 'FunSim',
+               'outputs/similarity_bog_disgenet_dgcutoff006_triplet.tsv': 'BOG',
+               'outputs/similarity_icod_disgenet_dgcutoff006_interactome_triplet.tsv': 'ICod',
                'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv': 'hamaneh',
-               'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv': 'rwr',
+               'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv': 'NetSim',
                'outputs/similarity_experiments_shortestpath_transformed_less_disgenet_'
                'dgcutoff006_interactome.tsv': 'shortestpath',
                'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv': 'module',
@@ -291,6 +292,8 @@ def evaluation_70benchmarkset(simpathlist, shortnames, mysimloc=0, times=1,
                     else:
                         print("\t\t", end='')
                 print()
+            auctemp = eva_auc(tpfpr)
+            plot_roc(tpfpr, shortnames, auctemp)
     print("---avg auc values------------------------------------------------------------------")
     aucs = eva_aucs(tpfprs)
     auclen = len(aucs)
@@ -334,7 +337,7 @@ def evaluation_70benchmarkset(simpathlist, shortnames, mysimloc=0, times=1,
     print(sameclass, "benchamark pairs are in the same categories.")
     # -----------------------------------------
     print("replicated times:", times)
-    for topn in [50, 100, 200, 300, 400, 500]:
+    for topn in [25, 50, 100, 200, 300, 400, 500]:
         print('------ top', str(topn), '--------------------------')
         rankstats = eva_test_rankstats_multi(evarankings, topn, term2group)
         print("method\ttrue min\ttrue max\ttrue avg\tsame min\tsame max\tsame avg")
@@ -344,6 +347,22 @@ def evaluation_70benchmarkset(simpathlist, shortnames, mysimloc=0, times=1,
             print(shortnames[mn], truedict['min'], truedict['max'], truedict['avg'],
                   samedict['min'], samedict['max'], samedict['avg'], sep='\t')
         print('------------------------------------------------')
+    print("---rank stats 2---------------------------------------------------------------")
+    print("replicated times:", times)
+    term2group = {}
+    rdtemp = evarankings[0]
+    plen = len(rdtemp[list(rdtemp.keys())[0]])
+    ms = evarankings[0].keys()
+    print('rank', end='')
+    for m in ms:
+        print('\t' + shortnames[m], end='')
+    print()
+    for topn in range(0, plen+1):
+        rankstats = eva_test_rankstats_multi(evarankings, topn, term2group)
+        print(topn, end='')
+        for m in ms:
+            print('\t' + str(rankstats[m]['true_labels_num']['avg']), end='')
+        print()
     print("---rank info------------------------------------------------------------------")
     print("replicated times:", times)
     rankinfos = eva_test_pair_rankinfos(evarankings)
@@ -1403,4 +1422,4 @@ def analyze_allids(allids, one2one):
 
 
 if __name__ == "__main__":
-    diseaseid_mapping_stats()
+    evaluation_groundtruth(evaluation_simfilepaths2, shortnames2, [gtpathlist2[6], ])
