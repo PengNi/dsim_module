@@ -120,6 +120,7 @@ gtpathlist2 = ['outputs/similarity_go_bp_umls_dgcutoff006.tsv',
                ]
 
 
+# ---evaluation-----------------------------------------
 def evaluation_validationpairs(simpathlist, shortnames):
     # vpairsnlabels = eva_get_validationpairsnlabels_comorbidity("data/comorbidity/AllNet3_umlsid.net")
     vpairsnlabels = eva_get_validationpairsnlabels_comorbidity("data/comorbidity/AllNet3_doid.net")
@@ -381,7 +382,10 @@ def evaluation_70benchmarkset(simpathlist, shortnames, mysimloc=0, times=1,
             print(str(t[i]) + '\t', end='')
         print(str(t[len(t) - 1]))
 
+# --------------------------------------------------------------------
 
+
+# ---similarity calculation-------------------------------
 def similarity_cal_go():
     disease2gene_symbol = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv",
                                                              0.06, True, False)
@@ -581,7 +585,10 @@ def similarity_cal_pathway():
     stat_sims(sims)
     write_sims(sims, "outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv")
 
+# -----------------------------------------------------------
 
+
+# ---mapping-------------------------------------------------
 def do2umls_mapping():
     uds = read_umls_disease_info(0)
     do2umls = mapping.doid2umlsid(uds)
@@ -743,8 +750,8 @@ def doid2xref_mapping():
                 doid2icd9cm_3digit[d].add(i)
     stat_assos(doid2icd9cm_3digit)
     pprint(doid2icd9cm_3digit)
-    doid2icd9cm_3digit['DOID:2275'] = set(['462'])
-    doid2icd9cm_3digit['DOID:6132'] = set(['490'])
+    doid2icd9cm_3digit['DOID:2275'] = set(['462', ])
+    doid2icd9cm_3digit['DOID:6132'] = set(['490', ])
     stat_assos(doid2icd9cm_3digit)
     pprint(doid2icd9cm_3digit)
     icd9cm32doid = invert_dict(doid2icd9cm_3digit)
@@ -769,7 +776,10 @@ def conv_icd9id2doid_allnet():
                                 wf.write('\t'+i)
                             wf.write('\n')
 
+# -----------------------------------------------------------
 
+
+# ---information---------------------------------------------
 def disease_module_info():
     g = similarity_module.read_interactome("data/DataS1_interactome_rmslpe.tsv", False, False)
     print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
@@ -860,7 +870,10 @@ def gene_neighbor_info():
         lennondn = len(nei) - len(dn)
         print(gene + "\t" + str(len(nei)) + "\t" + str(len(dn)) + "\t" + str(lennondn))
 
+# ------------------------------------------------------------
 
+
+# ---hamaneh and rwr------------------------------------------
 def disease_gene_network_hamaneh():
     g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
                                            False, False)
@@ -1204,7 +1217,10 @@ def rwr_bmc_dgassos():
     stat_assos(dg_disgenet)
     # write_assos(dg_disgenet, "data/rwr_bmc_bioinfo/dg/rwr_dgassos_disgenet.tab")
 
+# -------------------------------------------------------------
 
+
+# ---disease id mapping stats----------------------------------
 def parse_morbidmap(morbidmap):
     mim = read_one_col(morbidmap, 1, True)
     mimnumber = set()
@@ -1257,7 +1273,7 @@ def diseaseid_mapping_stats():
             kids['icd9cm'].update(icd9cmids)
 
         allids_umls.append(kids)
-    print(len(allids_umls))
+    print('umls id:', len(allids_umls))
 
     allids_do = []
     doterms = dionto.getterms()
@@ -1289,7 +1305,7 @@ def diseaseid_mapping_stats():
                     kids['hpo'] = set()
                 kids['hpo'].add('HP:' + str(x).split(':')[1])
         allids_do.append(kids)
-    print(len(allids_do))
+    print('doid:', len(allids_do))
 
     allids_hpo = []
     hpoterms = hponto.getterms()
@@ -1317,10 +1333,98 @@ def diseaseid_mapping_stats():
                     kids['icd9cm'] = set()
                 kids['icd9cm'].add('icd9cm:' + str(x).split(':')[1])
         allids_hpo.append(kids)
-    print(len(allids_hpo))
+    print('hpo id:', len(allids_hpo))
 
-    allids = allids_do + allids_hpo + allids_umls
+    allids_mrconso = allids_mrconsorrf("E:\\UMLS\\2016AA\\META\\MRCONSO.RRF")
+    print('mrconso id:', len(allids_mrconso))
+
+    allids = allids_do + allids_hpo + allids_umls + allids_mrconso
     analyze_allids(allids, False)
+
+    idclasses = {'umls', 'do', 'omim', 'hpo', 'icd9cm', 'mesh'}
+
+    # ----omim test---------------------------------------
+    print("omim test:")
+    omimids = set(read_one_col("data/diseasename_new.txt", 1))
+    print(len(omimids))
+    omimtestresult = idmapping_test(omimids, allids)
+    print(len(omimtestresult))
+    print(omimids.difference(set(omimtestresult.keys())))
+    omimmapcount = {}
+    for idc in idclasses:
+        omimmapcount[idc] = 0
+    for mimid in omimtestresult.keys():
+        for oidtype in omimtestresult[mimid].keys():
+            omimmapcount[oidtype] += 1
+    pprint(omimmapcount)
+    # -----------------------------------------------------
+    # --doid test------------------------------------------
+    print("doid test:")
+    doids = set(read_one_col("data/disease_137_name2doid.tsv", 2))
+    print(len(doids))
+    dotestresult = idmapping_test(doids, allids, itype='do', prefix=True)
+    print(len(dotestresult))
+    print(doids.difference(set(dotestresult.keys())))
+    domapcount = {}
+    for idc in idclasses:
+        domapcount[idc] = 0
+    for did in dotestresult.keys():
+        for oidtype in dotestresult[did].keys():
+            domapcount[oidtype] += 1
+    pprint(domapcount)
+    # -----------------------------------------------------
+
+
+def allids_mrconsorrf(filepath):
+    mappings = []
+    mtemp = {}
+    idtypemap = {'MSH': 'mesh:', 'ICD9CM': 'icd9cm:',
+                 'OMIM': 'omim:', 'HPO': ''}
+    idtype2class = {'omim': 'omim', 'icd9cm': 'icd9cm',
+                    'HP': 'hpo', 'mesh': 'mesh'}
+    with open(filepath, mode='r', encoding='utf-8') as rf:
+        for line in rf:
+            words = line.strip().split('|')
+            umlsid = 'umls:' + words[0].strip()
+            otherid = words[13].strip()
+            othertype = words[11].strip()
+
+            if othertype in idtypemap.keys() and otherid != '' and otherid != 'NOCODE':
+                if umlsid not in mtemp.keys():
+                    mtemp[umlsid] = set()
+                mtemp[umlsid].add(idtypemap[othertype]+otherid)
+    for umlsid in mtemp.keys():
+        mids = dict()
+        mids['umls'] = set()
+        mids['umls'].add(umlsid)
+        for oid in mtemp[umlsid]:
+            idtype = str(oid).split(':')[0]
+            if idtype in idtype2class.keys():
+                idclass = idtype2class[idtype]
+                if idclass not in mids.keys():
+                    mids[idclass] = set()
+                mids[idclass].add(oid)
+        mappings.append(mids)
+    return mappings
+
+
+def idmapping_test(testids, allids, itype='omim', prefix=False):
+    testidmap = {}
+    for mids in allids:
+        if itype in mids.keys():
+            tids = mids[itype]
+            for tid in tids:
+                idtemp = tid
+                if not prefix:
+                    idtemp = str(idtemp).split(":")[1]
+                if idtemp in testids:
+                    if idtemp not in testidmap.keys():
+                        testidmap[idtemp] = {}
+                    for mk in mids.keys():
+                        if mk not in testidmap[idtemp].keys():
+                            testidmap[idtemp][mk] = set()
+                        testidmap[idtemp][mk].update(mids[mk])
+    return testidmap
 
 
 def analyze_allids(allids, one2one):
@@ -1334,10 +1438,12 @@ def analyze_allids(allids, one2one):
     meshidscount = set()
     for m in meshids:
         meshidscount.add("mesh:" + m)
+    print('number of mesh ids we care about:', len(meshidscount))
     omimids = parse_morbidmap('data/morbidmap.txt')
     omimidscount = set()
     for o in omimids:
         omimidscount.add("omim:" + o)
+    print('number of omim ids we care about:', len(omimidscount))
 
     idtypes = ['umls', 'do', 'omim', 'hpo', 'icd9cm', 'mesh']
     stats_matrix = {}
@@ -1406,7 +1512,8 @@ def analyze_allids(allids, one2one):
         for id2 in idtypes:
             print("\t"+str(stats_matrix[id1][id2]), end='')
         print()
-    countsum = {'umls': 15093, 'mesh': 5429, 'omim': 5856, 'do': 6930, 'icd9cm': 15000, 'hpo': 11813}
+    countsum = {'umls': 21237, 'mesh': len(meshidscount),
+                'omim': len(omimidscount), 'do': 6930, 'icd9cm': 22406, 'hpo': 11813}
     for idt in idtypes:
         print("\t"+idt, end='')
     print()
@@ -1420,6 +1527,8 @@ def analyze_allids(allids, one2one):
         print()
     # -------------------------------------
 
+# --------------------------------------------------------------
+
 
 if __name__ == "__main__":
-    evaluation_groundtruth(evaluation_simfilepaths2, shortnames2, [gtpathlist2[6], ])
+    diseaseid_mapping_stats()
