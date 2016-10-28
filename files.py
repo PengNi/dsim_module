@@ -237,6 +237,48 @@ def write_sims(simdict, filepath, header=False, sep='\t'):
     print("write_sims: writing finished.")
 
 
+def write_simmatrix(simdict, filepath, asorder=False, dorder=None, sep='\t'):
+    """
+    write dict contains similarities between each two entities (e.g. diseases)
+    to a file in matrix format
+    :param simdict: dict, key-value (string-dict<string-float>):
+    {entity1:{entity2: sim1, entity3: sim2,},}
+    :param filepath: file path to a file
+    "V1sepV2sepsim",default False
+    :param asorder: if row name and col name of the output matrix as order
+    :param dorder: list of ordered matrix dimnames, if asorder is True, this will work
+    :param sep: delimiter, default '\t'
+    :return: None
+    """
+    def findsimvalue(d1, d2, dsims):
+        if d1 in dsims.keys() and d2 in dsims[d1].keys():
+            return dsims[d1][d2]
+        elif d2 in dsims.keys() and d1 in dsims[d2].keys():
+            return dsims[d2][d1]
+        else:
+            if d1 == d2:
+                return 1.0
+            return 0.0
+
+    dnames = set(simdict.keys())
+    for d in simdict.keys():
+        dnames.update(set(simdict[d].keys()))
+    if asorder:
+        dnames = dorder
+    else:
+        dnames = list(dnames)
+    with open(filepath, mode='w') as f:
+        for d in dnames:
+            f.write(sep + d)
+        f.write("\n")
+        for da in dnames:
+            f.write(da)
+            for db in dnames:
+                f.write(sep + str(findsimvalue(da, db, simdict)))
+            f.write("\n")
+        print("write_simmatrix: writing finished.")
+
+
 def write_slist(slist, filepath, header=False):
     """
     write a list which each element is a string to a file.

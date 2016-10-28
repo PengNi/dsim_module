@@ -17,6 +17,7 @@ from files import stat_network
 from files import write_assos
 from files import write_mappings
 from files import write_sims
+from files import write_simmatrix
 from files import write_slist
 from files import invert_dict
 from umls_disease import read_all_gene_disease_associations
@@ -1530,5 +1531,51 @@ def analyze_allids(allids, one2one):
 # --------------------------------------------------------------
 
 
+# ---cal disease sim for evaluation with disease gene prediction--------------------
+def similarity_cal_predeva():
+    # dgassos = read_assos("data/test/geneOmimId_diseaseOmimId_in_ppi.txt",
+    #                      False, "\t", 2, 1)
+    # stat_assos(dgassos)
+    # # omim2hprd = read_mappings("D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\HPRD_ID_MAPPINGS.txt",
+    # #                           False, "\t", 6, 1)
+    # omim2entrez = read_mappings("data/test/HPRD_ID_MAPPINGS.txt",
+    #                             False, "\t", 6, 5)
+    # stat_maps(omim2entrez)
+    # dgassos = mapping.convert_dict_values(dgassos, omim2entrez)
+    # stat_assos(dgassos)
+    #
+    # # g = similarity_module.read_interactome("D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\HPRD_ppi.txt",
+    # #                                        False, False)
+    # g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv", False, False)
+    # print(len(g.vs), len(g.es))
+    #
+    # dsim = similarity_module.similarity_cal_spavgn(dgassos, g)
+    # dsim = common_use.normalize_simdict(dsim)
+    # write_simmatrix(dsim,
+    #                 "data/test/similarity_spavgn_dgomim_interactome_matrix.tsv")
+
+    d137order = read_one_col("data/test/disease_137_SIDD.txt", 1)
+    doname2doid = read_mappings("data/test/disease_137_name2doid.tsv", False)
+    dgassos = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
+    # dgassos = read_assos("data/test/doid_result.txt", False, "\t", 2, 3)
+    dgassos_cal = {}
+    for dname in d137order:
+        if doname2doid[dname] in dgassos.keys():
+            dgassos_cal[dname] = dgassos[doname2doid[dname]]
+
+    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/normalize_ppi_symbol.txt", False, False)
+    print(len(g.vs), len(g.es))
+    dsim = similarity_module.similarity_cal_spavgn(dgassos_cal, g)
+    dsim = common_use.normalize_simdict(dsim)
+    write_simmatrix(dsim, "data/test/similarity_spavgn_sidd_humannet.tsv", True, d137order)
+
+    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab", False, False)
+    print(len(g.vs), len(g.es))
+    dsim = similarity_module.similarity_cal_spavgn(dgassos_cal, g)
+    dsim = common_use.normalize_simdict(dsim)
+    write_simmatrix(dsim, "data/test/similarity_spavgn_sidd_hppin.tsv", True, d137order)
+# --------------------------------------------------------------
+
+
 if __name__ == "__main__":
-    diseaseid_mapping_stats()
+    similarity_cal_predeva()

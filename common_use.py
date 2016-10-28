@@ -4,6 +4,29 @@ from statsmodels.sandbox.stats.multicomp import multipletests
 from files import stat_assos
 
 
+def normalize_simdict(simdict):
+    """
+    normalize a simdict, xc = (x-minx)/(max-minx)
+    :param simdict: a dict contains sim values, (key-value: string-dict<string-float>)
+    :return: a dict, (key-value: string-dict<string-float>)
+    """
+    minv = float('inf')
+    maxv = float('-inf')
+    for d in simdict.keys():
+        for k in simdict[d].keys():
+            if minv > simdict[d][k]:
+                minv = simdict[d][k]
+            if maxv < simdict[d][k]:
+                maxv = simdict[d][k]
+    nsimdict = {}
+    delta = maxv - minv
+    for d in simdict.keys():
+        nsimdict[d] = {}
+        for k in simdict[d].keys():
+            nsimdict[d][k] = (simdict[d][k] - minv)/delta
+    return nsimdict
+
+
 def hypergeometric_test(acassos, bcassos, mtmethod='fdr_bh', pvcutoff=0.05):
     """
     based on A-C and B-C associations, using hypergeometric test to get
