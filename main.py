@@ -54,15 +54,19 @@ from plots import plot_roc
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
 
-evaluation_simfilepaths1 = [  # 'outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwsl.tsv',
-                            'outputs/similarity_funsim_rwrsidd.tsv',
-                            'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
+evaluation_simfilepaths1 = ['outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwsl.tsv',
+                            # 'outputs/similarity_funsim_rwrsidd.tsv',
+                            # 'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
                             # 'outputs/similarity_module5_rwrsidd_hppinwsl.tsv',
                             'outputs/similarity_experiments_rwr_rwrsidd_hppinwsl.tsv',
                             'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
-                            'outputs/similarity_icod_rwrsidd_hppinwsl_triplet.tsv',
-                            'outputs/similarity_bognew_rwrsidd_triplet.tsv',
+                            # 'outputs/similarity_icod_rwrsidd_hppinwsl_triplet.tsv',
+                            # 'outputs/similarity_bognew_rwrsidd_triplet.tsv',
                             'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv',
+                            # 'outputs/similarity_spavgncle_trans_rwrsidd_hppinwsl.tsv',
+                            # 'outputs/similarity_spmaxncle_trans_rwrsidd_hppinwsl.tsv',
+                            'outputs/similarity_spmaxn_trans_rwrsidd_hppinwsl.tsv',
+                            # 'outputs/similarity_spmaxnlog_trans_rwrsidd_hppinwsl.tsv'
                             # 'outputs/similarity_spavgn_trans_less_rwrsidd_hppinwsl.tsv',
                             # 'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv',
                             ]
@@ -71,16 +75,22 @@ shortnames1 = {'outputs/similarity_funsim_rwrsidd.tsv': 'FunSim',
                'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv': 'hamaneh',
                'outputs/similarity_module5_rwrsidd_hppinwsl.tsv': 'module',
                'outputs/similarity_experiments_rwr_rwrsidd_hppinwsl.tsv': 'NetSim',
-               'outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwsl.tsv': 'shortestpath',
+               'outputs/similarity_experiments_shortestpath_transformed_less_rwrsidd_hppinwsl.tsv': 'spmax',
                'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv': 'Sun_topo',
                'outputs/similarity_icod_rwrsidd_hppinwsl_triplet.tsv': 'ICod',
                'outputs/similarity_bognew_rwrsidd_triplet.tsv': 'BOG',
                'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv': 'spavgn',
                'outputs/similarity_spavgn_trans_less_rwrsidd_hppinwsl.tsv': 'spavgnl',
                'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv': 'pathwayj',
+               'outputs/similarity_spavgncle_trans_rwrsidd_hppinwsl.tsv': 'spavgncle',
+               'outputs/similarity_spmaxncle_trans_rwrsidd_hppinwsl.tsv': 'spmaxncle',
+               'outputs/similarity_spmaxn_trans_rwrsidd_hppinwsl.tsv': 'spmaxn',
+               'outputs/similarity_spmaxnlog_trans_rwrsidd_hppinwsl.tsv': 'spmaxnlog',
                }
 
 gtpathlist1 = ['outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv',
+               'outputs/similarity_domain_jaccard_di2do_sidd.tsv',
+               'outputs/similarity_pathway_jaccard_doid2keggpathway.tsv',
                ]
 
 evaluation_simfilepaths2 = [  # str('outputs/similarity_experiments_shortestpath_transformed_less_disgenet_dgcut' +
@@ -118,6 +128,7 @@ gtpathlist2 = ['outputs/similarity_go_bp_umls_dgcutoff006.tsv',
                'outputs/similarity_symptom_1445umlsid.tsv',
                'outputs/similarity_symptom_1736umlsid.tsv',
                'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv',
+               'outputs/similarity_domain_jaccard_di2do_disgenet_dgcutoff006.tsv',
                ]
 
 
@@ -172,6 +183,8 @@ def evaluation_validationpairs(simpathlist, shortnames):
             else:
                 print('\t\t', end='')
         print()
+    auctemp = eva_auc(vpairs_tprfpr)
+    plot_roc(vpairs_tprfpr, shortnames, auctemp)
     print("------------auc value----------------------------------------------------------")
     vpairs_auc = eva_auc(vpairs_tprfpr)
     for a in vpairs_auc.keys():
@@ -382,7 +395,6 @@ def evaluation_70benchmarkset(simpathlist, shortnames, mysimloc=0, times=1,
         for i in range(0, len(t) - 1):
             print(str(t[i]) + '\t', end='')
         print(str(t[len(t) - 1]))
-
 # --------------------------------------------------------------------
 
 
@@ -545,10 +557,12 @@ def similarity_cal_module():
     # write_sims(sims, "similarity_module4_umls_dcutoff006.tsv")
     # sims = similarity_module.similarity_cal_module_5(disease2gene_entrez, g)
     # write_sims(sims, "outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv")
-    sims = similarity_module.similarity_cal_spavgn(disease2gene_entrez, g, False)
-    write_sims(sims, "outputs/similarity_spavgn_trans_disgenet_dgcutoff006_interactome.tsv")
-    sims = similarity_module.similarity_cal_spavgn(disease2gene_entrez, g, True, 1)
-    write_sims(sims, "outputs/similarity_spavgn_trans_less_disgenet_dgcutoff006_interactome.tsv")
+    # sims = similarity_module.similarity_cal_spavgn_circle(disease2gene_entrez, g, False)
+    # write_sims(sims, "outputs/similarity_spavgncle_trans_rwrsidd_hppinwsl.tsv")
+    sims = similarity_module.similarity_cal_spmaxn_circle(disease2gene_entrez, g, False)
+    write_sims(sims, "outputs/similarity_spmaxncle_trans_disgenet_dgcutoff006_interactome.tsv")
+    sims = similarity_module.similarity_cal_spmaxn(disease2gene_entrez, g, False)
+    write_sims(sims, "outputs/similarity_spmaxn_trans_disgenet_dgcutoff006_interactome.tsv")
 
 
 def combine_pathway_data_gsea():
@@ -561,7 +575,7 @@ def combine_pathway_data_gsea():
     # write_assos(pgassos, 'data/pathway_gsea/pgassos.c2.cp.bkr.v5.1.symbols.tsv')
 
 
-def get_disease_pathway_associations():
+def get_disease_pathway_assos():
     # disease2gene = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
     #                                                   0.06, True, True)
     # pathway2gene = read_assos("data/pathway_gsea/pgassos.c2.cp.v5.1.entrez.tsv")
@@ -579,13 +593,32 @@ def get_disease_pathway_associations():
 
 
 def similarity_cal_pathway():
-    d2p = read_assos("data/pathway_gsea/dpassos.c2.cp.bkr.v5.1.symbols.rwrsidd.bh005.tsv")
+    d2p = read_assos("data/kegg_disease/doid2keggpathway.tsv")
     print("disease-pathway assos: ", end='')
     stat_assos(d2p)
     sims = diseases_similarity_pathway_jaccard(list(d2p.keys()), d2p)
     stat_sims(sims)
-    write_sims(sims, "outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv")
+    write_sims(sims, "outputs/similarity_pathway_jaccard_doid2keggpathway.tsv")
 
+
+def get_disease_domain_assos():
+    # disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
+    disease2gene = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
+                                                      0.06, True, True)
+    domain2gene = read_assos("data/org_Hs_eg_db/entrez2symbol2pfam.tsv", True, '\t', 3, 1)
+
+    ddoassos = common_use.hypergeometric_test(disease2gene, domain2gene)
+    stat_assos(ddoassos)
+    write_assos(ddoassos, "data/org_Hs_eg_db/didoassos_disgenet_dgcutoff006.tsv")
+
+
+def similarity_cal_domain():
+    di2do = read_assos("data/org_Hs_eg_db/didoassos_sidd.tsv", False, "\t", 1, 2)
+    print("disease-domain assos: ", end='')
+    stat_assos(di2do)
+    sims = diseases_similarity_pathway_jaccard(list(di2do.keys()), di2do)
+    stat_sims(sims)
+    # write_sims(sims, "outputs/similarity_domain_jaccard_di2do_sidd.tsv")
 # -----------------------------------------------------------
 
 
@@ -659,19 +692,6 @@ def icd9id2umlsid_mapping():
     # write_assos(icd92umls, "data/disgenet/icd9_3digit2umlsid.tsv")
 
 
-def conv_icd9id2umlsid_allnet():
-    icd9id2umlsid = read_mappings("data/disgenet/icd9_3digit2umlsid.tsv")
-    with open("data/comorbidity/AllNet3.net", mode='r') as rf:
-        with open("data/comorbidity/AllNet3_umlsid.net", mode='w') as wf:
-            for line in rf:
-                words = line.strip().split("\t")
-                if words[0] in icd9id2umlsid.keys() and words[1] in icd9id2umlsid.keys():
-                    wf.write(icd9id2umlsid[words[0]] + '\t' + icd9id2umlsid[words[1]])
-                    for i in words[2:]:
-                        wf.write('\t'+i)
-                    wf.write('\n')
-
-
 def diseaseidmapping_hsdn():
     meshnames1 = read_one_col("ncomms5212-s5.txt", 1, True)
     meshnames2 = read_one_col("ncomms5212-s5.txt", 2, True)
@@ -735,48 +755,71 @@ def conv_meshname2umlsid_in_hsdn():
     write_sims(hsdnumlssims, "similarity_symptom_1736umlsid.tsv")
 
 
-def doid2xref_mapping():
+def get_umls2keggpathways():
+    mesh2pathways = read_assos('data/kegg_disease/mesh2pathway.tsv')
+    stat_assos(mesh2pathways)
+
+    uds = read_umls_disease_info(0)
+    umlsterms = uds.getumlsdiseases()
+    # allids_mrconso = allids_mrconsorrf("E:\\UMLS\\2016AA\\META\\MRCONSO.RRF")
+    # print('mrconso id:', len(allids_mrconso))
+
+    umls2mesh = {}
+    for ut in umlsterms.keys():
+        meshs = umlsterms[ut].getmeshids()
+        if len(meshs) > 0:
+            umls2mesh[ut] = set()
+            umls2mesh[ut].update(meshs)
+    # umlsdiseases_cal = set(umlsterms.keys())
+    # for allid in allids_mrconso:
+    #     umlsidset = allid['umls']
+    #     for uid in umlsidset:
+    #         if uid in umlsdiseases_cal and 'mesh' in allid.keys():
+    #             if uid not in umls2mesh.keys():
+    #                 umls2mesh[uid] = set()
+    #             umls2mesh[uid].update(allid['mesh'])
+
+    umls2pathway = {}
+    for ut in umls2mesh.keys():
+        pwtemp = set()
+        for msh in umls2mesh[ut]:
+            if msh in mesh2pathways.keys():
+                pwtemp.update(mesh2pathways[msh])
+        if len(pwtemp) > 0:
+            umls2pathway[ut] = pwtemp
+    stat_assos(umls2pathway)
+    # write_assos(umls2pathway, 'data/kegg_disease/umls2keggpathway.tsv')
+
+
+def get_doid2keggpathways():
+    mesh2pathways = read_assos('data/kegg_disease/mesh2pathway.tsv')
+    stat_assos(mesh2pathways)
+
     dionto = DiseaseOntology()
     dionto.readobofile('data/do/HumanDO.obo')
-    # ---doid2icd9cm----------------------------------------
-    doid2icd9cm = mapping.doid2xref("ICD9CM", False, dionto)
-    stat_assos(doid2icd9cm)
-    # write_assos(doid2icd9cm, "data/do/doid2icd9cm.tsv")
-    doid2icd9cm_3digit = {}
-    for d in doid2icd9cm.keys():
-        for i in doid2icd9cm[d]:
-            if len(i) == 3:
-                if d not in doid2icd9cm_3digit.keys():
-                    doid2icd9cm_3digit[d] = set()
-                doid2icd9cm_3digit[d].add(i)
-    stat_assos(doid2icd9cm_3digit)
-    pprint(doid2icd9cm_3digit)
-    doid2icd9cm_3digit['DOID:2275'] = set(['462', ])
-    doid2icd9cm_3digit['DOID:6132'] = set(['490', ])
-    stat_assos(doid2icd9cm_3digit)
-    pprint(doid2icd9cm_3digit)
-    icd9cm32doid = invert_dict(doid2icd9cm_3digit)
-    stat_assos(icd9cm32doid)
-    pprint(icd9cm32doid)
-    write_assos(icd9cm32doid, 'data/do/icd93digit2doid_temp.tsv')
-    # ------------------------------------------------------
+    doterms = dionto.getterms()
 
+    doid2mesh = {}
+    for d in doterms.keys():
+        xrefs = doterms[d].getxrefs()
+        meshset = set()
+        for x in xrefs:
+            if str(x).startswith("MeSH:") or str(x).startswith("MSH:"):
+                meshset.add('mesh:' + str(x).split(':')[1])
+        if len(meshset) > 0:
+            doid2mesh[d] = meshset
+    stat_assos(doid2mesh)
 
-def conv_icd9id2doid_allnet():
-    icd92do = read_assos('data/do/icd93digit2doid_temp.tsv')
-    stat_assos(icd92do)
-    with open("data/comorbidity/AllNet3.net", mode='r') as rf:
-        with open("data/comorbidity/AllNet3_doid.net", mode='w') as wf:
-            for line in rf:
-                words = line.strip().split("\t")
-                if words[0] in icd92do.keys() and words[1] in icd92do.keys():
-                    for w0 in icd92do[words[0]]:
-                        for w1 in icd92do[words[1]]:
-                            wf.write(w0 + '\t' + w1)
-                            for i in words[2:]:
-                                wf.write('\t'+i)
-                            wf.write('\n')
-
+    doid2pathway = {}
+    for d in doid2mesh.keys():
+        pwset = set()
+        for m in doid2mesh[d]:
+            if m in mesh2pathways.keys():
+                pwset.update(mesh2pathways[m])
+        if len(pwset) > 0:
+            doid2pathway[d] = pwset
+    stat_assos(doid2pathway)
+    write_assos(doid2pathway, 'data/kegg_disease/doid2keggpathway.tsv')
 # -----------------------------------------------------------
 
 
@@ -870,7 +913,6 @@ def gene_neighbor_info():
         dn = all_disease_genes.intersection(nei)
         lennondn = len(nei) - len(dn)
         print(gene + "\t" + str(len(nei)) + "\t" + str(len(dn)) + "\t" + str(lennondn))
-
 # ------------------------------------------------------------
 
 
@@ -1217,7 +1259,6 @@ def rwr_bmc_dgassos():
                     dg_disgenet[d].add(gt.strip(";").strip())
     stat_assos(dg_disgenet)
     # write_assos(dg_disgenet, "data/rwr_bmc_bioinfo/dg/rwr_dgassos_disgenet.tab")
-
 # -------------------------------------------------------------
 
 
@@ -1527,7 +1568,6 @@ def analyze_allids(allids, one2one):
                 print("\t"+str(stats_matrix[id1][id2]/countsum[id1])[0:6], end='')
         print()
     # -------------------------------------
-
 # --------------------------------------------------------------
 
 
@@ -1550,21 +1590,11 @@ def similarity_cal_predeva():
     # g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv", False, False)
     print(len(g.vs), len(g.es))
 
-    # dsim = similarity_module.similarity_cal_spavgn(dgassos, g)
-    # sps_norm = experiments.sim_gene2gene_shortestpath(g)
-    # dsim = experiments.sim_geneset2geneset(dgassos, sps_norm)
-    sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2genescore_dgomim_hprd.tsv")
-    for d in dgassos.keys():
-        vset = set()
-        for v in dgassos[d]:
-            vset.add(str(int(v)))
-        dgassos[d] = vset
-    stat_assos(dgassos)
-    dsim = experiments.sim_geneset2geneset_rwr(dgassos, sim_gene2geneset)
+    dsim = similarity_module.similarity_cal_spmaxn(dgassos, g)
 
-    dsim = common_use.normalize_simdict(dsim)
+    # dsim = common_use.normalize_simdict(dsim)
     write_simmatrix(dsim,
-                    "data/test/similarity_rwr_dgomim_hprd_matrix.tsv")
+                    "data/test/similarity_spmaxn_dgomim_hprd_matrix.tsv")
     # ---------------------------------------------------------------------------
 
     # ----disease mirna prediction-----------------------------------------------
@@ -1597,4 +1627,7 @@ def similarity_cal_predeva():
 
 
 if __name__ == "__main__":
-    similarity_cal_predeva()
+    # evaluation_groundtruth(evaluation_simfilepaths1, shortnames1, [gtpathlist1[2], ])
+    evaluation_70benchmarkset(evaluation_simfilepaths1, shortnames1, 0, 100,
+                              'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
+    # evaluation_validationpairs(evaluation_simfilepaths1, shortnames1)
