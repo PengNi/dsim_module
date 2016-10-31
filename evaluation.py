@@ -222,14 +222,16 @@ def eva_ranking(scoredict):
     return scorenlabel
 
 
-def eva_roc_getvalidationpairs(sims, validationpairsnlabels):
+def eva_roc_getvalidationpairs(sims, validationpairsnlabels, times=1):
     """
     get the similarity scores and labels of the validation pairs in sims
     :param sims: got from method eva_readsims(), contains sims of methods need
     to be evaluated
     :param validationpairsnlabels: dict, contains validation pairs and their lables, can be got
     from method eva_get_validationpairsnlabels_comorbidity()
-    :return: dict, dict pattern is
+    :param times: times to replicate the evaluation, one time produces one result which
+    can be used to draw ROC
+    :return: a list of dict, dict pattern is
     {disease1: {disease2:{method1: simvalue, method2: simvalue, ..., label: 0/1}, }, }
     """
     dpairs = {}
@@ -251,19 +253,73 @@ def eva_roc_getvalidationpairs(sims, validationpairsnlabels):
             del dpairs[d]
     print("number of disease pairs which all methods can cal: ", end='')
     stat_assos(dpairs)
+    dpairs_t = {}
+    dpairs_f = {}
+    counter_t = 0
+    counter_f = 0
+    for d in dpairs.keys():
+        for p in dpairs[d]:
+            if findsimvalue(d, p, validationpairsnlabels) == 1:
+                if d not in dpairs_t.keys():
+                    dpairs_t[d] = set()
+                dpairs_t[d].add(p)
+                counter_t += 1
+            elif findsimvalue(d, p, validationpairsnlabels) == 0:
+                if d not in dpairs_f.keys():
+                    dpairs_f[d] = set()
+                dpairs_f[d].add(p)
+                counter_f += 1
+            else:
+                print("excuse me ?")
+    print('true labels can be caled:', counter_t)
+    print('false labels can be caled:', counter_f)
 
-    res = {}
-    for d1 in dpairs.keys():
-        res[d1] = {}
-        for d2 in dpairs[d1]:
-            res[d1][d2] = {}
-            for m in sims.keys():
-                res[d1][d2][m] = findsimvalue(d1, d2, sims[m])
-            res[d1][d2]['label'] = findsimvalue(d1, d2, validationpairsnlabels)
-    return res
+    ress = []
+    if counter_f/counter_t <= 5:
+        res = {}
+        for d1 in dpairs.keys():
+            res[d1] = {}
+            for d2 in dpairs[d1]:
+                res[d1][d2] = {}
+                for m in sims.keys():
+                    res[d1][d2][m] = findsimvalue(d1, d2, sims[m])
+                res[d1][d2]['label'] = findsimvalue(d1, d2, validationpairsnlabels)
+        ress.append(res)
+    else:
+        if counter_f/counter_t > 10:
+            randompairs = 10 * counter_t
+        else:
+            randompairs = 5 * counter_t
+        for df in dpairs_f.keys():
+            dpairs_f[df] = list(dpairs_f[df])
+        for t in range(0, times):
+            res = {}
+            for d1 in dpairs_t.keys():
+                res[d1] = {}
+                for d2 in dpairs_t[d1]:
+                    res[d1][d2] = {}
+                    for m in sims.keys():
+                        res[d1][d2][m] = findsimvalue(d1, d2, sims[m])
+                    res[d1][d2]['label'] = 1
+            randomcount = 0
+            d1s = list(dpairs_f.keys())
+            while randomcount < randompairs:
+                p = d1s[randint(0, len(d1s) - 1)]
+                q = dpairs_f[p][randint(0, len(dpairs_f[p]) - 1)]
+                if not ((p in res.keys() and q in res[p].keys()) or (q in res.keys() and p in res[q].keys())):
+                    if p not in res.keys():
+                        res[p] = {}
+                    res[p][q] = {}
+                    for m in sims.keys():
+                        res[p][q][m] = findsimvalue(p, q, sims[m])
+                    res[p][q]['label'] = 0
+                    randomcount += 1
+            ress.append(res)
+
+    return ress
 
 
-def eva_get_validationpairsnlabels_comorbidity(comorbidityfilepath, phi_cutoff=0, ttest_cutoff=1.96):
+def eva_get_validationpairsnlabels_comorbidity(comorbidityfilepath, phi_cutoff=0.06, ttest_cutoff=1.96):
     """
     based on comorbidity info, get disease pairs needed validation and the pairs' labels (0/1,
     0 represents two diseases have no significant correlation, 1 means they have)
@@ -283,7 +339,7 @@ def eva_get_validationpairsnlabels_comorbidity(comorbidityfilepath, phi_cutoff=0
             d2 = words[1].strip()
             if d1 not in pairs.keys():
                 pairs[d1] = {}
-            if float(words[8].strip()) > phi_cutoff and float(words[9].strip()) >= ttest_cutoff:
+            if float(words[8].strip()) >= phi_cutoff and float(words[9].strip()) >= ttest_cutoff:
                 pairs[d1][d2] = 1
                 tcount += 1
             else:

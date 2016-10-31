@@ -171,7 +171,8 @@ def read_simmatrix(filepath, rowheader=True, colheader=True, sep="\t"):
                 vtemp = float(words[i+starter])
                 if colnames[i] in sim.keys() and rownames[rcount] in sim[colnames[i]].keys():
                     if vtemp != sim[colnames[i]][rownames[rcount]]:
-                        print(rownames[rcount], colnames[i], "have two sim values.")
+                        print(rownames[rcount], colnames[i], "have two sim values.",
+                              vtemp, sim[colnames[i]][rownames[rcount]])
                 else:
                     sim[rownames[rcount]][colnames[i]] = vtemp
             rcount += 1

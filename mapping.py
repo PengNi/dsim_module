@@ -63,9 +63,10 @@ def icd9cmid2umlsid_alldigit(umlsdiseases):
     for u in umlsdis.keys():
         for i in umlsdis[u].geticd9cmids():
             icd9id = i[7:]
-            if icd9id not in icd92umls.keys():
-                icd92umls[icd9id] = set()
-            icd92umls[icd9id].add(umlsdis[u].getid())
+            if len(icd9id) < 7:
+                if icd9id not in icd92umls.keys():
+                    icd92umls[icd9id] = set()
+                icd92umls[icd9id].add(umlsdis[u].getid())
     return icd92umls
 
 

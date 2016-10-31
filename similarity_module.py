@@ -497,6 +497,54 @@ def similarity_cal_spmaxn(dgassos, graph, gfilter=False, gncutoff=1, transformdi
     return result
 
 
+def similarity_cal_spmax(dgassos, graph, gfilter=False, gncutoff=1, transformdistance=True):
+    """
+
+    :param dgassos:
+    :param graph:
+    :param gfilter:
+    :param gncutoff:
+    :param transformdistance:
+    :return:
+    """
+    gvs = set(graph.vs['name'])
+
+    if gfilter:
+        dgassos_new = {}
+        for d in dgassos.keys():
+            dgleft = gvs.intersection(dgassos[d])
+            if len(dgleft) >= gncutoff:
+                dgassos_new[d] = dgleft
+    else:
+        dgassos_new = dgassos
+    diseases = list(dgassos_new.keys())
+    print("there are {} diseases can be calculated.".format(len(diseases)))
+
+    dgs = set()
+    for d in diseases:
+        dgs |= set(dgassos_new[d])
+    print("disease genes num:", len(dgs))
+    sim_gene2gene = sim_gene2gene_shortestpath(dgs, graph, transformdistance)
+    print("gene2gene sim cal done..")
+
+    result = {}
+    for i in range(0, len(diseases)):
+        result[diseases[i]] = {}
+        now = time.time()
+        print("sim_geneset2geneset():", i, "dg len:", len(dgassos_new[diseases[i]]))
+        for j in range(i, len(diseases)):
+            simsum = 0.0
+            for g in dgassos_new[diseases[i]]:
+                simsum += sim_geneset2gene_max(g, dgassos_new[diseases[j]], sim_gene2gene)
+            for g in dgassos_new[diseases[j]]:
+                simsum += sim_geneset2gene_max(g, dgassos_new[diseases[i]], sim_gene2gene)
+            result[diseases[i]][diseases[j]] = (simsum /
+                                                (len(dgassos_new[diseases[i]]) +
+                                                 len(dgassos_new[diseases[j]])))
+        print("---------------------------------------cost time:", str(time.time() - now))
+    return result
+
+
 def similarity_cal_spmaxn_circle(dgassos, graph, gfilter=False, gncutoff=1, transformdistance=True):
     """
 

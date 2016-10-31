@@ -93,16 +93,18 @@ gtpathlist1 = ['outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_b
                'outputs/similarity_pathway_jaccard_doid2keggpathway.tsv',
                ]
 
-evaluation_simfilepaths2 = [  # str('outputs/similarity_experiments_shortestpath_transformed_less_disgenet_dgcut' +
-                            #   'off006_interactome.tsv'),
+evaluation_simfilepaths2 = [str('outputs/similarity_experiments_shortestpath_transformed_less_disgenet_dgcut' +
+                                'off006_interactome.tsv'),
                             'outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc_triplet.tsv',
-                            'outputs/similarity_funsim_disgenet_dgcutoff006.tsv',
-                            'outputs/similarity_bog_disgenet_dgcutoff006_triplet.tsv',
-                            'outputs/similarity_icod_disgenet_dgcutoff006_interactome_triplet.tsv',
-                            'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
+                            # 'outputs/similarity_funsim_disgenet_dgcutoff006.tsv',
+                            # 'outputs/similarity_bog_disgenet_dgcutoff006_triplet.tsv',
+                            # 'outputs/similarity_icod_disgenet_dgcutoff006_interactome_triplet.tsv',
+                            # 'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
                             'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv',
                             'outputs/similarity_spavgn_trans_disgenet_dgcutoff006_interactome.tsv',
+                            'outputs/similarity_spmaxncle_trans_disgenet_dgcutoff006_interactome.tsv',
+                            'outputs/similarity_spmaxn_trans_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_spavgn_trans_less_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv',
                             ]
@@ -114,11 +116,13 @@ shortnames2 = {'outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc
                'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv': 'hamaneh',
                'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv': 'NetSim',
                'outputs/similarity_experiments_shortestpath_transformed_less_disgenet_'
-               'dgcutoff006_interactome.tsv': 'shortestpath',
+               'dgcutoff006_interactome.tsv': 'spmax',
                'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv': 'module',
                'outputs/similarity_spavgn_trans_disgenet_dgcutoff006_interactome.tsv': 'spavgn',
                'outputs/similarity_spavgn_trans_less_disgenet_dgcutoff006_interactome.tsv': 'spavgnl',
                'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv': 'pathwayj',
+               'outputs/similarity_spmaxncle_trans_disgenet_dgcutoff006_interactome.tsv': 'spmaxncle',
+               'outputs/similarity_spmaxn_trans_disgenet_dgcutoff006_interactome.tsv': 'spmaxn',
                }
 
 gtpathlist2 = ['outputs/similarity_go_bp_umls_dgcutoff006.tsv',
@@ -131,64 +135,106 @@ gtpathlist2 = ['outputs/similarity_go_bp_umls_dgcutoff006.tsv',
                'outputs/similarity_domain_jaccard_di2do_disgenet_dgcutoff006.tsv',
                ]
 
+evaluation_simfilepaths3 = ['outputs/similarity_spmaxn_trans_icd9disgenet_dgcutoff006_interactome.tsv',
+                            'outputs/similarity_spavgn_trans_icd9disgenet_dgcutoff006_interactome.tsv',
+                            'outputs/similarity_spmax_trans_icd9disgenet_dgcutoff006_interactome.tsv',
+                            'outputs/similarity_rwr_icd9disgenet_dgcutoff006_interactome.tsv',
+                            ]
+
+shortnames3 = {'outputs/similarity_spmaxn_trans_icd9disgenet_dgcutoff006_interactome.tsv': 'spmaxn',
+               'outputs/similarity_spavgn_trans_icd9disgenet_dgcutoff006_interactome.tsv': 'spavgn',
+               'outputs/similarity_spmax_trans_icd9disgenet_dgcutoff006_interactome.tsv': 'spmax',
+               'outputs/similarity_rwr_icd9disgenet_dgcutoff006_interactome.tsv': 'NetSim',
+               }
+
+
+evaluation_simfilepaths4 = ['outputs/similarity_rwr_disgenet_dgcutoff000_interactome.tsv',
+                            ]
+
+shortnames4 = {'outputs/similarity_rwr_disgenet_dgcutoff000_interactome.tsv': 'NetSim',
+               }
+
 
 # ---evaluation-----------------------------------------
-def evaluation_validationpairs(simpathlist, shortnames):
+def evaluation_validationpairs(simpathlist, shortnames, times=1):
     # vpairsnlabels = eva_get_validationpairsnlabels_comorbidity("data/comorbidity/AllNet3_umlsid.net")
-    vpairsnlabels = eva_get_validationpairsnlabels_comorbidity("data/comorbidity/AllNet3_doid.net")
+    # vpairsnlabels = eva_get_validationpairsnlabels_comorbidity("data/comorbidity/AllNet3_doid.net")
+    vpairsnlabels = eva_get_validationpairsnlabels_comorbidity("data/comorbidity/AllNet5.net")
 
     msims = eva_readsims(simpathlist)
     print("------------scores and lable---------------------------------------------------")
-    vpairsinfo = eva_roc_getvalidationpairs(msims, vpairsnlabels)
-    d1 = list(vpairsinfo.keys())[0]
-    d2 = list(vpairsinfo[d1].keys())[0]
-    methodnames = list(vpairsinfo[d1][d2].keys())
-    methodnames.remove('label')
-    print("d1\td2\tlabel", end='')
-    for m in methodnames:
-        print("\t" + shortnames[m], end='')
-    print()
-    for d1 in vpairsinfo.keys():
-        for d2 in vpairsinfo[d1].keys():
-            print(d1 + '\t' + d2 + '\t' + str(vpairsinfo[d1][d2]['label']), end='')
-            for m in methodnames:
-                print("\t" + str(vpairsinfo[d1][d2][m]), end='')
-            print()
+    vpairsinfos = eva_roc_getvalidationpairs(msims, vpairsnlabels, times)
+    t = 0
+    # for vpairsinfo in vpairsinfos:
+    #     if t < 1:
+    #         d1 = list(vpairsinfo.keys())[0]
+    #         d2 = list(vpairsinfo[d1].keys())[0]
+    #         methodnames = list(vpairsinfo[d1][d2].keys())
+    #         methodnames.remove('label')
+    #         print("d1\td2\tlabel", end='')
+    #         for m in methodnames:
+    #             print("\t" + shortnames[m], end='')
+    #         print()
+    #         for d1 in vpairsinfo.keys():
+    #             for d2 in vpairsinfo[d1].keys():
+    #                 print(d1 + '\t' + d2 + '\t' + str(vpairsinfo[d1][d2]['label']), end='')
+    #                 for m in methodnames:
+    #                     print("\t" + str(vpairsinfo[d1][d2][m]), end='')
+    #                 print()
+    #         t += 1
     print("------------pair ranks---------------------------------------------------------")
-    vpairs_rank = eva_ranking(vpairsinfo)
-    ms = list(vpairs_rank.keys())
-    for m in ms:
-        print(str(shortnames[m]) + "\t\t\t", end="")
-    print()
-    llen = len(vpairs_rank[ms[0]])
-    for i in range(0, llen):
-        for m in ms:
-            for j in range(0, 4):
-                print(str(vpairs_rank[m][i][j]) + "\t", end="")
-        print()
+    vpairs_ranks = eva_rankings(vpairsinfos)
+    # t = 0
+    # for vpairs_rank in vpairs_ranks:
+    #     if t < 1:
+    #         ms = list(vpairs_rank.keys())
+    #         for m in ms:
+    #             print(str(shortnames[m]) + "\t\t\t", end="")
+    #         print()
+    #         llen = len(vpairs_rank[ms[0]])
+    #         for i in range(0, llen):
+    #             for m in ms:
+    #                 for j in range(0, 4):
+    #                     print(str(vpairs_rank[m][i][j]) + "\t", end="")
+    #             print()
+    #         t += 1
     print("------------tpr and fpr--------------------------------------------------------")
-    vpairs_tprfpr = eva_tprfpr(eva_ranking(vpairsinfo))
-    methodnames = list(vpairs_tprfpr.keys())
-    llens = []
-    for m in methodnames:
-        llens.append(len(vpairs_tprfpr[m]))
-        print(str(shortnames[m]) + "_fpr\t" + m + "_tpr\t", end='')
-    print()
-    maxlen = max(llens)
-    for i in range(0, maxlen):
-        for m in methodnames:
-            if i < len(vpairs_tprfpr[m]):
-                for j in range(0, 2):
-                    print(str(vpairs_tprfpr[m][i][j]) + "\t", end="")
-            else:
-                print('\t\t', end='')
-        print()
-    auctemp = eva_auc(vpairs_tprfpr)
-    plot_roc(vpairs_tprfpr, shortnames, auctemp)
+    vpairs_tprfprs = eva_tprfprs(vpairsinfos)
+    t = 0
+    for vpairs_tprfpr in vpairs_tprfprs:
+        if t < 1:
+            methodnames = list(vpairs_tprfpr.keys())
+            llens = []
+            for m in methodnames:
+                llens.append(len(vpairs_tprfpr[m]))
+                print(str(shortnames[m]) + "_fpr\t" + m + "_tpr\t", end='')
+            print()
+            maxlen = max(llens)
+            for i in range(0, maxlen):
+                for m in methodnames:
+                    if i < len(vpairs_tprfpr[m]):
+                        for j in range(0, 2):
+                            print(str(vpairs_tprfpr[m][i][j]) + "\t", end="")
+                    else:
+                        print('\t\t', end='')
+                print()
+            auctemp = eva_auc(vpairs_tprfpr)
+            plot_roc(vpairs_tprfpr, shortnames, auctemp)
+            t += 1
     print("------------auc value----------------------------------------------------------")
-    vpairs_auc = eva_auc(vpairs_tprfpr)
-    for a in vpairs_auc.keys():
-        print(shortnames[a]+'\t'+str(vpairs_auc[a]))
+    vpairs_aucs = eva_aucs(vpairs_tprfprs)
+    auclen = len(vpairs_aucs)
+    print("replicated times:", auclen)
+    mns = list(vpairs_aucs[0].keys())
+    avgaucs = []
+    for mn in mns:
+        avgauc = 0.0
+        for auc in vpairs_aucs:
+            avgauc += auc[mn]
+        avgaucs.append((str(mn), avgauc / auclen))
+    avgaucs = sorted(avgaucs, key=lambda a: a[1], reverse=True)
+    for x in avgaucs:
+        print(str(shortnames[x[0]]) + "\t" + str(x[1]))
 
 
 def evaluation_groundtruth(simpathlist, shortnames, gtpaths):
@@ -536,9 +582,10 @@ def geneid_convert_coexpression():
 
 
 def similarity_cal_module():
-    disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
-                                                             0.06, True, True)
+    # disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
+    #                                                          0.06, True, True)
     # disease2gene_entrez = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
+    disease2gene_entrez = read_assos('data/comorbidity/icd9cm2entrezgene_disgenet_dgcutoff000.tsv')
     print("disease gene assos: ", end='')
     stat_assos(disease2gene_entrez)
 
@@ -547,22 +594,12 @@ def similarity_cal_module():
     #                                        False, False)
     print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
 
-    # sims = similarity_module.similarity_cal_module_1(disease2gene_entrez, g)
-    # write_sims(sims, "similarity_module1_umls_dcutoff006.tsv")
-    # sims = similarity_module.similarity_cal_module_2(disease2gene_entrez, g)
-    # write_sims(sims, "similarity_module2_umls_dcutoff006.tsv")
-    # sims = similarity_module.similarity_cal_module_3(disease2gene_entrez, g)
-    # write_sims(sims, "similarity_module3_umls_dcutoff006.tsv")
-    # sims = similarity_module.similarity_cal_module_4(disease2gene_entrez, g)
-    # write_sims(sims, "similarity_module4_umls_dcutoff006.tsv")
-    # sims = similarity_module.similarity_cal_module_5(disease2gene_entrez, g)
-    # write_sims(sims, "outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv")
-    # sims = similarity_module.similarity_cal_spavgn_circle(disease2gene_entrez, g, False)
-    # write_sims(sims, "outputs/similarity_spavgncle_trans_rwrsidd_hppinwsl.tsv")
-    sims = similarity_module.similarity_cal_spmaxn_circle(disease2gene_entrez, g, False)
-    write_sims(sims, "outputs/similarity_spmaxncle_trans_disgenet_dgcutoff006_interactome.tsv")
+    sims = similarity_module.similarity_cal_spavgn(disease2gene_entrez, g, False)
+    write_sims(sims, "outputs/similarity_spavgn_trans_icd9disgenet_dgcutoff000_interactome.tsv")
+    sims = similarity_module.similarity_cal_spmax(disease2gene_entrez, g, False)
+    write_sims(sims, "outputs/similarity_spmax_trans_icd9disgenet_dgcutoff000_interactome.tsv")
     sims = similarity_module.similarity_cal_spmaxn(disease2gene_entrez, g, False)
-    write_sims(sims, "outputs/similarity_spmaxn_trans_disgenet_dgcutoff006_interactome.tsv")
+    write_sims(sims, "outputs/similarity_spmaxn_trans_icd9disgenet_dgcutoff000_interactome.tsv")
 
 
 def combine_pathway_data_gsea():
@@ -678,18 +715,36 @@ def probeid2entrezid_compare():
             print(p, p2e_ann[p], p2e_mnd[p], sep='\t')
 
 
-def icd9id2umlsid_mapping():
-    uds = read_umls_disease_info(0)
+def get_icd9id2gene_umlsdisgenet():
+    # get icd9id 2 gene from disgenet and umls mrconso.rrf
+    uds = read_umls_disease_info(0.0)
     icd92umls = mapping.icd9cmid2umlsid_alldigit(uds)
     stat_assos(icd92umls)
-    pprint(icd92umls)
-    icd9s = list(icd92umls.keys())
-    for icd9 in icd9s:
-        if len(icd9) != 3:
-            del icd92umls[icd9]
+
+    allids_mrconso = allids_mrconsorrf("E:\\UMLS\\2016AA\\META\\MRCONSO.RRF")
+    print('mrconso id:', len(allids_mrconso))
+
+    for allid in allids_mrconso:
+        if 'icd9cm' in allid.keys():
+            for icd9 in allid['icd9cm']:
+                icd9id = icd9.split(':')[1]
+                if len(icd9id) < 7:
+                    if icd9id not in icd92umls.keys():
+                        icd92umls[icd9id] = set()
+                    icd92umls[icd9id].update(allid['umls'])
     stat_assos(icd92umls)
-    pprint(icd92umls)
-    # write_assos(icd92umls, "data/disgenet/icd9_3digit2umlsid.tsv")
+
+    umlsterms = uds.getumlsdiseases()
+    icd92gene = {}
+    for icd9id in icd92umls.keys():
+        geneset = set()
+        for umlsid in icd92umls[icd9id]:
+            if umlsid in umlsterms.keys():
+                geneset.update(umlsterms[umlsid].getentrezgenes())
+        if len(geneset) > 0:
+            icd92gene[icd9id] = geneset
+    stat_assos(icd92gene)
+    write_assos(icd92gene, "data/comorbidity/icd9cm2entrezgene_disgenet_dgcutoff000.tsv")
 
 
 def diseaseidmapping_hsdn():
@@ -1259,6 +1314,23 @@ def rwr_bmc_dgassos():
                     dg_disgenet[d].add(gt.strip(";").strip())
     stat_assos(dg_disgenet)
     # write_assos(dg_disgenet, "data/rwr_bmc_bioinfo/dg/rwr_dgassos_disgenet.tab")
+
+
+def rwr_dgfilter():
+    icd92gene = read_assos("data/comorbidity/icd9cm2entrezgene_disgenet_dgcutoff000_s.tsv")
+    stat_assos(icd92gene)
+    g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv",
+                                           False, False)
+    print("number of vertices:", g.vcount())
+    gvs = set(g.vs['name'])
+    dgassos_new = {}
+    for d in icd92gene.keys():
+        dgleft = gvs.intersection(icd92gene[d])
+        if len(dgleft) >= 1:
+            dgassos_new[d] = dgleft
+    print("disease gene assos left: ", end='')
+    stat_assos(dgassos_new)
+    write_assos(dgassos_new, 'data/comorbidity/icd9cm2entrezgene_disgenet_dgcutoff000_ininteractome.tsv')
 # -------------------------------------------------------------
 
 
@@ -1628,6 +1700,6 @@ def similarity_cal_predeva():
 
 if __name__ == "__main__":
     # evaluation_groundtruth(evaluation_simfilepaths1, shortnames1, [gtpathlist1[2], ])
-    evaluation_70benchmarkset(evaluation_simfilepaths1, shortnames1, 0, 100,
-                              'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
-    # evaluation_validationpairs(evaluation_simfilepaths1, shortnames1)
+    # evaluation_70benchmarkset(evaluation_simfilepaths1, shortnames1, 0, 100,
+    #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
+    evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
