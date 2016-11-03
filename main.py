@@ -9,7 +9,6 @@ from files import read_one_col
 from files import read_mappings
 from files import read_assos
 from files import read_sims
-from files import read_simmatrix
 from files import stat_assos
 from files import stat_maps
 from files import stat_sims
@@ -36,7 +35,6 @@ from evaluation import eva_70benchmarkpairs
 from evaluation import eva_ranking
 from evaluation import eva_rankings
 from evaluation import eva_cal_ranks
-from evaluation import eva_tprfpr
 from evaluation import eva_tprfprs
 from evaluation import eva_auc
 from evaluation import eva_aucs
@@ -59,14 +57,14 @@ evaluation_simfilepaths1 = ['outputs/similarity_experiments_shortestpath_transfo
                             # 'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
                             # 'outputs/similarity_module5_rwrsidd_hppinwsl.tsv',
                             'outputs/similarity_experiments_rwr_rwrsidd_hppinwsl.tsv',
-                            'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
+                            # 'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
                             # 'outputs/similarity_icod_rwrsidd_hppinwsl_triplet.tsv',
                             # 'outputs/similarity_bognew_rwrsidd_triplet.tsv',
-                            'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv',
-                            # 'outputs/similarity_spavgncle_trans_rwrsidd_hppinwsl.tsv',
-                            # 'outputs/similarity_spmaxncle_trans_rwrsidd_hppinwsl.tsv',
-                            'outputs/similarity_spmaxn_trans_rwrsidd_hppinwsl.tsv',
-                            # 'outputs/similarity_spmaxnlog_trans_rwrsidd_hppinwsl.tsv'
+                            'outputs/similarity_dpathwayCosineSpmax_allpathway_rwrsidd_hppinwsl.tsv',
+                            'outputs/similarity_dpathwayCosineSpmin_allpathway_rwrsidd_hppinwsl.tsv',
+                            # 'outputs/similarity_dpathwayEuclideanSpmin_allpathway_rwrsidd_hppinwsl.tsv',
+                            # 'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv',
+                            # 'outputs/similarity_spmaxn_trans_rwrsidd_hppinwsl.tsv',
                             # 'outputs/similarity_spavgn_trans_less_rwrsidd_hppinwsl.tsv',
                             # 'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv',
                             ]
@@ -82,10 +80,10 @@ shortnames1 = {'outputs/similarity_funsim_rwrsidd.tsv': 'FunSim',
                'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv': 'spavgn',
                'outputs/similarity_spavgn_trans_less_rwrsidd_hppinwsl.tsv': 'spavgnl',
                'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv': 'pathwayj',
-               'outputs/similarity_spavgncle_trans_rwrsidd_hppinwsl.tsv': 'spavgncle',
-               'outputs/similarity_spmaxncle_trans_rwrsidd_hppinwsl.tsv': 'spmaxncle',
                'outputs/similarity_spmaxn_trans_rwrsidd_hppinwsl.tsv': 'spmaxn',
-               'outputs/similarity_spmaxnlog_trans_rwrsidd_hppinwsl.tsv': 'spmaxnlog',
+               'outputs/similarity_dpathwayCosineSpmax_allpathway_rwrsidd_hppinwsl.tsv': 'pCosSpmaxall',
+               'outputs/similarity_dpathwayCosineSpmin_allpathway_rwrsidd_hppinwsl.tsv': 'pCosSpminall',
+               'outputs/similarity_dpathwayEuclideanSpmin_allpathway_rwrsidd_hppinwsl.tsv': 'pEucSpminall',
                }
 
 gtpathlist1 = ['outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv',
@@ -103,7 +101,6 @@ evaluation_simfilepaths2 = [str('outputs/similarity_experiments_shortestpath_tra
                             'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv',
                             'outputs/similarity_spavgn_trans_disgenet_dgcutoff006_interactome.tsv',
-                            'outputs/similarity_spmaxncle_trans_disgenet_dgcutoff006_interactome.tsv',
                             'outputs/similarity_spmaxn_trans_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_spavgn_trans_less_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv',
@@ -147,11 +144,22 @@ shortnames3 = {'outputs/similarity_spmaxn_trans_icd9disgenet_dgcutoff006_interac
                'outputs/similarity_rwr_icd9disgenet_dgcutoff006_interactome.tsv': 'NetSim',
                }
 
-
 evaluation_simfilepaths4 = ['outputs/similarity_rwr_disgenet_dgcutoff000_interactome.tsv',
+                            'outputs/similarity_spavgn_trans_icd9disgenet_dgcutoff000_interactome.tsv',
+                            # 'outputs/similarity_spmax_trans_icd9disgenet_dgcutoff000_interactome.tsv',
+                            # 'outputs/similarity_spmaxn_trans_icd9disgenet_dgcutoff000_interactome.tsv',
+                            'outputs/similarity_bog_icd9disgenet_dgcutoff000_triplet.tsv',
+                            'outputs/similarity_funsim_icd9disgenet_dgcutoff000.tsv',
+                            'outputs/similarity_suntopo_icd9disgenet_dgcutoff000_interactomemaxcc_triplet.tsv',
                             ]
 
 shortnames4 = {'outputs/similarity_rwr_disgenet_dgcutoff000_interactome.tsv': 'NetSim',
+               'outputs/similarity_spavgn_trans_icd9disgenet_dgcutoff000_interactome.tsv': 'spavgn',
+               'outputs/similarity_spmax_trans_icd9disgenet_dgcutoff000_interactome.tsv': 'spmax',
+               'outputs/similarity_spmaxn_trans_icd9disgenet_dgcutoff000_interactome.tsv': 'spmaxn',
+               'outputs/similarity_bog_icd9disgenet_dgcutoff000_triplet.tsv': 'BOG',
+               'outputs/similarity_funsim_icd9disgenet_dgcutoff000.tsv': 'FunSim',
+               'outputs/similarity_suntopo_icd9disgenet_dgcutoff000_interactomemaxcc_triplet.tsv': 'Sun_topo',
                }
 
 
@@ -603,13 +611,13 @@ def similarity_cal_module():
 
 
 def combine_pathway_data_gsea():
-    paths = ['data/pathway_gsea/c2.cp.biocarta.v5.1.symbols.gmt',
-             'data/pathway_gsea/c2.cp.kegg.v5.1.symbols.gmt',
-             'data/pathway_gsea/c2.cp.reactome.v5.1.symbols.gmt', ]
-    # paths = ['data/pathway_gsea/c2.cp.v5.1.symbols.gmt', ]
+    paths = [  # 'data/pathway_gsea/c2.cp.biocarta.v5.1.symbols.gmt',
+             # 'data/pathway_gsea/c2.cp.kegg.v5.1.symbols.gmt',
+             # 'data/pathway_gsea/c2.cp.reactome.v5.1.symbols.gmt',
+             'data/pathway_gsea/c2.all.v5.1.symbols.gmt', ]
     pgassos = combine_pathway_data(paths)
     stat_assos(pgassos)
-    # write_assos(pgassos, 'data/pathway_gsea/pgassos.c2.cp.bkr.v5.1.symbols.tsv')
+    # write_assos(pgassos, 'data/pathway_gsea/pgassos.c2.all.v5.1.symbols.tsv')
 
 
 def get_disease_pathway_assos():
@@ -618,15 +626,18 @@ def get_disease_pathway_assos():
     # pathway2gene = read_assos("data/pathway_gsea/pgassos.c2.cp.v5.1.entrez.tsv")
 
     disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
-    pathway2gene = read_assos("data/pathway_gsea/pgassos.c2.cp.v5.1.symbols.tsv")
+    pathway2gene = read_assos("data/pathway_gsea/pgassos.c2.cp.bkr.v5.1.symbols.tsv")
 
     stat_assos(disease2gene)
     stat_assos(pathway2gene)
-    dpassos = common_use.hypergeometric_test(disease2gene, pathway2gene)
+    dpassos = common_use.hypergeometric_test(disease2gene, pathway2gene, 'fdr_bh', 0.10)
     stat_assos(dpassos)
+    pdassos = invert_dict(dpassos)
+    for p in pdassos.keys():
+        print(p, len(pdassos[p]), sep='\t')
     # write_assos(dpassos,
     #             "data/pathway_gsea/dpassos.c2.cp.v5.1.entrez.disgenet.dgcutoff006.bh005.tsv")
-    write_assos(dpassos, "data/pathway_gsea/dpassos.c2.cp.v5.1.symbols.rwrsidd.bh005.tsv")
+    # write_assos(dpassos, "data/pathway_gsea/dpassos.c2.all.v5.1.symbols.rwrsidd.bh005.tsv")
 
 
 def similarity_cal_pathway():
@@ -636,6 +647,40 @@ def similarity_cal_pathway():
     sims = diseases_similarity_pathway_jaccard(list(d2p.keys()), d2p)
     stat_sims(sims)
     write_sims(sims, "outputs/similarity_pathway_jaccard_doid2keggpathway.tsv")
+
+
+def pathway_in_ppi():
+    pathway2gene = read_assos("data/pathway_gsea/pgassos.c2.all.v5.1.symbols.tsv")
+    stat_assos(pathway2gene)
+
+    # --read graph---------------------------------------------------------------------------
+    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
+                                           False, False)
+    # g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv", False, False)
+    # ---------------------------------------------------------------------------------------
+    print(len(g.vs()), len(g.es()))
+    pks = list(pathway2gene.keys())
+    for p in pks:
+        geneset = pathway2gene[p]
+        nodes = g.vs.select(name_in=geneset)
+        plcc = g.subgraph(nodes).clusters(mode='WEAK').giant()
+        print(p, len(geneset), len(nodes), len(plcc.vs()),
+              len(nodes)/len(geneset), len(plcc.vs())/len(nodes), sep='\t')
+        if not (len(nodes)/len(geneset) >= 0.8 and len(plcc.vs())/len(nodes) >= 0.4):
+            del pathway2gene[p]
+    stat_assos(pathway2gene)
+    # write_assos(pathway2gene, 'data/pathway_gsea/pgassos.c2.all.v5.1.symbols.0804.hppinwsl.tsv')
+
+
+def similarity_cal_pathwayvector():
+    disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
+    pathway2gene = read_assos('data/pathway_gsea/pgassos.c2.cp.bkr.v5.1.symbols.tsv')
+    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
+                                           False, False)
+
+    sims = similarity_module.similarity_cal_pathwayvector(disease2gene, pathway2gene,
+                                                          g, 'SpTransMax_tfidf', 'Cosine')
+    write_sims(sims, 'outputs/similarity_dpathwayCosSpmaxidf_bkrpathway_rwrsidd_hppinwsl.tsv')
 
 
 def get_disease_domain_assos():
@@ -1699,7 +1744,8 @@ def similarity_cal_predeva():
 
 
 if __name__ == "__main__":
-    # evaluation_groundtruth(evaluation_simfilepaths1, shortnames1, [gtpathlist1[2], ])
-    # evaluation_70benchmarkset(evaluation_simfilepaths1, shortnames1, 0, 100,
+    # evaluation_groundtruth(evaluation_simfilepaths1, shortnames1, [gtpathlist1[1], ])
+    # evaluation_70benchmarkset(evaluation_simfilepaths1, shortnames1, 3, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
-    evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
+    # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
+    similarity_cal_pathwayvector()

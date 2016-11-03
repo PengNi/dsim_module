@@ -1,8 +1,11 @@
 #! /usr/bin/env python3
 import math
 import time
+from scipy import spatial
 from igraph import Graph
 from files import stat_assos
+from files import invert_dict
+from common_use import hypergeometric_test
 
 
 def read_interactome(interactomefile, weights, directed):
@@ -597,6 +600,178 @@ def similarity_cal_spmaxn_circle(dgassos, graph, gfilter=False, gncutoff=1, tran
             navg = math.sqrt(1 - pow(navg - 1, 2))
             result[diseases[i]][diseases[j]] = osim / navg
         print("---------------------------------------cost time:", str(time.time() - now))
+    return result
+
+
+def similarity_cal_pathwayvector(dgassos, pgassos, graph, simway='SpMin', vectorway='Cosine', gncutoff=1):
+    """
+
+    :param dgassos:
+    :param pgassos:
+    :param graph:
+    :param simway:
+    :param vectorway:
+    :param gncutoff:
+    :return:
+    """
+    print('nodes:', len(graph.vs()), 'edges:', len(graph.es()))
+    # ---only use the lcc-----------
+    glcc = graph.clusters(mode='WEAK').giant()
+    gnodes = set(glcc.vs['name'])
+    print('lcc nodes:', len(glcc.vs()), 'edges:', len(glcc.es()))
+    stat_assos(dgassos)
+    dgassos_new = {}
+    for d in dgassos.keys():
+        dgleft = gnodes.intersection(dgassos[d])
+        if len(dgleft) >= gncutoff:
+            dgassos_new[d] = dgleft
+    print("disease gene assos left: ", end='')
+    stat_assos(dgassos_new)
+    stat_assos(pgassos)
+    pgassos_new = {}
+    for p in pgassos.keys():
+        pgleft = gnodes.intersection(pgassos[p])
+        if len(pgleft) >= 1:
+            pgassos_new[p] = pgleft
+    print("pathway gene assos left: ", end='')
+    stat_assos(pgassos_new)
+
+    dpvectors = disease2pahtwayvectors(dgassos_new, pgassos_new, glcc, simway)
+    return sim_dpvectors(dpvectors, vectorway)
+
+
+def disease2pahtwayvectors(dgassos, pgassos, graph, simway='SpMin'):
+    # node 2 node similarity---------------------------
+    nodenames = graph.vs['name']
+    sps = graph.shortest_paths(source=nodenames, target=nodenames, weights=None, mode=3)
+    g2loc = {}
+    for i in range(0, len(nodenames)):
+        g2loc[nodenames[i]] = i
+    # -------------------------------------------------
+    pathways = list(pgassos.keys())
+    dpvector = {}
+    counter = 0
+    if simway == 'SpMin':
+        for d in dgassos.keys():
+            dpvector[d] = []
+            dgenes = dgassos[d]
+            for p in pathways:
+                pgenes = pgassos[p]
+                simsum = 0.0
+                for g in dgenes:
+                    simsum += minsp_geneset2gene(g, pgenes, g2loc, sps)
+                for g in pgenes:
+                    simsum += minsp_geneset2gene(g, dgenes, g2loc, sps)
+                dpvector[d].append(simsum/(len(dgenes) + len(pgenes)))
+            counter += 1
+            print("disease2pathwayvectors:", counter)
+    elif simway == 'SpTransMax':
+        spstrans = []
+        for i in range(0, len(nodenames)):
+            spstrans.append([])
+            for j in range(0, len(nodenames)):
+                spstrans[i].append(transformed_distance(sps[i][j]))
+
+        for d in dgassos.keys():
+            dpvector[d] = []
+            dgenes = dgassos[d]
+            for p in pathways:
+                pgenes = pgassos[p]
+                simsum = 0.0
+                for g in dgenes:
+                    simsum += maxtrans_geneset2gene(g, pgenes, g2loc, spstrans)
+                for g in pgenes:
+                    simsum += maxtrans_geneset2gene(g, dgenes, g2loc, spstrans)
+                dpvector[d].append(simsum/(len(dgenes) + len(pgenes)))
+            counter += 1
+            print("disease2pathwayvectors:", counter)
+    elif simway == 'SpTransMax_tfidf':
+        spstrans = []
+        for i in range(0, len(nodenames)):
+            spstrans.append([])
+            for j in range(0, len(nodenames)):
+                spstrans[i].append(transformed_distance(sps[i][j]))
+        # ---get disease2pathway assos---
+        dpassos = hypergeometric_test(dgassos, pgassos)
+        print('disease pathway assos: ', end='')
+        stat_assos(dpassos)
+        pdassos = invert_dict(dpassos)
+        dsnum = len(dpassos.keys())
+        pidf = {}
+        for p in pdassos.keys():
+            pidf[p] = math.log2(dsnum/len(pdassos[p]))
+        pathways = list(pdassos.keys())
+        p2loc = {}
+        for i in range(0, len(pathways)):
+            p2loc[pathways[i]] = i
+        # -------------------------------
+        for d in dpassos.keys():
+            dpvector[d] = [0.0] * len(pathways)
+            dgenes = dgassos[d]
+            for p in dpassos[d]:
+                pgenes = pgassos[p]
+                simsum = 0.0
+                for g in dgenes:
+                    simsum += maxtrans_geneset2gene(g, pgenes, g2loc, spstrans)
+                for g in pgenes:
+                    simsum += maxtrans_geneset2gene(g, dgenes, g2loc, spstrans)
+                weightdp = simsum / (len(dgenes) + len(pgenes))
+                dpvector[d][p2loc[p]] = pidf[p] * weightdp
+            counter += 1
+            print("disease2pathwayvectors:", counter)
+    elif simway == 'SpAvg':
+        pass
+    else:
+        print('no matched strategy!')
+        return None
+    return dpvector
+
+
+def sim_dpvectors(dpvectors, vectorway='Cosine'):
+    sims = {}
+    ds = list(dpvectors.keys())
+    if vectorway == 'Cosine':
+        for i in range(0, len(ds)):
+            sims[ds[i]] = {}
+            for j in range(i, len(ds)):
+                sims[ds[i]][ds[j]] = 1 - spatial.distance.cosine(dpvectors[ds[i]], dpvectors[ds[j]])
+            print('sim_dpvectors:', i)
+    elif vectorway == 'mutualinformation':
+        pass
+    elif vectorway == 'euclidean':
+        for i in range(0, len(ds)):
+            sims[ds[i]] = {}
+            for j in range(i, len(ds)):
+                sims[ds[i]][ds[j]] = spatial.distance.euclidean(dpvectors[ds[i]], dpvectors[ds[j]])
+            print('sim_dpvectors:', i)
+    elif vectorway == 'euclidean_exp':
+        for i in range(0, len(ds)):
+            sims[ds[i]] = {}
+            for j in range(i, len(ds)):
+                sims[ds[i]][ds[j]] = \
+                    transformed_distance(spatial.distance.euclidean(dpvectors[ds[i]], dpvectors[ds[j]]))
+            print('sim_dpvectors:', i)
+    else:
+        print('no vectorway specified!')
+        return None
+    return sims
+
+
+def minsp_geneset2gene(g1, g2set, gene2loc, spmatrix):
+    result = float('inf')
+    for g2 in g2set:
+        sptemp = spmatrix[gene2loc[g1]][gene2loc[g2]]
+        if sptemp < result:
+            result = sptemp
+    return result
+
+
+def maxtrans_geneset2gene(g1, g2set, gene2loc, spmatrix):
+    result = float('-inf')
+    for g2 in g2set:
+        sptemp = spmatrix[gene2loc[g1]][gene2loc[g2]]
+        if sptemp > result:
+            result = sptemp
     return result
 
 
