@@ -213,6 +213,23 @@ def entrezid2symbol(entrezid_list, species="human"):
     return mapping
 
 
+def symbol2uniprot(symbolid_list, species='human'):
+    mg = mygene.MyGeneInfo()
+    result = mg.querymany(symbolid_list, scope='symbol',
+                          fields='uniprot', species=species)
+    mapping = {}
+    for r in result:
+        if 'notfound' not in r.keys():
+            if r['query'] not in mapping.keys():
+                mapping[r['query']] = set()
+            if 'uniprot' in r.keys() and 'Swiss-Prot' in r['uniprot'].keys():
+                if isinstance(r['uniprot']['Swiss-Prot'], str):
+                    mapping[r['query']].add(r['uniprot']['Swiss-Prot'])
+                else:
+                    mapping[r['query']].update(set(r['uniprot']['Swiss-Prot']))
+    return mapping
+
+
 def geneida2geneidb(geneida, geneidb, geneida_list, species='human'):
     """
     convert geneida to geneidb
@@ -258,7 +275,7 @@ def convert_dict_values(dictionary, mapping):
     """
     convert dict value ids upon a mapping dict
     :param dictionary: dict whose key-value is string-set<string>
-    :param mapping: dict whose key-value is string-string
+    :param mapping: dict whose key-value is string-string/string-set<string>
     :return:
     """
     newdict = {}
@@ -266,11 +283,18 @@ def convert_dict_values(dictionary, mapping):
         newdict[k] = set()
         for v in dictionary[k]:
             if v in mapping.keys():
-                newdict[k].add(mapping[v])
+                if isinstance(mapping[v], str):
+                    newdict[k].add(mapping[v])
+                else:
+                    newdict[k].update(mapping[v])
+    ks = list(newdict.keys())
+    for k in ks:
+        if len(newdict[k]) == 0:
+            del newdict[k]
     return newdict
 
 
-def covert_dict_keys(dictionary, mapping):
+def convert_dict_keys(dictionary, mapping):
     """
     convert dict value ids upon a mapping dict
     :param dictionary: dict whose key-value is string-whatever

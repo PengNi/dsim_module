@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 """for plots"""
+import files
 import matplotlib
 matplotlib.use('Agg')
 
@@ -30,3 +31,36 @@ def plot_roc(tprfpr, names2legends, names2aucs, savepath='roc.png', fformat='png
     plt.xlabel('False Positive Rate')
     plt.legend(loc='lower right')
     plt.savefig(savepath, format=fformat)
+    plt.clf()
+
+
+def plot_simshist(sims, title, bins=10, color='red', savepath='hist.png', fformat='png'):
+    """
+    plot histgram of sim values
+    :param sims:
+    :param title:
+    :param bins:
+    :param color:
+    :param savepath:
+    :param fformat:
+    :return:
+    """
+    calpairs = {}
+    for k in sims.keys():
+        calpairs[k] = set()
+        calpairs[k].update(set(sims[k].keys()))
+        calpairs[k].discard(k)
+    files.stat_assos(calpairs)
+
+    simvalues = []
+    for k1 in calpairs.keys():
+        for k2 in calpairs[k1]:
+            simvalues.append(sims[k1][k2])
+    from matplotlib import pyplot as plt
+    plt.hist(simvalues, bins=bins, color=color)
+    plt.title(title)
+    plt.xlabel("Value")
+    plt.ylabel("Frequency")
+    plt.yscale('log', nonposy='clip')
+    plt.savefig(str(title + savepath), format=fformat)
+    plt.clf()

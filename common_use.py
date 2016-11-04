@@ -19,6 +19,7 @@ def normalize_simdict(simdict):
             if maxv < simdict[d][k]:
                 maxv = simdict[d][k]
     nsimdict = {}
+    print(maxv, minv)
     delta = maxv - minv
     for d in simdict.keys():
         nsimdict[d] = {}

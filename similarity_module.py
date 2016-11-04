@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 import math
 import time
+import numpy
 from scipy import spatial
 from igraph import Graph
 from files import stat_assos
@@ -328,6 +329,109 @@ def similarity_cal_module_5(dgassos, graph, gncutoff=1):
                 normsims[diseases[i]][diseases[j]] = sims[diseases[i]][diseases[j]]/avgmaxsim
         print(i, "done...")
     return normsims
+
+
+def similarity_cal_module_6(dgassos, graph, gncutoff=1):
+    """
+        module cal method 6
+        :param dgassos: a dict object which keys are module names and values are module
+        nodes sets
+        :param graph: an igraph object
+        :param gncutoff: gene number cut off, only diseases whose number of associated
+        genes in graph is no less than gncutoff will be calculated
+        :return: a dict, (key-value: string-dict<string-float>)
+        """
+    # only use lcc-----
+    glcc = graph.clusters(mode='WEAK').giant()
+    gvs = set(glcc.vs['name'])
+
+    dgassos_new = {}
+    for d in dgassos.keys():
+        dgleft = gvs.intersection(dgassos[d])
+        if len(dgleft) >= gncutoff:
+            dgassos_new[d] = dgleft
+    diseases = list(dgassos_new.keys())
+    print("there are {} diseases can be calculated.".format(len(diseases)))
+
+    glccnodes = list(gvs)
+    gn2loc = {}
+    for i in range(0, len(glccnodes)):
+        gn2loc[glccnodes[i]] = i
+    adjmat = numpy.zeros(shape=(len(glccnodes), len(glccnodes)), dtype=numpy.int8)
+    for i in range(0, len(glccnodes) - 1):
+        for j in range(i + 1, len(glccnodes)):
+            if glcc.are_connected(glccnodes[i], glccnodes[j]):
+                adjmat[i, j] = 1
+                adjmat[j, i] = 1
+    adjmat2nd = numpy.full(shape=(len(glccnodes), len(glccnodes)), fill_value=-1, dtype=numpy.int8)
+    print('sim cal beginning...')
+    sims = {}
+    for i in range(0, len(diseases)):
+        now = time.time()
+        print("sim_geneset2geneset():", i, "dg len:", len(dgassos_new[diseases[i]]))
+        sims[diseases[i]] = {}
+        for j in range(i, len(diseases)):
+            gsi = dgassos_new[diseases[i]]
+            gsj = dgassos_new[diseases[j]]
+            gsilen = len(gsi)
+            gsjlen = len(gsj)
+            gsid = gsi.difference(gsj)
+            gsjd = gsj.difference(gsi)
+            sim = 2 * len(gsi.intersection(gsj))
+            for g in gsid:
+                cc_one, cc_two = 0, 0
+                gloc = gn2loc[g]
+                for otherg in gsj:
+                    othergloc = gn2loc[otherg]
+                    cc_one += adjmat[gloc, othergloc]
+                    if adjmat2nd[gloc, othergloc] == -1:
+                        adjmat2nd[gloc, othergloc] = numpy.dot(adjmat[gloc], adjmat[othergloc])
+                        adjmat2nd[othergloc, gloc] = adjmat2nd[gloc, othergloc]
+                    if adjmat2nd[gloc, othergloc] > 0:
+                        cc_two += 1
+                sim += (cc_one * 2 + cc_two) / (gsjlen * 4)
+            for g in gsjd:
+                cc_one, cc_two = 0, 0
+                gloc = gn2loc[g]
+                for otherg in gsi:
+                    othergloc = gn2loc[otherg]
+                    cc_one += adjmat[gloc, othergloc]
+                    if adjmat2nd[gloc, othergloc] == -1:
+                        adjmat2nd[gloc, othergloc] = numpy.dot(adjmat[gloc], adjmat[othergloc])
+                        adjmat2nd[othergloc, gloc] = adjmat2nd[gloc, othergloc]
+                    if adjmat2nd[gloc, othergloc] > 0:
+                        cc_two += 1
+                sim += (cc_one * 2 + cc_two) / (gsilen * 4)
+            sims[diseases[i]][diseases[j]] = sim / (len(gsi) + len(gsj))
+        print("---------------------------------------cost time:", str(time.time() - now))
+    return sims
+
+
+def similarity_cal_module_7(dgassos, graph, gncutoff=1):
+    """
+    module cal method 7
+    :param dgassos: a dict object which keys are module names and values are module
+    nodes sets
+    :param graph: an igraph object
+    :param gncutoff: gene number cut off, only diseases whose number of associated
+    genes in graph is no less than gncutoff will be calculated
+    :return: a dict, (key-value: string-dict<string-float>)
+    """
+    gvs = set(graph.vs['name'])
+
+    dgassos_new = {}
+    for d in dgassos.keys():
+        dgleft = gvs.intersection(dgassos[d])
+        if len(dgleft) >= gncutoff:
+            dgassos_new[d] = dgleft
+    diseases = list(dgassos_new.keys())
+    print("there are {} diseases can be calculated.".format(len(diseases)))
+
+    nodenames = list(gvs)
+    sps = graph.shortest_paths(source=nodenames, target=nodenames, weights=None, mode=3)
+    gn2loc = {}
+    for i in range(0, len(nodenames)):
+        gn2loc[nodenames[i]] = i
 
 
 def similarity_cal_spavgn(dgassos, graph, gfilter=False, gncutoff=1, transformdistance=True):
@@ -789,7 +893,7 @@ def sim_gene2gene_shortestpath(dgs, graph, transformdistance=True):
     else:
         for i in range(0, len(nodenames)):
             for j in range(i, len(nodenames)):
-                result[nodenames[i]][nodenames[j]] = 1 / (sps[i][j] + 1)
+                result[nodenames[i]][nodenames[j]] = 1 / 2**(sps[i][j])
                 result[nodenames[j]][nodenames[i]] = result[nodenames[i]][nodenames[j]]
     # supply
     dglefts = set(dgs).difference(set(nodenames))
