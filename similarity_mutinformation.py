@@ -55,17 +55,7 @@ def similarity_mutiinfomation(dgassos):
     sims = {}
     for i in range(0, len(ds)):
         sims[ds[i]] = {}
-        gsi = dgassos[ds[i]]
         for j in range(i, len(ds)):
-            gsj = dgassos[ds[j]]
-            gsij = gsi.intersection(gsj)
-            gsio = gsi.difference(gsj)
-            gsjo = gsj.difference(gsi)
-            scoretemp = 2 * len(gsij)
-            for g in gsio:
-                scoretemp += gs2gscore[ds[j]][g]
-            for g in gsjo:
-                scoretemp += gs2gscore[ds[i]][g]
-            sims[ds[i]][ds[j]] = scoretemp/(len(gsi) + len(gsj))
+            sims[ds[i]][ds[j]] = 0
         print("similarity_mutulinformation:", i)
     return sims

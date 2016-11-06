@@ -5,6 +5,7 @@ import similarity_module
 import mapping
 import common_use
 import experiments
+import similarity_genesim
 from files import read_one_col
 from files import read_mappings
 from files import read_assos
@@ -754,6 +755,18 @@ def similarity_cal_domain():
     sims = diseases_similarity_pathway_jaccard(list(di2do.keys()), di2do)
     stat_sims(sims)
     # write_sims(sims, "outputs/similarity_domain_jaccard_di2do_sidd.tsv")
+
+
+def simlarity_cal_geneseim():
+    gfunsim = read_simmatrix('data/test/genesim_wang_bma_gobp.tsv')
+    dgassos = read_assos('data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab')
+    stat_assos(dgassos)
+    dgs = set()
+    for d in dgassos.keys():
+        dgs.update(dgassos[d])
+    dg2dgsim = similarity_genesim.simmatrix(list(dgs), gfunsim)
+    dsims = similarity_genesim.similarity_cal(dgassos, dg2dgsim)
+    write_sims(dsims, 'outputs/similarity_genefun_rwrsidd_wangbmabp.tsv')
 # -----------------------------------------------------------
 
 
@@ -1068,21 +1081,43 @@ def gene_neighbor_info():
         print(gene + "\t" + str(len(nei)) + "\t" + str(len(dn)) + "\t" + str(lennondn))
 
 
-def diseasegene_visuailizationfile():
-    g = read_assos("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab")
-    stat_assos(g)
-    dpairs = read_assos('data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
-    bmptuple = []
-    for p in dpairs.keys():
-        for q in dpairs[p]:
-            bmptuple.append((p, q))
-    print(len(bmptuple))
+def benchmarksetpairs_stats():
+    # bmkpairs = read_assos("data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv")
     dgassos = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
     stat_assos(dgassos)
+    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
+                                           False, False)
+    print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
+    gnodes = g.vs['name']
 
-    dpair = ("DOID:9588", "DOID:9471")
-    gs1, gs2 = dgassos[dpair[0]], dgassos[dpair[1]]
-    print(dpair[0], len(gs1), dpair[1], len(gs2))
+    pairsrank = []
+    with open('C:\\Users\\NP\\Desktop\\pairsrank.txt', mode='r') as rf:
+        line = next(rf)
+        heads = line.strip().split('\t')
+        for fline in rf:
+            words = fline.strip().split('\t')
+            for i in range(2, len(words)):
+                words[i] = float(words[i])
+            pairsrank.append(words)
+
+    method = 5
+    print("----" + heads[method] + "--------")
+    from operator import itemgetter
+    pairsrank = sorted(pairsrank, key=itemgetter(method))
+    # bmktuple = []
+    # for d1 in bmkpairs.keys():
+    #     for d2 in bmkpairs[d1]:
+    #         bmktuple.append((d1, d2))
+    for h in heads:
+        print(h, end='\t')
+    print()
+    for pair in pairsrank:
+        for p in pair:
+            print(p, end='\t')
+        a, b = pair[0], pair[1]
+        print(len(dgassos[a]), len(dgassos[b]),
+              len(dgassos[a].intersection(gnodes)), len(dgassos[b].intersection(gnodes)),
+              len(dgassos[a].intersection(dgassos[b])), sep='\t')
 # ------------------------------------------------------------
 
 
@@ -1818,4 +1853,4 @@ if __name__ == "__main__":
     # evaluation_70benchmarkset(evaluation_simfilepaths1, shortnames1, 1, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    pass
+    simlarity_cal_geneseim()

@@ -333,14 +333,14 @@ def similarity_cal_module_5(dgassos, graph, gncutoff=1):
 
 def similarity_cal_module_6(dgassos, graph, gncutoff=1):
     """
-        module cal method 6
-        :param dgassos: a dict object which keys are module names and values are module
-        nodes sets
-        :param graph: an igraph object
-        :param gncutoff: gene number cut off, only diseases whose number of associated
-        genes in graph is no less than gncutoff will be calculated
-        :return: a dict, (key-value: string-dict<string-float>)
-        """
+    module cal method 6
+    :param dgassos: a dict object which keys are module names and values are module
+    nodes sets
+    :param graph: an igraph object
+    :param gncutoff: gene number cut off, only diseases whose number of associated
+    genes in graph is no less than gncutoff will be calculated
+    :return: a dict, (key-value: string-dict<string-float>)
+    """
     # only use lcc-----
     glcc = graph.clusters(mode='WEAK').giant()
     gvs = set(glcc.vs['name'])
