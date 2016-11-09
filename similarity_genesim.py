@@ -6,7 +6,7 @@ def similarity_cal(dgassos, g2gsimmat):
     diseases = list(dgassos.keys())
     sims = {}
     for i in range(0, len(diseases)):
-        sims[i] = {}
+        sims[diseases[i]] = {}
         gsi = dgassos[diseases[i]]
         for j in range(i, len(diseases)):
             gsj = dgassos[diseases[j]]
@@ -25,6 +25,7 @@ def similarity_cal(dgassos, g2gsimmat):
 
 
 def simmatrix(genes, g2gsim):
+    print('simmatrix begin..')
     sims = {}
     genes = list(genes)
     for g in genes:
@@ -41,6 +42,7 @@ def simmatrix(genes, g2gsim):
                 else:
                     sims[genes[i]][genes[j]] = 0.0
             sims[genes[j]][genes[i]] = sims[genes[i]][genes[j]]
+    print('simmatrix end..')
     return sims
 
 

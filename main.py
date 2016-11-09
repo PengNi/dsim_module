@@ -55,10 +55,10 @@ from plots import plot_simshist
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
 
-evaluation_simfilepaths1 = ['outputs/similarity_funsim_rwrsidd.tsv',
-                            'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
+evaluation_simfilepaths1 = [  # 'outputs/similarity_funsim_rwrsidd.tsv',
+                            # 'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
                             'outputs/similarity_experiments_rwr_rwrsidd_hppinwsl.tsv',
-                            'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
+                            # 'outputs/similarity_suntopo_rwrsidd_hppinwosl_triplet.tsv',
                             # 'outputs/similarity_icod_rwrsidd_hppinwsl_triplet.tsv',
                             # 'outputs/similarity_bognew_rwrsidd_triplet.tsv',
                             # 'outputs/similarity_module5_rwrsidd_hppinwsl.tsv',
@@ -68,6 +68,7 @@ evaluation_simfilepaths1 = ['outputs/similarity_funsim_rwrsidd.tsv',
                             # 'outputs/similarity_dpathwayEuclideanSpmin_allpathway_rwrsidd_hppinwsl.tsv',
                             # 'outputs/similarity_dpathwayCosSpmaxidf_bkrpathway_rwrsidd_hppinwsl.tsv',
                             # 'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv',
+                            'outputs/similarity_genefun_rwrsidd_wangbmabp.tsv',
                             ]
 
 shortnames1 = {'outputs/similarity_funsim_rwrsidd.tsv': 'FunSim',
@@ -84,6 +85,7 @@ shortnames1 = {'outputs/similarity_funsim_rwrsidd.tsv': 'FunSim',
                'outputs/similarity_dpathwayCosineSpmax_allpathway_rwrsidd_hppinwsl.tsv': 'pCosSpmaxall',
                'outputs/similarity_dpathwayCosineSpmin_allpathway_rwrsidd_hppinwsl.tsv': 'pCosSpminall',
                'outputs/similarity_dpathwayEuclideanSpmin_allpathway_rwrsidd_hppinwsl.tsv': 'pEucSpminall',
+               'outputs/similarity_genefun_rwrsidd_wangbmabp.tsv': 'genefun',
                }
 
 gtpathlist1 = ['outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv',
@@ -1845,12 +1847,69 @@ def similarity_cal_predeva():
     # dsim = common_use.normalize_simdict(dsim)
     # write_simmatrix(dsim, "data/test/similarity_spmax_sidd_hppin.tsv", True, d137order)
     # -----------------------------------------------------------------------------------
+
+
+def convert_similarity():
+    from operator import itemgetter
+    dgassos = read_assos("D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\"
+                         "geneOmimId_diseaseOmimId_in_ppi.txt", False, '\t', 2, 1)
+    stat_assos(dgassos)
+    count = 0
+    diseases = list(dgassos.keys())
+    for i in range(0, len(diseases)-1):
+        for j in range(i+1, len(diseases)):
+            if len(dgassos[diseases[i]].intersection(dgassos[diseases[j]])) != 0:
+                count += 1
+    print('disease pairs:', count)
+    origsim = read_simmatrix('D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\'
+                             'similarity_spavgn_dgomim_hprd_matrix.tsv', True, False)
+    stat_sims(origsim)
+    simvalue = []
+    for d1 in origsim.keys():
+        for d2 in origsim[d1].keys():
+            if d1 != d2:
+                simvalue.append((d1, d2, origsim[d1][d2]))
+    print('simvalue len:', len(simvalue))
+    simvalue = sorted(simvalue, key=itemgetter(2), reverse=True)
+    simvalue = simvalue[0:2*count]
+
+    with open('D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\'
+              'diseasepairs_spavgn_dgomim_hprd.tsv', mode='w') as wf:
+        for simv in simvalue:
+            wf.write(simv[0] + '\t' + simv[1] + '\n')
+
+    dneighbors = {}
+    for simv in simvalue:
+        a, b = simv[0], simv[1]
+        if a not in dneighbors.keys():
+            dneighbors[a] = set()
+        if b not in dneighbors.keys():
+            dneighbors[b] = set()
+        dneighbors[a].add(b)
+        dneighbors[b].add(a)
+    stat_assos(dneighbors)
+
+    # ressim = {}
+    # for i in range(0, len(diseases)):
+    #     ressim[diseases[i]] = {}
+    #     for j in range(i, len(diseases)):
+    #         if i == j:
+    #             ressim[diseases[i]][diseases[j]] = 1.0
+    #         else:
+    #             ressim[diseases[i]][diseases[j]] = 0.0
+    #
+    # for d1 in ressim.keys():
+    #     for d2 in ressim[d1].keys():
+    #         if d1 in dneighbors.keys() and d2 in dneighbors.keys():
+    #             pass  # something like ecc
+    # write_simmatrix(ressim, 'D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\'
+    #                         'similarity_spavgn_ecc_dgomim_hprd_matrix.tsv')
 # --------------------------------------------------------------
 
 
 if __name__ == "__main__":
     # evaluation_groundtruth(evaluation_simfilepaths1, shortnames1, [gtpathlist1[1], ])
-    # evaluation_70benchmarkset(evaluation_simfilepaths1, shortnames1, 1, 100,
+    # evaluation_70benchmarkset(evaluation_simfilepaths1, shortnames1, 3, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    simlarity_cal_geneseim()
+    pass
