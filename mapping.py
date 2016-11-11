@@ -244,7 +244,7 @@ def geneida2geneidb(geneida, geneidb, geneida_list, species='human'):
                           fields=geneidb, species=species)
     mapping = {}
     for r in result:
-        if 'notfound' not in r.keys():
+        if 'notfound' not in r.keys() and geneidb in r.keys():
             if r['query'] not in mapping.keys():
                 mapping[r['query']] = set()
             mapping[r['query']].add(r[geneidb])

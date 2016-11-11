@@ -46,9 +46,37 @@ def simmatrix(genes, g2gsim):
     return sims
 
 
+def simmatrix_combine(genes, g2gsim1, g2gsim2, alpha=0.5):
+    print('simmatrix begin..')
+    sims = {}
+    genes = list(genes)
+    for g in genes:
+        sims[g] = {}
+    for i in range(0, len(genes)):
+        for j in range(i, len(genes)):
+            sims[genes[i]][genes[j]] = alpha * findsimvalue(genes[i], genes[j], g2gsim1) + \
+                                       (1 - alpha) * findsimvalue(genes[i], genes[j], g2gsim2)
+            sims[genes[j]][genes[i]] = sims[genes[i]][genes[j]]
+    print('simmatrix end..')
+    return sims
+
+
 def sim_geneset2gene_max(g, gset, sim_gene2gene):
     result = 0.0
     for i in gset:
         if sim_gene2gene[g][i] > result:
             result = sim_gene2gene[g][i]
     return result
+
+
+def findsimvalue(g1, g2, gsims):
+    if g1 in gsims.keys() and g2 in gsims[g1].keys():
+        ggsim = gsims[g1][g2]
+    elif g2 in gsims.keys() and g1 in gsims[g2].keys():
+        ggsim = gsims[g2][g1]
+    else:
+        if g1 == g2:
+            ggsim = 1.0
+        else:
+            ggsim = 0.0
+    return ggsim

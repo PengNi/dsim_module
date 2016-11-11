@@ -69,6 +69,7 @@ evaluation_simfilepaths1 = [  # 'outputs/similarity_funsim_rwrsidd.tsv',
                             # 'outputs/similarity_dpathwayCosSpmaxidf_bkrpathway_rwrsidd_hppinwsl.tsv',
                             # 'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv',
                             'outputs/similarity_genefun_rwrsidd_wangbmabp.tsv',
+                            'outputs/similarity_spavgngenefun_rwrsidd_hppinwsl_wangbmpbp.tsv',
                             ]
 
 shortnames1 = {'outputs/similarity_funsim_rwrsidd.tsv': 'FunSim',
@@ -86,6 +87,7 @@ shortnames1 = {'outputs/similarity_funsim_rwrsidd.tsv': 'FunSim',
                'outputs/similarity_dpathwayCosineSpmin_allpathway_rwrsidd_hppinwsl.tsv': 'pCosSpminall',
                'outputs/similarity_dpathwayEuclideanSpmin_allpathway_rwrsidd_hppinwsl.tsv': 'pEucSpminall',
                'outputs/similarity_genefun_rwrsidd_wangbmabp.tsv': 'genefun',
+               'outputs/similarity_spavgngenefun_rwrsidd_hppinwsl_wangbmpbp.tsv': 'spavgngenefun',
                }
 
 gtpathlist1 = ['outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_bh005.tsv',
@@ -93,8 +95,8 @@ gtpathlist1 = ['outputs/similarity_pathway_jaccard_cp.bkr.v5.1.symbols_rwrsidd_b
                'outputs/similarity_pathway_jaccard_doid2keggpathway.tsv',
                ]
 
-evaluation_simfilepaths2 = [str('outputs/similarity_experiments_shortestpath_transformed_less_disgenet_dgcut' +
-                                'off006_interactome.tsv'),
+evaluation_simfilepaths2 = [  # str('outputs/similarity_experiments_shortestpath_transformed_less_disgenet_dgcut' +
+                              #  'off006_interactome.tsv'),
                             'outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc_triplet.tsv',
                             # 'outputs/similarity_funsim_disgenet_dgcutoff006.tsv',
                             # 'outputs/similarity_bog_disgenet_dgcutoff006_triplet.tsv',
@@ -103,7 +105,8 @@ evaluation_simfilepaths2 = [str('outputs/similarity_experiments_shortestpath_tra
                             'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv',
                             'outputs/similarity_spavgn_trans_disgenet_dgcutoff006_interactome.tsv',
-                            'outputs/similarity_spmaxn_trans_disgenet_dgcutoff006_interactome.tsv',
+                            # 'outputs/similarity_spmaxn_trans_disgenet_dgcutoff006_interactome.tsv',
+                            'outputs/similarity_genefun_disgenet006_wangbmabp.tsv',
                             # 'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv',
                             ]
 
@@ -118,8 +121,8 @@ shortnames2 = {'outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc
                'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv': 'module',
                'outputs/similarity_spavgn_trans_disgenet_dgcutoff006_interactome.tsv': 'spavgn',
                'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv': 'pathwayj',
-               'outputs/similarity_spmaxncle_trans_disgenet_dgcutoff006_interactome.tsv': 'spmaxncle',
                'outputs/similarity_spmaxn_trans_disgenet_dgcutoff006_interactome.tsv': 'spmaxn',
+               'outputs/similarity_genefun_disgenet006_wangbmabp.tsv': 'genefun',
                }
 
 gtpathlist2 = ['outputs/similarity_go_bp_umls_dgcutoff006.tsv',
@@ -169,6 +172,20 @@ evapath_omim = ['D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\similarity_rwr_
 shnames_omim = {'D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\similarity_rwr_dgomim_hprd_matrix.tsv': 'NetSim',
                 'D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\similarity_spavgn_dgomim_hprd_matrix.tsv': 'spavgn',
                 'D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\disease_disease_similarity.tsv': 'MimMiner', }
+
+evaluation_simfilepaths5 = ['outputs/similarity_funsim_rwrsidd.tsv',
+                            # 'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
+                            'outputs/similarity_rwr_rwrsidd_interactome.tsv',
+                            'outputs/similarity_suntopo_rwrsidd_interactomemaxcc_triplet.tsv',
+                            'outputs/similarity_spavgn_rwrsidd_interactome.tsv',
+                            ]
+
+shortnames5 = {'outputs/similarity_funsim_rwrsidd.tsv': 'FunSim',
+               # 'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
+               'outputs/similarity_rwr_rwrsidd_interactome.tsv': 'NetSim',
+               'outputs/similarity_suntopo_rwrsidd_interactomemaxcc_triplet.tsv': 'Sun_topo',
+               'outputs/similarity_spavgn_rwrsidd_interactome.tsv': 'ModuleSim',
+               }
 
 
 # ---evaluation-----------------------------------------
@@ -648,22 +665,19 @@ def geneid_convert_coexpression():
 
 
 def similarity_cal_module():
-    # disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
-    #                                                          0.06, True, True)
-    disease2gene_entrez = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
-    # disease2gene_entrez = read_assos('data/comorbidity/icd9cm2entrezgene_disgenet_dgcutoff000.tsv')
+    disease2gene = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
+                                                      0.0, True, True)
+    # disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab")
     print("disease gene assos: ", end='')
-    stat_assos(disease2gene_entrez)
+    stat_assos(disease2gene)
 
-    # g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv", False, False)
-    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
-                                           False, False)
+    g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv", False, False)
+    # g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
+    #                                        False, False)
     print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
 
-    sims = similarity_module.similarity_cal_spmax(disease2gene_entrez, g, False, 1, False)
-    write_sims(sims, 'outputs/similarity_spmax2pow_rwrsidd_hppinwsl.tsv')
-    sims = similarity_module.similarity_cal_spmax(disease2gene_entrez, g)
-    write_sims(sims, 'outputs/similarity_spmaxexp_rwrsidd_hppinwsl.tsv')
+    sims = similarity_module.similarity_cal_spavgn(disease2gene, g)
+    write_sims(sims, 'outputs/similarity_spavgn_disgenet_dgcutoff000_interactome.tsv')
 
 
 def combine_pathway_data_gsea():
@@ -760,15 +774,30 @@ def similarity_cal_domain():
 
 
 def simlarity_cal_geneseim():
-    gfunsim = read_simmatrix('data/test/genesim_wang_bma_gobp.tsv')
-    dgassos = read_assos('data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab')
+    gfunsim = read_simmatrix('data/test/genesim_disgenet006_wang_bma_gobp.tsv')
+    # dgassos = read_assos('data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab')
+    dgassos = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
+                                                 0.06, True, True)
     stat_assos(dgassos)
     dgs = set()
     for d in dgassos.keys():
         dgs.update(dgassos[d])
     dg2dgsim = similarity_genesim.simmatrix(list(dgs), gfunsim)
     dsims = similarity_genesim.similarity_cal(dgassos, dg2dgsim)
-    write_sims(dsims, 'outputs/similarity_genefun_rwrsidd_wangbmabp.tsv')
+    write_sims(dsims, 'outputs/similarity_genefun_disgenet006_wangbmabp.tsv')
+
+
+def similarity_cal_combinesim():
+    dsim1 = read_sims('outputs/similarity_genefun_rwrsidd_wangbmabp.tsv')
+    dsim2 = read_sims('outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv')
+
+    dsim = {}
+    for d1 in dsim1.keys():
+        dsim[d1] = {}
+        for d2 in dsim1[d1].keys():
+            dsim[d1][d2] = dsim1[d1][d2] * similarity_genesim.findsimvalue(d1, d2, dsim2)
+        print(d1)
+    write_sims(dsim, 'outputs/similarity_spavgngenefun_rwrsidd_hppinwsl_wangbmpbp.tsv')
 # -----------------------------------------------------------
 
 
@@ -988,6 +1017,19 @@ def get_doid2keggpathways():
             doid2pathway[d] = pwset
     stat_assos(doid2pathway)
     write_assos(doid2pathway, 'data/kegg_disease/doid2keggpathway.tsv')
+
+
+def convert_geneid_dgassos():
+    dgassos = read_assos('data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab')
+    stat_assos(dgassos)
+    dgs = set()
+    for d in dgassos.keys():
+        dgs.update(dgassos[d])
+    symbol2entrezid = mapping.geneida2geneidb('symbol', 'entrezgene', list(dgs))
+    stat_assos(symbol2entrezid)
+    dgassos_conv = mapping.convert_dict_values(dgassos, symbol2entrezid)
+    stat_assos(dgassos_conv)
+    # write_assos(dgassos_conv, 'data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab')
 # -----------------------------------------------------------
 
 
@@ -1197,9 +1239,9 @@ def experiment():
     #                                        False, False)
     print("number of vertices:", g.vcount())
     gvs = set(g.vs['name'])
-    disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
-                                                             0.06, True, True)
-    # disease2gene_entrez = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
+    # disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
+    #                                                          0.06, True, True)
+    disease2gene_entrez = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab")
     stat_assos(disease2gene_entrez)
     dgassos_new = {}
     for d in disease2gene_entrez.keys():
@@ -1225,13 +1267,13 @@ def experiment():
     # # ------------------------------------------------------------------
 
     # # ---bmc rwr------------------------------------------------------------
-    # sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2genescore_disgenet_dgcutoff006_interactome.tsv")
-    # sim_d2d = experiments.sim_geneset2geneset_rwr(disease2gene_entrez, sim_gene2geneset)
-    # write_sims(sim_d2d, "outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv")
+    sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2genescore_rwrsidd_interactome.tsv")
+    sim_d2d = experiments.sim_geneset2geneset_rwr(disease2gene_entrez, sim_gene2geneset)
+    write_sims(sim_d2d, "outputs/similarity_rwr_rwrsidd_interactome.tsv")
     # # ----------------------------------------------------------------------
 
     # ---shortest path------------------------------------------------------
-    sps_norm = experiments.sim_gene2gene_shortestpath(g)
+    # sps_norm = experiments.sim_gene2gene_shortestpath(g)
 
     # sim_d2d = experiments.sim_geneset2geneset(dgassos_new, sps_norm)
     # write_sims(sim_d2d,
@@ -1469,20 +1511,20 @@ def rwr_bmc_dgassos():
 
 
 def rwr_dgfilter():
-    icd92gene = read_assos("data/comorbidity/icd9cm2entrezgene_disgenet_dgcutoff000_s.tsv")
-    stat_assos(icd92gene)
+    dgassos = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab")
+    stat_assos(dgassos)
     g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv",
                                            False, False)
     print("number of vertices:", g.vcount())
     gvs = set(g.vs['name'])
     dgassos_new = {}
-    for d in icd92gene.keys():
-        dgleft = gvs.intersection(icd92gene[d])
+    for d in dgassos.keys():
+        dgleft = gvs.intersection(dgassos[d])
         if len(dgleft) >= 1:
             dgassos_new[d] = dgleft
     print("disease gene assos left: ", end='')
     stat_assos(dgassos_new)
-    write_assos(dgassos_new, 'data/comorbidity/icd9cm2entrezgene_disgenet_dgcutoff000_ininteractome.tsv')
+    write_assos(dgassos_new, 'data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid_ininteractome.tab')
 # -------------------------------------------------------------
 
 
@@ -1909,7 +1951,7 @@ def convert_similarity():
 
 if __name__ == "__main__":
     # evaluation_groundtruth(evaluation_simfilepaths1, shortnames1, [gtpathlist1[1], ])
-    # evaluation_70benchmarkset(evaluation_simfilepaths1, shortnames1, 3, 100,
+    # evaluation_70benchmarkset(evaluation_simfilepaths5, shortnames5, 0, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
     pass
