@@ -927,6 +927,105 @@ def sim_geneset2gene_max(g, gset, sim_gene2gene):
     return result
 
 
+def katzwalklength(g, k=5, fileprefix='data/interactome_science/interactome_adjmat'):
+    """
+
+    :param g: igraph graph object
+    :param k: cutoff of walk length
+    :param fileprefix:
+    :return:
+    """
+    gvs = set(g.vs['name'])
+    gnodes = list(gvs)
+    # node2loc = {}
+    # for i in range(0, len(gnodes)):
+    #     node2loc[gnodes[i]] = i
+    adjmat = numpy.zeros(shape=(len(gnodes), len(gnodes)), dtype=numpy.int8)
+    for i in range(0, len(gnodes)):
+        for j in range(i, len(gnodes)):
+            if g.are_connected(gnodes[i], gnodes[j]):
+                adjmat[i, j] = 1
+                adjmat[j, i] = 1
+    print('similarity_module: katzwalklength:', 'preprocess done..')
+    kadjmat = 1
+    for m in range(1, k+1):
+        kadjmat = numpy.dot(kadjmat, adjmat)
+        with open(fileprefix+str(m)+'.tsv', mode='w') as wf:
+            for g in gnodes:
+                wf.write('\t'+g)
+            wf.write('\n')
+            for i in range(0, len(gnodes)):
+                wf.write(gnodes[i])
+                for j in range(0, len(gnodes)):
+                    wf.write('\t' + str(kadjmat[i, j]))
+                wf.write('\n')
+        print('similarity_module: katzwalklength:', m)
+
+
+def similarity_cal_katz(dgassos, gene2loc, adjmats, beta=None):
+    """
+
+    :param dgassos:
+    :param gene2loc:
+    :param adjmats:
+    :param beta:
+    :return:
+    """
+    if beta is None:
+        beta = max([sum(adjmats[0][i]) for i in range(0, len(adjmats[0]))])
+        print(beta)
+        beta = 1/(beta**2)
+        print(beta)
+    genes = set(gene2loc.keys())
+    dgassos_new = {}
+    for d in dgassos.keys():
+        dgleft = genes.intersection(dgassos[d])
+        if len(dgleft) >= 1:
+            dgassos_new[d] = dgleft
+    diseases = list(dgassos_new.keys())
+    print("there are {} diseases can be calculated.".format(len(diseases)))
+
+    katzmat = numpy.zeros(shape=(len(genes), len(genes)), dtype=numpy.float32)
+    for i in range(0, len(genes)):
+        for j in range(i, len(genes)):
+            for c in range(0, len(adjmats)):
+                katzmat[i, j] += beta**(c+1) * adjmats[c][i, j]
+            katzmat[j, i] = katzmat[i, j]
+
+    print("disease sim cal beginning..")
+    sims = {}
+    for i in range(0, len(diseases)):
+        sims[diseases[i]] = {}
+        gsi = dgassos_new[diseases[i]]
+        loci = [gene2loc[g] for g in gsi]
+        for j in range(i, len(diseases)):
+            gsj = dgassos_new[diseases[j]]
+            locj = [gene2loc[g] for g in gsj]
+            simtemp = 0.0
+            for loc in loci:
+                simtemp += max(katzmat[loc, locj])
+            for loc in locj:
+                simtemp += max(katzmat[loc, loci])
+            sims[diseases[i]][diseases[j]] = simtemp / (len(gsi) + len(gsj))
+        print("similarity_cal_katz:", i)
+    return sims
+
+
+def read_adjmatrix(filepath):
+    """
+
+    :param filepath:
+    :return:
+    """
+    adjlist = []
+    with open(filepath, mode='r') as rf:
+        next(rf)
+        for line in rf:
+            words = line.strip().split('\t')
+            adjlist.append([int(i) for i in words[1:len(words)]])
+    return numpy.array(adjlist)
+
+
 def diameter(dgassos, graph):
     """
     given a dict which contains a list of node groups, and an igraph object,
