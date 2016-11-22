@@ -129,7 +129,6 @@ shortnames2 = {'outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc
                'outputs/similarity_spmaxn_trans_disgenet_dgcutoff006_interactome.tsv': 'spmaxn',
                'outputs/similarity_genefun_disgenet006_wangbmabp.tsv': 'genefun',
                'outputs/similarity_katz5_disgenet_dgcutoff006_interactome_beta05.tsv': 'katz5_05',
-               'outputs/similarity_katz5_disgenet_dgcutoff006_interactome_betadef.tsv': 'katz5_def',
                'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_beta05.tsv': 'katz4_05',
                'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_beta025.tsv': 'katz4_025',
                'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_betadef.tsv': 'katz4_def',
@@ -826,14 +825,6 @@ def similarity_cal_katz():
         adjmats.append(similarity_module.read_adjmatrix('data/interactome_science/interactome_adjmat'
                                                         + str(i) + '.tsv'))
     # -----------
-    sims = similarity_module.similarity_cal_katz(dgassos, gene2loc, adjmats, 0.5)
-    write_sims(sims, 'outputs/similarity_katz5_disgenet_dgcutoff006_interactome_beta05.tsv')
-    sims = similarity_module.similarity_cal_katz(dgassos, gene2loc, adjmats, None)
-    write_sims(sims, 'outputs/similarity_katz5_disgenet_dgcutoff006_interactome_betadef.tsv')
-    sims = similarity_module.similarity_cal_katz(dgassos, gene2loc, adjmats[0:4], 0.5)
-    write_sims(sims, 'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_beta05.tsv')
-    sims = similarity_module.similarity_cal_katz(dgassos, gene2loc, adjmats[0:4], 0.25)
-    write_sims(sims, 'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_beta025.tsv')
     sims = similarity_module.similarity_cal_katz(dgassos, gene2loc, adjmats[0:4], None)
     write_sims(sims, 'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_betadef.tsv')
     pass

@@ -972,10 +972,10 @@ def similarity_cal_katz(dgassos, gene2loc, adjmats, beta=None):
     :return:
     """
     if beta is None:
-        beta = max([sum(adjmats[0][i]) for i in range(0, len(adjmats[0]))])
+        beta = numpy.linalg.norm(adjmats[0], 2)
+        beta = 1 / beta
         print(beta)
-        beta = 1/(beta**2)
-        print(beta)
+        # beta = 10**(-6)
     genes = set(gene2loc.keys())
     dgassos_new = {}
     for d in dgassos.keys():
