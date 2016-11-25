@@ -1065,7 +1065,7 @@ def convert_geneid_dgassos():
 
 # ---information---------------------------------------------
 def disease_module_info():
-    g = similarity_module.read_interactome("data/DataS1_interactome_rmslpe.tsv", False, False)
+    g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome_rmslpe.tsv", False, False)
     print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
 
     disease_genes = read_all_gene_disease_associations("data/all_gene_disease_associations.tsv", 0)
@@ -1192,6 +1192,18 @@ def benchmarksetpairs_stats():
         print(len(dgassos[a]), len(dgassos[b]),
               len(dgassos[a].intersection(gnodes)), len(dgassos[b].intersection(gnodes)),
               len(dgassos[a].intersection(dgassos[b])), sep='\t')
+
+
+def tissuespecificity_stats():
+    expgenes = read_one_col('data/tissuespec_srep/srep35241-s4.txt', 1, True)
+    print('number of experssion genes:', len(set(expgenes)))
+
+    g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv", False, False)
+    print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
+    gvs = set(g.vs['name'])
+
+    expnodes = gvs.intersection(expgenes)
+    print(len(expnodes))
 # ------------------------------------------------------------
 
 
@@ -1999,8 +2011,8 @@ def convert_similarity():
 
 if __name__ == "__main__":
     # evaluation_groundtruth(evaluation_simfilepaths1, shortnames1, [gtpathlist1[1], ])
-    evaluation_70benchmarkset(evaluation_simfilepaths2, shortnames2, 0, 100,
-                              'data/benchmarkset_funsim/ground_truth_70_disease_pairs_umlsid.tsv')
+    # evaluation_70benchmarkset(evaluation_simfilepaths2, shortnames2, 0, 100,
+    #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_umlsid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    # similarity_cal_katz()
+    tissuespecificity_stats()
     pass

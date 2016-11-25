@@ -487,7 +487,19 @@ auto-generated-by: OBO-Edit 2.3.1
 有标签"is_obsolete: true"的term有2369个
 #-------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------
+16. tissue specificity disease module统计
+reference: Kitsak M, Sharma A, Menche J, et al. Tissue Specificity of Human 
+Disease Module[J]. Scientific Reports, 2016, 6.
+本文用到了pnas 2004年的文章 (reference: Su A I, Wiltshire T, Batalov S, et al. 
+A gene atlas of the mouse and human protein-encoding transcriptomes[J]. 
+Proceedings of the National Academy of Sciences of the United States of America, 
+2004, 101(16): 6062-6067.) 的数据。
 
+共有13068个gene (entrezid) 有在不同组织的表达数据；
+interactome有13460个点 (gene, entrezid)；
+13460个gene当中，有10434个有表达数据。
+#-------------------------------------------------------------------------
 
 
 
