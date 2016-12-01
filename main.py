@@ -6,6 +6,7 @@ import mapping
 import common_use
 import experiments
 import similarity_genesim
+import similarity_tissuespecificity
 from files import read_one_col
 from files import read_mappings
 from files import read_assos
@@ -1195,19 +1196,36 @@ def benchmarksetpairs_stats():
 
 
 def tissuespecificity_stats():
-    expgenes = read_one_col('data/tissuespec_srep/srep35241-s4.txt', 1, True)
-    print('number of experssion genes:', len(set(expgenes)))
-
+    # ---find subgraph in each tissue---
     g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv", False, False)
     print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
-    gvs = set(g.vs['name'])
-    expnodes = gvs.intersection(expgenes)
-    print(len(expnodes))
-
+    tissue2genes = similarity_tissuespecificity.find_tissuegenes('data/tissuespec_srep/srep35241-s4.txt')
+    print("tissue2gene stats: ", end='')
+    stat_assos(tissue2genes)
+    tissuegraphs = similarity_tissuespecificity.find_tissuesubgraphs(tissue2genes, g)
+    # ----------------------------------
+    # ---get dsiease-gene assos in tissue specific interactome--
     disease2gene = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
                                                       0.06, True, True)
     print("disease gene assos: ", end='')
     stat_assos(disease2gene)
+    expnodes = set(read_one_col('data/tissuespec_srep/srep35241-s4.txt', 1, True)).intersection(g.vs['name'])
+    print('exp nodes:', len(expnodes))
+    d2g_new = {}
+    gcutoff = 5
+    for d in disease2gene.keys():
+        genes = disease2gene[d].intersection(expnodes)
+        if len(genes) >= gcutoff:
+            d2g_new[d] = genes
+    stat_assos(d2g_new)
+    # # ids47 = read_one_col('data/benchmarkset_funsim/ground_truth_doid2umlsid_47diseases.tsv', 2)
+    # # print(len(set(ids47).intersection(set(d2g_new.keys()))))
+    # ----------------------------------------------------------
+    # ---get disease-tissue assos---
+    d2t = similarity_tissuespecificity.find_diseasetissueassos(tissuegraphs, d2g_new)
+    stat_assos(d2t)
+    write_assos(d2t, 'data/tissuespec_srep/disease2tissue_disgenet_dgcutoff006_gcutoff5.tsv')
+    # ------------------------------
 # ------------------------------------------------------------
 
 
@@ -2207,5 +2225,5 @@ if __name__ == "__main__":
     # evaluation_70benchmarkset(evaluation_simfilepaths2, shortnames2, 0, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_umlsid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    diseaseid_mapping_stats()
+    tissuespecificity_stats()
     pass
