@@ -3,6 +3,71 @@ from random import randint
 import numpy as np
 
 
+def transformed_distance(shortestpathdis=0, a=1, b=1):
+    return a*np.exp(-b*shortestpathdis)
+
+
+def sim_geneset2gene_avg(g, gset, sim_gene2gene):
+    sims = []
+    for i in gset:
+        sims.append(sim_gene2gene[g][i])
+    return sum(sims)/len(sims)
+
+
+def similarity_cal(d2g, d2t, tissuegraphs):
+    tissue_genesims = {}
+    tissuegeneset = {}
+    for t in tissuegraphs.keys():
+        nodenames = tissuegraphs[t].vs['name']
+        tissuegeneset[t] = set(nodenames)
+        sps = tissuegraphs[t].shortest_paths(source=nodenames, target=nodenames, weights=None, mode=3)
+        result = {}
+        for n in nodenames:
+            result[n] = {}
+        for i in range(0, len(nodenames)):
+            for j in range(i, len(nodenames)):
+                result[nodenames[i]][nodenames[j]] = transformed_distance(sps[i][j])
+                result[nodenames[j]][nodenames[i]] = result[nodenames[i]][nodenames[j]]
+        tissue_genesims[t] = result
+        print(t)
+    print("tissue genesim done..")
+    d2tg = {}
+    dselfsim = {}
+    for d in d2t.keys():
+        d2tg[d] = {}
+        dselfsim[d] = {}
+        for t in d2t[d]:
+            d2tg[d][t] = d2g[d].intersection(tissuegeneset[t])
+            avgsim = 0.0
+            for g in d2tg[d][t]:
+                avgsim += sim_geneset2gene_avg(g, d2tg[d][t], tissue_genesims[t])
+            dselfsim[d][t] = avgsim / len(d2tg[d][t])
+    print("disease selfsim done..")
+    sims = {}
+    ds = list(d2tg.keys())
+    for i in range(0, len(ds)):
+        sims[ds[i]] = {}
+        for j in range(i, len(ds)):
+            commont = d2t[ds[i]].intersection(d2t[ds[j]])
+            if len(commont) == 0:
+                sims[ds[i]][ds[j]] = 0.0
+            else:
+                simij = []
+                for t in commont:
+                    gsi = d2tg[ds[i]][t]
+                    gsj = d2tg[ds[j]][t]
+                    sim = 0.0
+                    for g in gsi:
+                        sim += sim_geneset2gene_avg(g, gsj, tissue_genesims[t])
+                    for g in gsj:
+                        sim += sim_geneset2gene_avg(g, gsi, tissue_genesims[t])
+                    sim /= (len(gsi) + len(gsj))
+                    simij.append(sim * 2 / (dselfsim[ds[i]][t] + dselfsim[ds[j]][t]))
+                sims[ds[i]][ds[j]] = max(simij)
+        print('sim_cal:', i)
+    return sims
+
+
 def find_diseasetissueassos(tissuegraphs, d2g, gcutoff=5, zcutoff=1.6):
     """
 

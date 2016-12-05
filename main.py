@@ -103,14 +103,12 @@ evaluation_simfilepaths2 = [  # str('outputs/similarity_experiments_shortestpath
                             # 'outputs/similarity_bog_disgenet_dgcutoff006_triplet.tsv',
                             # 'outputs/similarity_icod_disgenet_dgcutoff006_interactome_triplet.tsv',
                             # 'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
-                            'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv',
+                            # 'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv',
                             'outputs/similarity_spavgn_trans_disgenet_dgcutoff006_interactome.tsv',
-                            # 'outputs/similarity_katz5_disgenet_dgcutoff006_interactome_beta05.tsv',
-                            # 'outputs/similarity_katz5_disgenet_dgcutoff006_interactome_betadef.tsv',
-                            # 'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_beta05.tsv',
-                            # 'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_beta025.tsv',
-                            'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_betadef.tsv',
+                            # 'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_betadef.tsv',
+                            # 'outputs/similarity_spavgn_tissue_disgenet_dgcutoff006_interactome.tsv',
+                            'outputs/similarity_spavgn_tissue1_disgenet_dgcutoff006_interactome.tsv'
                             # 'outputs/similarity_spmaxn_trans_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_genefun_disgenet006_wangbmabp.tsv',
                             # 'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv',
@@ -129,10 +127,9 @@ shortnames2 = {'outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc
                'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv': 'pathwayj',
                'outputs/similarity_spmaxn_trans_disgenet_dgcutoff006_interactome.tsv': 'spmaxn',
                'outputs/similarity_genefun_disgenet006_wangbmabp.tsv': 'genefun',
-               'outputs/similarity_katz5_disgenet_dgcutoff006_interactome_beta05.tsv': 'katz5_05',
-               'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_beta05.tsv': 'katz4_05',
-               'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_beta025.tsv': 'katz4_025',
                'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_betadef.tsv': 'katz4_def',
+               'outputs/similarity_spavgn_tissue_disgenet_dgcutoff006_interactome.tsv': 'tissuespec',
+               'outputs/similarity_spavgn_tissue1_disgenet_dgcutoff006_interactome.tsv': 'tissuespec1',
                }
 
 gtpathlist2 = ['outputs/similarity_go_bp_umls_dgcutoff006.tsv',
@@ -152,36 +149,6 @@ evapath_omim = ['D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\similarity_rwr_
 shnames_omim = {'D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\similarity_rwr_dgomim_hprd_matrix.tsv': 'NetSim',
                 'D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\similarity_spavgn_dgomim_hprd_matrix.tsv': 'spavgn',
                 'D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\disease_disease_similarity.tsv': 'MimMiner', }
-
-evaluation_simfilepaths5 = ['outputs/similarity_funsim_rwrsidd.tsv',
-                            # 'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
-                            'outputs/similarity_rwr_rwrsidd_interactome.tsv',
-                            'outputs/similarity_suntopo_rwrsidd_interactomemaxcc_triplet.tsv',
-                            'outputs/similarity_spavgn_rwrsidd_interactome.tsv',
-                            ]
-
-shortnames5 = {'outputs/similarity_funsim_rwrsidd.tsv': 'FunSim',
-               # 'outputs/similarity_hamaneh_rwrsidd_hppinwsl.tsv',
-               'outputs/similarity_rwr_rwrsidd_interactome.tsv': 'NetSim',
-               'outputs/similarity_suntopo_rwrsidd_interactomemaxcc_triplet.tsv': 'Sun_topo',
-               'outputs/similarity_spavgn_rwrsidd_interactome.tsv': 'ModuleSim',
-               }
-
-evaluation_simfilepaths6 = ['outputs/similarity_spavgn_disgenet_dgcutoff000_interactome.tsv',
-                            ]
-
-shortnames6 = {'outputs/similarity_spavgn_disgenet_dgcutoff000_interactome.tsv': 'ModuleSim',
-               }
-
-evaluation_simfilepaths7 = ['outputs/similarity_funsim_disgenet_curated.tsv',
-                            'outputs/similarity_spavgn_disgenet_curated_interactome.tsv',
-                            'outputs/similarity_suntopo_disgenet_curated_interactomemaxcc_triplet.tsv',
-                            ]
-
-shortnames7 = {'outputs/similarity_funsim_disgenet_curated.tsv': 'FunSim',
-               'outputs/similarity_spavgn_disgenet_curated_interactome.tsv': 'ModuleSim',
-               'outputs/similarity_suntopo_disgenet_curated_interactomemaxcc_triplet.tsv': 'Sun_topo',
-               }
 
 
 # ---evaluation-----------------------------------------
@@ -437,7 +404,7 @@ def evaluation_70benchmarkset(simpathlist, shortnames, mysimloc=0, times=1,
     print(sameclass, "benchamark pairs are in the same categories.")
     # -----------------------------------------
     print("replicated times:", times)
-    for topn in [25, 50, 100, 200, 300, 400, 500]:
+    for topn in [25, 50, 100, 200, 300]:
         print('------ top', str(topn), '--------------------------')
         rankstats = eva_test_rankstats_multi(evarankings, topn, term2group)
         print("method\ttrue min\ttrue max\ttrue avg\tsame min\tsame max\tsame avg")
@@ -1212,7 +1179,7 @@ def tissuespecificity_stats():
     expnodes = set(read_one_col('data/tissuespec_srep/srep35241-s4.txt', 1, True)).intersection(g.vs['name'])
     print('exp nodes:', len(expnodes))
     d2g_new = {}
-    gcutoff = 5
+    gcutoff = 1
     for d in disease2gene.keys():
         genes = disease2gene[d].intersection(expnodes)
         if len(genes) >= gcutoff:
@@ -1222,9 +1189,15 @@ def tissuespecificity_stats():
     # # print(len(set(ids47).intersection(set(d2g_new.keys()))))
     # ----------------------------------------------------------
     # ---get disease-tissue assos---
-    d2t = similarity_tissuespecificity.find_diseasetissueassos(tissuegraphs, d2g_new)
+    # d2t = similarity_tissuespecificity.find_diseasetissueassos(tissuegraphs, d2g_new, 1)
+    # write_assos(d2t, 'data/tissuespec_srep/disease2tissue_disgenet_dgcutoff006_gcutoff1.tsv')
+    d2t = read_assos('data/tissuespec_srep/disease2tissue_disgenet_dgcutoff006_gcutoff1.tsv')
     stat_assos(d2t)
-    write_assos(d2t, 'data/tissuespec_srep/disease2tissue_disgenet_dgcutoff006_gcutoff5.tsv')
+    # ------------------------------
+    # ---sim cal--------------------
+    sims = similarity_tissuespecificity.similarity_cal(d2g_new, d2t, tissuegraphs)
+    stat_sims(sims)
+    write_sims(sims, 'outputs/similarity_spavgn_tissue1_disgenet_dgcutoff006_interactome.tsv')
     # ------------------------------
 # ------------------------------------------------------------
 
@@ -2222,8 +2195,8 @@ def convert_similarity():
 
 if __name__ == "__main__":
     # evaluation_groundtruth(evaluation_simfilepaths1, shortnames1, [gtpathlist1[1], ])
-    # evaluation_70benchmarkset(evaluation_simfilepaths2, shortnames2, 0, 100,
-    #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_umlsid.tsv')
+    evaluation_70benchmarkset(evaluation_simfilepaths2, shortnames2, 0, 100,
+                              'data/benchmarkset_funsim/ground_truth_70_disease_pairs_umlsid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    tissuespecificity_stats()
+    # tissuespecificity_stats()
     pass
