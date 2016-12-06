@@ -105,10 +105,11 @@ evaluation_simfilepaths2 = [  # str('outputs/similarity_experiments_shortestpath
                             # 'outputs/similarity_hamaneh_interactomenumls_dgcuff006.tsv',
                             # 'outputs/similarity_experiments_rwr_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_module5_disgenet_dgcutoff006_interactome.tsv',
+                            'outputs/similarity_spavgn_tissue_disgenet_dgcutoff006_interactome.tsv',
+                            'outputs/similarity_spavgnwithtissue_disgenet_dgcutoff006_interactome.tsv',
                             'outputs/similarity_spavgn_trans_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_betadef.tsv',
-                            # 'outputs/similarity_spavgn_tissue_disgenet_dgcutoff006_interactome.tsv',
-                            'outputs/similarity_spavgn_tissue1_disgenet_dgcutoff006_interactome.tsv'
+                            # 'outputs/similarity_spavgn_tissue1_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_spmaxn_trans_disgenet_dgcutoff006_interactome.tsv',
                             # 'outputs/similarity_genefun_disgenet006_wangbmabp.tsv',
                             # 'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv',
@@ -130,6 +131,7 @@ shortnames2 = {'outputs/similarity_suntopo_disgenet_dgcutoff006_interactomemaxcc
                'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_betadef.tsv': 'katz4_def',
                'outputs/similarity_spavgn_tissue_disgenet_dgcutoff006_interactome.tsv': 'tissuespec',
                'outputs/similarity_spavgn_tissue1_disgenet_dgcutoff006_interactome.tsv': 'tissuespec1',
+               'outputs/similarity_spavgnwithtissue_disgenet_dgcutoff006_interactome.tsv': 'tissuecomb',
                }
 
 gtpathlist2 = ['outputs/similarity_go_bp_umls_dgcutoff006.tsv',
@@ -141,6 +143,14 @@ gtpathlist2 = ['outputs/similarity_go_bp_umls_dgcutoff006.tsv',
                'outputs/similarity_pathway_jaccard_cp.bkr.v5.1.entrez_disgenet_dgcutoff006_bh005.tsv',
                'outputs/similarity_domain_jaccard_di2do_disgenet_dgcutoff006.tsv',
                ]
+
+evaluation_simfilepaths3 = ['outputs/similarity_spavgn_doid_disgenet006_interactome.tsv',
+                            'outputs/similarity_rwr_doiddisgenet006_interactome.tsv',
+                            ]
+
+shortnames3 = {'outputs/similarity_spavgn_doid_disgenet006_interactome.tsv': 'ModuleSim',
+               'outputs/similarity_rwr_doiddisgenet006_interactome.tsv': 'NetSim',
+               }
 
 evapath_omim = ['D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\similarity_rwr_dgomim_hprd_matrix.tsv',
                 'D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\similarity_spavgn_dgomim_hprd_matrix.tsv',
@@ -638,20 +648,30 @@ def geneid_convert_coexpression():
 
 
 def similarity_cal_module():
-    # disease2gene = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
-    #                                                   0.0, True, True)
-    # disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab")
-    disease2gene = read_assos('data/disgenet/curated_gene_disease_associations.tsv', True, '\t', 1, 2)
-    print("disease gene assos: ", end='')
-    stat_assos(disease2gene)
-
     g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv", False, False)
     # g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
     #                                        False, False)
     print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
+    gvs = set(g.vs['name'])
+
+    # disease2gene = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
+    #                                                   0.0, True, True)
+    # disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab")
+    disease2gene = read_assos('data/disgenet/gene_disease_assos_doid2entrezid_disgenetcutoff006.tsv')
+    print("disease gene assos: ", end='')
+    stat_assos(disease2gene)
+    dgassos_new = {}
+    for d in disease2gene.keys():
+        dgleft = gvs.intersection(disease2gene[d])
+        if len(dgleft) >= 1:
+            dgassos_new[d] = dgleft
+    print("disease gene assos left: ", end='')
+    stat_assos(dgassos_new)
 
     sims = similarity_module.similarity_cal_spavgn(disease2gene, g)
-    write_sims(sims, 'outputs/similarity_spavgn_disgenet_curated_interactome.tsv')
+    write_sims(sims, 'outputs/similarity_spavgn_doid_disgenet006_interactome.tsv')
+    sims = similarity_module.similarity_cal_spavgn(dgassos_new, g)
+    write_sims(sims, 'outputs/similarity_spavgn_doid_disgenet006_filtered_interactome.tsv')
 
 
 def combine_pathway_data_gsea():
@@ -747,7 +767,7 @@ def similarity_cal_domain():
     # write_sims(sims, "outputs/similarity_domain_jaccard_di2do_sidd.tsv")
 
 
-def simlarity_cal_geneseim():
+def similarity_cal_geneseim():
     gfunsim = read_simmatrix('data/test/genesim_disgenet006_wang_bma_gobp.tsv')
     # dgassos = read_assos('data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab')
     dgassos = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
@@ -762,16 +782,16 @@ def simlarity_cal_geneseim():
 
 
 def similarity_cal_combinesim():
-    dsim1 = read_sims('outputs/similarity_genefun_rwrsidd_wangbmabp.tsv')
-    dsim2 = read_sims('outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv')
+    dsim1 = read_sims('outputs/similarity_spavgn_tissue_disgenet_dgcutoff006_interactome.tsv')
+    dsim2 = read_sims('outputs/similarity_spavgn_trans_disgenet_dgcutoff006_interactome.tsv')
 
     dsim = {}
     for d1 in dsim1.keys():
         dsim[d1] = {}
         for d2 in dsim1[d1].keys():
-            dsim[d1][d2] = dsim1[d1][d2] * similarity_genesim.findsimvalue(d1, d2, dsim2)
+            dsim[d1][d2] = (dsim1[d1][d2] + similarity_genesim.findsimvalue(d1, d2, dsim2)) / 2
         print(d1)
-    write_sims(dsim, 'outputs/similarity_spavgngenefun_rwrsidd_hppinwsl_wangbmpbp.tsv')
+    write_sims(dsim, 'outputs/similarity_spavgnwithtissue_disgenet_dgcutoff006_interactome.tsv')
 
 
 def similarity_cal_katz():
@@ -1028,6 +1048,17 @@ def convert_geneid_dgassos():
     dgassos_conv = mapping.convert_dict_values(dgassos, symbol2entrezid)
     stat_assos(dgassos_conv)
     # write_assos(dgassos_conv, 'data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab')
+
+
+def get_do2gene_from_disgenet():
+    disease2gene = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
+                                                      0.06, True, False)
+    stat_assos(disease2gene)
+    do2umls = read_assos("data/disgenet/doid2umlsid.tsv")
+    stat_assos(do2umls)
+    do2gene = mapping.convert_dict_values(do2umls, disease2gene)
+    stat_assos(do2gene)
+    # write_assos(do2gene, 'data/disgenet/gene_disease_assos_doid2symbol_disgenetcutoff006.tsv')
 # -----------------------------------------------------------
 
 
@@ -1179,7 +1210,7 @@ def tissuespecificity_stats():
     expnodes = set(read_one_col('data/tissuespec_srep/srep35241-s4.txt', 1, True)).intersection(g.vs['name'])
     print('exp nodes:', len(expnodes))
     d2g_new = {}
-    gcutoff = 1
+    gcutoff = 5
     for d in disease2gene.keys():
         genes = disease2gene[d].intersection(expnodes)
         if len(genes) >= gcutoff:
@@ -1191,13 +1222,13 @@ def tissuespecificity_stats():
     # ---get disease-tissue assos---
     # d2t = similarity_tissuespecificity.find_diseasetissueassos(tissuegraphs, d2g_new, 1)
     # write_assos(d2t, 'data/tissuespec_srep/disease2tissue_disgenet_dgcutoff006_gcutoff1.tsv')
-    d2t = read_assos('data/tissuespec_srep/disease2tissue_disgenet_dgcutoff006_gcutoff1.tsv')
+    d2t = read_assos('data/tissuespec_srep/disease2tissue_disgenet_dgcutoff006_gcutoff5.tsv')
     stat_assos(d2t)
     # ------------------------------
     # ---sim cal--------------------
     sims = similarity_tissuespecificity.similarity_cal(d2g_new, d2t, tissuegraphs)
     stat_sims(sims)
-    write_sims(sims, 'outputs/similarity_spavgn_tissue1_disgenet_dgcutoff006_interactome.tsv')
+    write_sims(sims, 'outputs/similarity_spavgn_tissue_disgenet_dgcutoff006_interactome.tsv')
     # ------------------------------
 # ------------------------------------------------------------
 
@@ -1278,7 +1309,7 @@ def experiment():
     gvs = set(g.vs['name'])
     # disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
     #                                                          0.06, True, True)
-    disease2gene_entrez = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab")
+    disease2gene_entrez = read_assos('data/disgenet/gene_disease_assos_doid2entrezid_disgenetcutoff006.tsv')
     stat_assos(disease2gene_entrez)
     dgassos_new = {}
     for d in disease2gene_entrez.keys():
@@ -1304,9 +1335,9 @@ def experiment():
     # # ------------------------------------------------------------------
 
     # # ---bmc rwr------------------------------------------------------------
-    sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2genescore_rwrsidd_interactome.tsv")
+    sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2genescore_doiddisgenet006_interactome.tsv")
     sim_d2d = experiments.sim_geneset2geneset_rwr(disease2gene_entrez, sim_gene2geneset)
-    write_sims(sim_d2d, "outputs/similarity_rwr_rwrsidd_interactome.tsv")
+    write_sims(sim_d2d, "outputs/similarity_rwr_doiddisgenet006_interactome.tsv")
     # # ----------------------------------------------------------------------
 
     # ---shortest path------------------------------------------------------
@@ -1735,127 +1766,130 @@ def diseaseid_mapping_stats():
         if 'umls' in allid.keys():
             umlsidcount.update(allid['umls'])
     print('umlsid:', len(umlsidcount))
-    analyze_allids(allidsnew, False)
+    analyze_allids(allidsnew, True)
 
-    idclasses = {'umls', 'do', 'omim', 'hpo', 'icd9cm', 'mesh'}
+    # idclasses = {'umls', 'do', 'omim', 'hpo', 'icd9cm', 'mesh'}
 
-    # ----omim test---------------------------------------
-    print("omim test:")
-    omimids = set(read_one_col("data/diseasename_new.txt", 1))
-    print(len(omimids))
-    omimtestresult = idmapping_test(omimids, allidsnew)
-    print(len(omimtestresult))
-    print(omimids.difference(set(omimtestresult.keys())))
-    omimmapcount = {}
-    for idc in idclasses:
-        omimmapcount[idc] = 0
-    for mimid in omimtestresult.keys():
-        for oidtype in omimtestresult[mimid].keys():
-            omimmapcount[oidtype] += 1
-    pprint(omimmapcount)
-    omimidsp = set()
-    for m in omimids:
-        omimidsp.add('omim:' + m)
-    allids_mim = []
-    for allid in allidsnew:
-        if 'omim' in allid.keys() and len(allid['omim'].intersection(omimidsp)) > 0:
-            allids_mim.append(allid)
-    print(len(allids_mim))
-    notmap = set()
-    for mim in omimtestresult.keys():
-        if 'do' in omimtestresult[mim].keys():
-            print(mim, omimtestresult[mim]['do'], omimtestresult[mim]['umls'], sep='\t')
-        else:
-            notmap.add(mim)
-    for mim in notmap:
-        print(mim, '', omimtestresult[mim]['umls'], sep='\t')
-    mim2do = {}
-    for mim in omimtestresult.keys():
-        if mim not in notmap:
-            mim2do[mim] = omimtestresult[mim]['do']
-    stat_assos(mim2do)
-    # umlsid_rel = set()
-    # for mim in notmap:
-    #     umlsid_rel.update(omimtestresult[mim]['umls'])
-    # umlsid_ext = {}
-    # for uid in umlsid_rel:
-    #     umlsid_ext[uid] = set()
-    # with open('E:\\UMLS\\2016AA\\META\\MRREL.RRF', mode='r') as rf:
-    #     for line in rf:
-    #         words = line.strip().split('|')
-    #         umlsid1 = 'umls:' + words[0].strip()
-    #         umlsid2 = 'umls:' + words[4].strip()
-    #         if umlsid1 in umlsid_rel:
-    #             umlsid_ext[umlsid1].add(umlsid2)
-    #         if umlsid2 in umlsid_rel:
-    #             umlsid_ext[umlsid2].add(umlsid1)
-    # stat_assos(umlsid_ext)
-    # umlsallid = {}
-    # for allid in allidsnew:
-    #     if 'umls' in allid.keys():
-    #         for uid in allid['umls']:
-    #             umlsallid[uid] = allid
-    # # stat_maps(umlsallid)
-    # for mim in notmap:
-    #     dotemp = set()
-    #     fstumlss = omimtestresult[mim]['umls']
-    #     sndumlss = set()
-    #     for uid in fstumlss:
-    #         sndumlss.update(umlsid_ext[uid])
-    #     for uid in sndumlss:
-    #         if uid in umlsallid.keys():
-    #             alltemp = umlsallid[uid]
-    #             if 'do' in alltemp.keys():
-    #                 dotemp.update(alltemp['do'])
-    #     if len(dotemp) > 0:
-    #         mim2do[mim] = set()
-    #         mim2do[mim].update(dotemp)
-    # stat_assos(mim2do)
-    # for mim in mim2do:
-    #     if mim not in notmap:
-    #         print(mim, mim2do[mim])
-    # for mim in mim2do:
-    #     if mim in notmap:
-    #         print(mim, mim2do[mim])
-    # -----------------------------------------------------
-    # --doid test------------------------------------------
-    # print("doid test:")
-    # doids = set(read_one_col("data/disease_137_name2doid.tsv", 2))
-    # print(len(doids))
-    # dotestresult = idmapping_test(doids, allids, itype='do', prefix=True)
-    # print(len(dotestresult))
-    # print(doids.difference(set(dotestresult.keys())))
-    # domapcount = {}
+    # # ----omim test---------------------------------------
+    # print("omim test:")
+    # omimids = set(read_one_col("data/diseasename_new.txt", 1))
+    # print(len(omimids))
+    # omimtestresult = idmapping_test(omimids, allidsnew)
+    # print(len(omimtestresult))
+    # print(omimids.difference(set(omimtestresult.keys())))
+    # omimmapcount = {}
     # for idc in idclasses:
-    #     domapcount[idc] = 0
-    # for did in dotestresult.keys():
-    #     for oidtype in dotestresult[did].keys():
-    #         domapcount[oidtype] += 1
-    # pprint(domapcount)
-    # allids_doid = []
+    #     omimmapcount[idc] = 0
+    # for mimid in omimtestresult.keys():
+    #     for oidtype in omimtestresult[mimid].keys():
+    #         omimmapcount[oidtype] += 1
+    # pprint(omimmapcount)
+    # omimidsp = set()
+    # for m in omimids:
+    #     omimidsp.add('omim:' + m)
+    # allids_mim = []
     # for allid in allidsnew:
-    #     if 'do' in allid.keys() and len(allid['do'].intersection(doids)) > 0:
-    #         allids_doid.append(allid)
-    # print(len(allids_doid))
+    #     if 'omim' in allid.keys() and len(allid['omim'].intersection(omimidsp)) > 0:
+    #         allids_mim.append(allid)
+    # print(len(allids_mim))
     # notmap = set()
-    # for did in dotestresult.keys():
-    #     if 'omim' in dotestresult[did].keys():
-    #         print(did, dotestresult[did]['omim'], dotestresult[did]['umls'], sep='\t')
+    # for mim in omimtestresult.keys():
+    #     if 'do' in omimtestresult[mim].keys():
+    #         print(mim, omimtestresult[mim]['do'], omimtestresult[mim]['umls'], sep='\t')
     #     else:
-    #         notmap.add(did)
-    # for did in notmap:
-    #     print(did, '', dotestresult[did]['umls'], sep='\t')
-    # do2mim = {}
-    # for did in dotestresult.keys():
-    #     if did not in notmap:
-    #         do2mim[did] = dotestresult[did]['omim']
-    # stat_assos(do2mim)
-    # -----------------------------------------------------
-    # ---omim2mesh-----------------------------------------
-    # omim2mesh = get_idmapping(allids)
-    # stat_assos(omim2mesh)
-    # # write_assos(omim2mesh, 'omim2mesh.tsv')
-    # -----------------------------------------------------
+    #         notmap.add(mim)
+    # for mim in notmap:
+    #     print(mim, '', omimtestresult[mim]['umls'], sep='\t')
+    # mim2do = {}
+    # for mim in omimtestresult.keys():
+    #     if mim not in notmap:
+    #         mim2do[mim] = omimtestresult[mim]['do']
+    # stat_assos(mim2do)
+    # # umlsid_rel = set()
+    # # for mim in notmap:
+    # #     umlsid_rel.update(omimtestresult[mim]['umls'])
+    # # umlsid_ext = {}
+    # # for uid in umlsid_rel:
+    # #     umlsid_ext[uid] = set()
+    # # with open('E:\\UMLS\\2016AA\\META\\MRREL.RRF', mode='r') as rf:
+    # #     for line in rf:
+    # #         words = line.strip().split('|')
+    # #         umlsid1 = 'umls:' + words[0].strip()
+    # #         umlsid2 = 'umls:' + words[4].strip()
+    # #         if umlsid1 in umlsid_rel:
+    # #             umlsid_ext[umlsid1].add(umlsid2)
+    # #         if umlsid2 in umlsid_rel:
+    # #             umlsid_ext[umlsid2].add(umlsid1)
+    # # stat_assos(umlsid_ext)
+    # # umlsallid = {}
+    # # for allid in allidsnew:
+    # #     if 'umls' in allid.keys():
+    # #         for uid in allid['umls']:
+    # #             umlsallid[uid] = allid
+    # # # stat_maps(umlsallid)
+    # # for mim in notmap:
+    # #     dotemp = set()
+    # #     fstumlss = omimtestresult[mim]['umls']
+    # #     sndumlss = set()
+    # #     for uid in fstumlss:
+    # #         sndumlss.update(umlsid_ext[uid])
+    # #     for uid in sndumlss:
+    # #         if uid in umlsallid.keys():
+    # #             alltemp = umlsallid[uid]
+    # #             if 'do' in alltemp.keys():
+    # #                 dotemp.update(alltemp['do'])
+    # #     if len(dotemp) > 0:
+    # #         mim2do[mim] = set()
+    # #         mim2do[mim].update(dotemp)
+    # # stat_assos(mim2do)
+    # # for mim in mim2do:
+    # #     if mim not in notmap:
+    # #         print(mim, mim2do[mim])
+    # # for mim in mim2do:
+    # #     if mim in notmap:
+    # #         print(mim, mim2do[mim])
+    # # -----------------------------------------------------
+    # # --doid test------------------------------------------
+    # # print("doid test:")
+    # # doids = set(read_one_col("data/disease_137_name2doid.tsv", 2))
+    # # print(len(doids))
+    # # dotestresult = idmapping_test(doids, allids, itype='do', prefix=True)
+    # # print(len(dotestresult))
+    # # print(doids.difference(set(dotestresult.keys())))
+    # # domapcount = {}
+    # # for idc in idclasses:
+    # #     domapcount[idc] = 0
+    # # for did in dotestresult.keys():
+    # #     for oidtype in dotestresult[did].keys():
+    # #         domapcount[oidtype] += 1
+    # # pprint(domapcount)
+    # # allids_doid = []
+    # # for allid in allidsnew:
+    # #     if 'do' in allid.keys() and len(allid['do'].intersection(doids)) > 0:
+    # #         allids_doid.append(allid)
+    # # print(len(allids_doid))
+    # # notmap = set()
+    # # for did in dotestresult.keys():
+    # #     if 'omim' in dotestresult[did].keys():
+    # #         print(did, dotestresult[did]['omim'], dotestresult[did]['umls'], sep='\t')
+    # #     else:
+    # #         notmap.add(did)
+    # # for did in notmap:
+    # #     print(did, '', dotestresult[did]['umls'], sep='\t')
+    # # do2mim = {}
+    # # for did in dotestresult.keys():
+    # #     if did not in notmap:
+    # #         do2mim[did] = dotestresult[did]['omim']
+    # # stat_assos(do2mim)
+    # # -----------------------------------------------------
+    # # ---omim2mesh-----------------------------------------
+    # # omim2mesh = get_idmapping(allids)
+    # # stat_assos(omim2mesh)
+    # # # write_assos(omim2mesh, 'omim2mesh.tsv')
+    # # -----------------------------------------------------
+    # do2umls = get_idmapping(allidsnew, 'do', 'umls')
+    # stat_assos(do2umls)
+    # write_assos(do2umls, 'data/disgenet/doid2umlsid.tsv')
 
 
 def allids_mrconsorrf(filepath):
@@ -2015,24 +2049,24 @@ def analyze_allids(allids, one2one):
                 print("\t"+str(stats_matrix[id1][id2]/countsum[id1])[0:6], end='')
         print()
     # -------------------------------------
-    # ----print stats 2 do2omim------------
-    for allid in allids:
-        if 'do' in allid.keys() or 'omim' in allid.keys():
-            if 'umls' in allid.keys():
-                print(allid['umls'], end='')
-            else:
-                print('', end='')
-            print('\t', end='')
-            if 'do' in allid.keys():
-                print(allid['do'], end='')
-            else:
-                print('', end='')
-            print('\t', end='')
-            if 'omim' in allid.keys():
-                print(allid['omim'])
-            else:
-                print('')
-    # -------------------------------------
+    # # ----print stats 2 do2omim------------
+    # for allid in allids:
+    #     if 'do' in allid.keys() or 'omim' in allid.keys():
+    #         if 'umls' in allid.keys():
+    #             print(allid['umls'], end='')
+    #         else:
+    #             print('', end='')
+    #         print('\t', end='')
+    #         if 'do' in allid.keys():
+    #             print(allid['do'], end='')
+    #         else:
+    #             print('', end='')
+    #         print('\t', end='')
+    #         if 'omim' in allid.keys():
+    #             print(allid['omim'])
+    #         else:
+    #             print('')
+    # # -------------------------------------
 
 
 def get_idmapping(allids, idtype1='omim', idtype2='mesh'):
@@ -2198,5 +2232,4 @@ if __name__ == "__main__":
     evaluation_70benchmarkset(evaluation_simfilepaths2, shortnames2, 0, 100,
                               'data/benchmarkset_funsim/ground_truth_70_disease_pairs_umlsid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    # tissuespecificity_stats()
     pass

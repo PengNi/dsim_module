@@ -49,9 +49,7 @@ def similarity_cal(d2g, d2t, tissuegraphs):
         sims[ds[i]] = {}
         for j in range(i, len(ds)):
             commont = d2t[ds[i]].intersection(d2t[ds[j]])
-            if len(commont) == 0:
-                sims[ds[i]][ds[j]] = 0.0
-            else:
+            if len(commont) != 0:
                 simij = []
                 for t in commont:
                     gsi = d2tg[ds[i]][t]
