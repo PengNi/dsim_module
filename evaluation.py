@@ -449,6 +449,32 @@ def eva_70benchmarkpairs_onetime(allsims, alldpairs, bencallist):
     return res
 
 
+def eva_diseaseclasses(dsim, term2group):
+    """
+    evaluation dsim with disease classification
+    :param dsim: disease sim, a dict (key-value: string-dict<string-float>)
+    :param term2group: diseases classification, a dict (key-value: string-set<string>)
+    :return:
+    """
+    val_same, val_diff, val_all = [], [], []
+    ds_cal = set()
+    for d1 in dsim.keys():
+        for d2 in dsim[d1].keys():
+            if d1 != d2 and d1 in term2group.keys() and d2 in term2group.keys():
+                ds_cal.add(d1)
+                ds_cal.add(d2)
+                if len(term2group[d1].intersection(term2group[d2])) == 0:
+                    val_diff.append(dsim[d1][d2])
+                else:
+                    val_same.append(dsim[d1][d2])
+                val_all.append(dsim[d1][d2])
+    print('disease counted:', len(ds_cal))
+    print('\tall\tsame\tdiff')
+    print('len\t' + str(len(val_all)) + '\t' + str(len(val_same)) + '\t' + str(len(val_diff)))
+    print('avg\t' + str(sum(val_all) / len(val_all)) + '\t' + str(sum(val_same) / len(val_same))
+          + '\t' + str(sum(val_diff) / len(val_diff)))
+
+
 def eva_test_pair_rankinfo_ranking(rankinfo, benchmarkmethod, comparemethods):
     """
     ranking

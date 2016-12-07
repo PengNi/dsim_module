@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 from copy import deepcopy
-from pprint import pprint
 import similarity_module
 import mapping
 import common_use
@@ -47,6 +46,7 @@ from evaluation import eva_get_validationpairsnlabels_comorbidity
 from evaluation import eva_test_rankstats_multi
 from evaluation import eva_test_pair_rankinfos
 from evaluation import eva_test_pair_rankinfo_ranking
+from evaluation import eva_diseaseclasses
 from disease_ontology import DiseaseOntology
 from disease_ontology import get_terms_at_layern
 from disease_ontology import get_terms2offsprings
@@ -541,6 +541,20 @@ def evaluation_sharedgene(simpathlist, shortnames):
         plt.ylabel("shared domain ratio")
         plt.savefig('shareddomain_'+shortnames[simpath]+'.png', format='png')
         plt.clf()
+
+
+def evaluation_classification():
+    do = DiseaseOntology()
+    do.readobofile('data/do/HumanDO.obo')
+    do.settermslayers()
+    layer = 2
+    termgroups = get_terms_at_layern(layer, do)
+    term2group = invert_dict(get_terms2offsprings(termgroups, do))
+    stat_assos(term2group)
+
+    sims = read_sims('outputs/similarity_spavgn_doid_disgenet006_interactome.tsv')
+    stat_sims(sims)
+    eva_diseaseclasses(sims, term2group)
 # --------------------------------------------------------------------
 
 
@@ -2309,4 +2323,5 @@ if __name__ == "__main__":
     # evaluation_70benchmarkset(evaluation_simfilepaths_dh, shortnames_dh, 0, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
+    evaluation_classification()
     pass
