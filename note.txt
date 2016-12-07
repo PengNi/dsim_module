@@ -202,6 +202,8 @@ umlsname: Prostatitis ; prostatitis
     diseases: 15093 genes: 17381 associations: 429036
 取cutoff为0.06时
     diseases: 7887 genes: 9696 associations: 41261
+    根据umls mapping, disease id从umlsid mapping为doid, stats:
+    diseases: 1511 genes: 6929 associations: 20787
 取cutoff为0.08时
     diseases: 7879 genes: 9694 associations: 41122
 
