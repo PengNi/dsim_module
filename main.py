@@ -53,6 +53,8 @@ from disease_ontology import get_terms2offsprings
 from human_phenotype_ontology import HumanPhenotypeOntology
 from plots import plot_roc
 from plots import plot_simshist
+from plots import vennstats_twosets_ppi
+from plots import vennstats_twosets_dgassos
 
 namespaces = ("biological_process", "molecular_function", "cellular_component")
 
@@ -1317,6 +1319,52 @@ def disease_gene_assos_filter():
     print("disease gene assos left: ", end='')
     stat_assos(dgassos_new)
     write_assos(dgassos_new, "data/disgenet/gene_disease_assos_doid2symbol_disgenetcutoff006_inhppinwsl.tsv")
+
+
+def ppi_info_convertid():
+    ppifile = 'data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab'
+    gene1 = read_one_col(ppifile, 1)
+    gene2 = read_one_col(ppifile, 2)
+    genes = set(gene1).union(set(gene2))
+    print(len(genes))
+    ppi = read_assos(ppifile)
+    stat_network(ppi)
+    # genes = set(['NBPF8', 'WASH3P', 'PHKA2-AS1', 'HMGN1P30', 'SNORD13P1', 'MTCO2P1'])
+
+    symbole2entrez = mapping.geneida2geneidb('symbol', 'entrezgene', genes, 'human')
+    stat_assos(symbole2entrez)
+    # for s in symbole2entrez.keys():
+    #     if len(symbole2entrez[s]) > 1:
+    #         print(s, symbole2entrez[s])
+
+    ppi_conv = {}
+    for p1 in ppi.keys():
+        for p2 in ppi[p1]:
+            if p1 in symbole2entrez.keys() and p2 in symbole2entrez.keys():
+                p1c, p2c = symbole2entrez[p1], symbole2entrez[p2]
+                for p1cc in p1c:
+                    for p2cc in p2c:
+                        if not ((p1cc in ppi_conv.keys() and p2cc in ppi_conv[p1cc]) or
+                                (p2cc in ppi_conv.keys() and p1cc in ppi_conv[p2cc])):
+                            if p1cc not in ppi_conv.keys():
+                                ppi_conv[p1cc] = set()
+                            ppi_conv[p1cc].add(p2cc)
+    stat_network(ppi_conv)
+    # write_assos(ppi_conv, 'data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop_entrezid.tab')
+
+
+def venn_stats():
+    ppi1 = read_assos('data/interactome_science/DataS1_interactome.tsv')
+    ppi2 = read_assos('data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop_entrezid.tab')
+    stat_network(ppi1)
+    stat_network(ppi2)
+    vennstats_twosets_ppi(ppi1, ppi2)
+
+    d2g1 = read_assos('data/disgenet/gene_disease_assos_doid2entrezid_disgenetcutoff006.tsv')
+    d2g2 = read_assos('data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab')
+    stat_assos(d2g1)
+    stat_assos(d2g2)
+    vennstats_twosets_dgassos(d2g1, d2g2)
 # ------------------------------------------------------------
 
 
@@ -2323,5 +2371,5 @@ if __name__ == "__main__":
     # evaluation_70benchmarkset(evaluation_simfilepaths_dh, shortnames_dh, 0, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    evaluation_classification()
+    venn_stats()
     pass

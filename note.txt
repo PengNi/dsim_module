@@ -418,7 +418,8 @@ similarity computation[J]. BMC bioinformatics, 2016, 17(1): 326.
 (1) disease-gene
     a. sidd
         文章中的统计：2,427 diseases and 104,052 gene-disease associations
-        自己统计它在suppl提供的数据：diseases: 2427 genes: 11834 assos: 104057
+        自己统计它在suppl提供的数据：diseases: 2427 genes: 11834 assos: 104057 (geneid为symbol)
+        geneid由mygene转换为entrezid, 统计为: diseases: 2423 genes: 10527 assos: 99658
     b. disgenet
         文章中的统计：3,259 disease terms and 206,403 gene-disease associations
         自己统计它在suppl提供的数据：diseases: 3259 genes: 14849 assos: 206361
@@ -438,9 +439,10 @@ similarity computation[J]. BMC bioinformatics, 2016, 17(1): 326.
                 有自环, Taxid interactor A/B都为'taxid:9606(human)|taxid:9606(Homo sapiens)', 2016/9/18下载)
             homomint: nodes: 3352 edges: 7450 (geneid为symbol (用mygene转换uniprotid得到), 有自环)
             integrate四种数据集的网络：
-                nodes: 17506 edges: 284476 (有自环)
-                nodes: 17473 edges: 280376 (无自环)
-                nodes: 17452 edges: 280364 (最大连通分支)
+                nodes: 17506 edges: 284476 (有自环, geneid为symbol)
+                nodes: 16640 edges: 276584 (有自环, geneid为entrezid, 经mygene转换symbol得到)
+                nodes: 17473 edges: 280376 (无自环, geneid为symbol)
+                nodes: 17452 edges: 280364 (最大连通分支, geneid为symbol)
 #-------------------------------------------------------------------------
 
 #-------------------------------------------------------------------------
