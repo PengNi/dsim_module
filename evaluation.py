@@ -449,11 +449,13 @@ def eva_70benchmarkpairs_onetime(allsims, alldpairs, bencallist):
     return res
 
 
-def eva_diseaseclasses(dsim, term2group):
+def eva_diseaseclasses(dsim, term2group, wfpath, dstype):
     """
     evaluation dsim with disease classification
     :param dsim: disease sim, a dict (key-value: string-dict<string-float>)
     :param term2group: diseases classification, a dict (key-value: string-set<string>)
+    :param wfpath: writefile path
+    :param dstype: dataset type, string
     :return:
     """
     val_same, val_diff, val_all = [], [], []
@@ -468,6 +470,14 @@ def eva_diseaseclasses(dsim, term2group):
                 else:
                     val_same.append(dsim[d1][d2])
                 val_all.append(dsim[d1][d2])
+    with open(wfpath, mode='w') as wf:
+        wf.write('category\tvalue\tdataset\n')
+        for v in val_same:
+            wf.write('same\t' + str(v) + '\t' + str(dstype) + '\n')
+        for v in val_diff:
+            wf.write('diff\t' + str(v) + '\t' + str(dstype) + '\n')
+        for v in val_all:
+            wf.write('all\t' + str(v) + '\t' + str(dstype) + '\n')
     print('disease counted:', len(ds_cal))
     print('\tall\tsame\tdiff')
     print('len\t' + str(len(val_all)) + '\t' + str(len(val_same)) + '\t' + str(len(val_diff)))

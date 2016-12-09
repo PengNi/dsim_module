@@ -326,7 +326,7 @@ def evaluation_groundtruth(simpathlist, shortnames, gtpaths):
 
 
 def evaluation_70benchmarkset(simpathlist, shortnames, mysimloc=0, times=1,
-                              bmkpfile="data/benchmarkset_funsim/ground_truth_70_disease_pairs_umlsid.tsv"):
+                              bmkpfile="data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv"):
 
     benchmarkpairs = read_assos(bmkpfile, header=False)
     stat_assos(benchmarkpairs)
@@ -400,7 +400,14 @@ def evaluation_70benchmarkset(simpathlist, shortnames, mysimloc=0, times=1,
     print("---avg auc values------------------------------------------------------------------")
     aucs = eva_aucs(tpfprs)
     auclen = len(aucs)
+    # --sort method names---
     mns = list(aucs[0].keys())
+    mnshort = []
+    for mn in mns:
+        mnshort.append((mn, shortnames[mn]))
+    mnshort = sorted(mnshort, key=lambda a: a[1])
+    mns = [x[0] for x in mnshort]
+    # ----------------------
     print("--auc at each trial--")
     print('trial', end='')
     for mn in mns:
@@ -465,7 +472,14 @@ def evaluation_70benchmarkset(simpathlist, shortnames, mysimloc=0, times=1,
     term2group = {}
     rdtemp = evarankings[0]
     plen = len(rdtemp[list(rdtemp.keys())[0]])
-    ms = evarankings[0].keys()
+    # --sort method names---
+    ms = list(evarankings[0].keys())
+    mnshort = []
+    for mn in ms:
+        mnshort.append((mn, shortnames[mn]))
+    mnshort = sorted(mnshort, key=lambda a: a[1])
+    ms = [x[0] for x in mnshort]
+    # ----------------------
     print('rank', end='')
     for m in ms:
         print('\t' + shortnames[m], end='')
@@ -549,14 +563,27 @@ def evaluation_classification():
     do = DiseaseOntology()
     do.readobofile('data/do/HumanDO.obo')
     do.settermslayers()
-    layer = 2
+    layer = 3
     termgroups = get_terms_at_layern(layer, do)
     term2group = invert_dict(get_terms2offsprings(termgroups, do))
     stat_assos(term2group)
 
-    sims = read_sims('outputs/similarity_spavgn_doid_disgenet006_interactome.tsv')
-    stat_sims(sims)
-    eva_diseaseclasses(sims, term2group)
+    simfiles = ['outputs/similarity_spavgn_doid_disgenet006_interactome.tsv',
+                'outputs/similarity_spavgn_doiddisgenet006_hppinwsl.tsv',
+                'outputs/similarity_spavgn_rwrsidd_interactome.tsv',
+                'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv',
+                ]
+    simdstype = {
+        'outputs/similarity_spavgn_doid_disgenet006_interactome.tsv': 'di',
+        'outputs/similarity_spavgn_doiddisgenet006_hppinwsl.tsv': 'dh',
+        'outputs/similarity_spavgn_rwrsidd_interactome.tsv': 'si',
+        'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv': 'sh',
+    }
+    sims = eva_readsims(simfiles)
+    for mn in sims.keys():
+        print(mn)
+        eva_diseaseclasses(sims[mn], term2group,
+                           'evaresult/evaclassification_' + simdstype[mn] + '.tsv', simdstype[mn])
 # --------------------------------------------------------------------
 
 
@@ -2368,8 +2395,8 @@ def convert_similarity():
 
 if __name__ == "__main__":
     # evaluation_groundtruth(evaluation_simfilepaths1, shortnames1, [gtpathlist1[1], ])
-    # evaluation_70benchmarkset(evaluation_simfilepaths_dh, shortnames_dh, 0, 100,
+    # evaluation_70benchmarkset(evaluation_simfilepaths_di, shortnames_di, 0, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    venn_stats()
+    evaluation_classification()
     pass
