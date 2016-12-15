@@ -2398,5 +2398,5 @@ if __name__ == "__main__":
     # evaluation_70benchmarkset(evaluation_simfilepaths_di, shortnames_di, 0, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    evaluation_classification()
+    # evaluation_classification()
     pass
