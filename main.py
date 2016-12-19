@@ -1227,6 +1227,19 @@ def disease_module_info_simplify():
             print(str(0))
 
 
+def graph_maxflow_test():
+    g = similarity_module.read_interactome("data/graphTest.txt", False, False)
+    print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
+    nodes = g.vs()
+    nnames = nodes['name']
+    print(nnames)
+    for n1 in nodes:
+        for n2 in nodes:
+            print(str(g.maxflow_value(n1.index, n2.index, None)) + '\t', end='')
+        print()
+    pass
+
+
 def gene_neighbor_info():
     g = similarity_module.read_interactome("data/DataS1_interactome.tsv", False, False)
     print("number of vertices:", g.vcount())

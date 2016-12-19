@@ -1144,3 +1144,4 @@ def write_lcc():
     #         ns = glcc.vs[e.source]['name']
     #         nt = glcc.vs[e.target]['name']
     #         f.write(str(glccnodes2loc[ns])+' '+str(glccnodes2loc[nt])+'\n')
+    pass
