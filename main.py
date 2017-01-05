@@ -746,7 +746,7 @@ def similarity_cal_module():
     stat_assos(dgassos_new)
 
     sims = similarity_module.similarity_cal_spavgn(disease2gene, g)
-    write_sims(sims, 'outputs/similarity_spavgn_doiddisgenet006_hppinwsl.tsv')
+    # write_sims(sims, 'outputs/similarity_spavgn_doiddisgenet006_hppinwsl.tsv')
 
 
 def combine_pathway_data_gsea():
@@ -1901,7 +1901,7 @@ def diseaseid_mapping_stats():
         # allids_hpo.append(kids)
     print('hpo id:', len(allids_hpo))
 
-    allids_mrconso = allids_mrconsorrf("E:\\UMLS\\2016AA\\META\\MRCONSO.RRF")
+    allids_mrconso = allids_mrconsorrf("E:\\MRCONSO.RRF")
     print('mrconso id:', len(allids_mrconso))
 
     allids = allids_do + allids_mrconso + allids_umls + allids_hpo
@@ -1947,6 +1947,18 @@ def diseaseid_mapping_stats():
     print('umlsid:', len(umlsidcount))
     analyze_allids(allidsnew, True)
 
+    # mim2umls = get_idmapping(allidsnew, 'omim', 'umls')
+    # mimname = read_one_col('data/diseasename_new.txt', 1)
+    # mim2umls_filter = {}
+    # for mim in mimname:
+    #     if ('omim:' + mim) in mim2umls.keys():
+    #         mim2umls_filter[mim] = set()
+    #         mim2umls_filter[mim].update(mim2umls['omim:' + mim])
+    #     else:
+    #         print(mim)
+    # stat_assos(mim2umls)
+    # stat_assos(mim2umls_filter)
+    # # write_assos(mim2umls_filter, 'data/didr_mim2umls.tsv')
     # idclasses = {'umls', 'do', 'omim', 'hpo', 'icd9cm', 'mesh'}
 
     # # ----omim test---------------------------------------
@@ -2078,7 +2090,7 @@ def allids_mrconsorrf(filepath):
                  'OMIM': 'omim:', 'HPO': ''}
     idtype2class = {'omim': 'omim', 'icd9cm': 'icd9cm',
                     'HP': 'hpo', 'mesh': 'mesh'}
-    with open(filepath, mode='r', encoding='utf-8') as rf:
+    with open(filepath, mode='r', encoding='utf-16le') as rf:
         for line in rf:
             words = line.strip().split('|')
             umlsid = 'umls:' + words[0].strip()
@@ -2403,6 +2415,25 @@ def convert_similarity():
     #             pass  # something like ecc
     # write_simmatrix(ressim, 'D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\'
     #                         'similarity_spavgn_ecc_dgomim_hprd_matrix.tsv')
+
+
+def similarity_cal_didr():
+    mim = read_one_col("data/diseasename_new.txt", 1)
+    mim2umls = read_assos('data/didr_mim2umls.tsv')
+    umls2gene = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
+                                                   0.06)
+    mim2gene = mapping.convert_dict_values(mim2umls, umls2gene)
+    stat_assos(mim2gene)
+    write_assos(mim2gene, "data/didr_mim2gene_dsigenet006.tsv")
+
+    g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv",
+                                           False, False)
+    print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
+
+    sims = similarity_module.similarity_cal_spavgn(mim2gene, g)
+    stat_sims(sims)
+    # write_simmatrix(sims, 'data/similarity_spavgn_didrmim2disgenet006_interactome.tsv', True, mim, '\t')
+    pass
 # --------------------------------------------------------------
 
 
@@ -2412,4 +2443,5 @@ if __name__ == "__main__":
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
     # evaluation_classification()
+    # similarity_cal_didr()
     pass
