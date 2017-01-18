@@ -1482,13 +1482,15 @@ def get_disease_correlations_hamaneh():
 def experiment():
     # g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv",
     #                                        False, False)
-    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
+    # g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
+    #                                        False, False)
+    g = similarity_module.read_interactome("data/original_ppi.txt",
                                            False, False)
     print("number of vertices:", g.vcount())
     gvs = set(g.vs['name'])
     # disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
     #                                                          0.06, True, True)
-    disease2gene = read_assos('data/disgenet/gene_disease_assos_doid2symbol_disgenetcutoff006.tsv')
+    disease2gene = read_assos('data/pheno2geno.txt')
     stat_assos(disease2gene)
     dgassos_new = {}
     for d in disease2gene.keys():
@@ -1514,9 +1516,9 @@ def experiment():
     # # ------------------------------------------------------------------
 
     # # ---bmc rwr------------------------------------------------------------
-    sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2genescore_doiddisgenet006_hppinwsl.tsv")
+    sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2genescore_dige_omim170_originalppimagger.tsv")
     sim_d2d = experiments.sim_geneset2geneset_rwr(disease2gene, sim_gene2geneset)
-    write_sims(sim_d2d, "outputs/similarity_rwr_doiddisgenet006_hppinwsl.tsv")
+    write_sims(sim_d2d, "data/similarity_rwr_digeomim170_originalppimagger_triplet.tsv")
     # # ----------------------------------------------------------------------
 
     # ---shortest path------------------------------------------------------
@@ -2306,30 +2308,32 @@ def combine_allids_asumls(allids):
 # --------------------------------------------------------------
 
 
-# ---cal disease sim for evaluation with disease gene/mirna prediction--------------------
+# ---cal disease sim for evaluation with disease gene/mirna/drug prediction--------------------
 def similarity_cal_predeva():
     # ---disease gene prediction--------------------------------------------
-    dgassos = read_assos("data/test/geneOmimId_diseaseOmimId_in_ppi.txt",
-                         False, "\t", 2, 1)
+    dgassos = read_assos("D:\\Documents\\workspace\\matlabworkspace\\NoNCRstar-master\\CRstar\\"
+                         "pheno2geno.txt", True, "\t", 1, 2)
     stat_assos(dgassos)
-    omim2hprd = read_mappings("D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\HPRD_ID_MAPPINGS.txt",
-                              False, "\t", 6, 1)
+    # omim2hprd = read_mappings("D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\HPRD_ID_MAPPINGS.txt",
+    #                           False, "\t", 6, 1)
     # omim2entrez = read_mappings("data/test/HPRD_ID_MAPPINGS.txt",
     #                             False, "\t", 6, 5)
-    stat_maps(omim2hprd)
-    dgassos = mapping.convert_dict_values(dgassos, omim2hprd)
-    stat_assos(dgassos)
+    # stat_maps(omim2hprd)
+    # dgassos = mapping.convert_dict_values(dgassos, omim2hprd)
+    # stat_assos(dgassos)
 
-    g = similarity_module.read_interactome("D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\HPRD_ppi.txt",
-                                           False, False)
+    g = similarity_module.read_interactome("D:\\Documents\\workspace\\matlabworkspace\\NoNCRstar-master\\CRstar\\"
+                                           "original_ppi.txt", False, False)
     # g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv", False, False)
     print(len(g.vs), len(g.es))
 
-    dsim = similarity_module.similarity_cal_spmaxn(dgassos, g)
-
-    # dsim = common_use.normalize_simdict(dsim)
+    dsim = similarity_module.similarity_cal_spavgn(dgassos, g)
+    dsim = common_use.normalize_simdict(dsim)
+    d170 = read_one_col("D:\\Documents\\workspace\\matlabworkspace\\NoNCRstar-master\\CRstar\\"
+                        "PhenotypeID_170.tsv", 1)
     write_simmatrix(dsim,
-                    "data/test/similarity_spmaxn_dgomim_hprd_matrix.tsv")
+                    "D:\\Documents\\workspace\\matlabworkspace\\NoNCRstar-master\\CRstar\\"
+                    "similarity_spavgn_crstar170dg_matrix.tsv", True, d170)
     # ---------------------------------------------------------------------------
 
     # ----disease mirna prediction-----------------------------------------------
@@ -2344,19 +2348,11 @@ def similarity_cal_predeva():
     #
     # g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/normalize_ppi_symbol.txt", False, False)
     # print(len(g.vs), len(g.es))
-    # # dsim = similarity_module.similarity_cal_spavgn(dgassos_cal, g)
-    # sps_norm = experiments.sim_gene2gene_shortestpath(g)
-    # dsim = experiments.sim_geneset2geneset(dgassos_cal, sps_norm)
-    # dsim = common_use.normalize_simdict(dsim)
-    # write_simmatrix(dsim, "data/test/similarity_spmax_sidd_humannet.tsv", True, d137order)
     #
-    # g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab", False, False)
-    # print(len(g.vs), len(g.es))
-    # # dsim = similarity_module.similarity_cal_spavgn(dgassos_cal, g)
-    # sps_norm = experiments.sim_gene2gene_shortestpath(g)
-    # dsim = experiments.sim_geneset2geneset(dgassos_cal, sps_norm)
-    # dsim = common_use.normalize_simdict(dsim)
-    # write_simmatrix(dsim, "data/test/similarity_spmax_sidd_hppin.tsv", True, d137order)
+    # sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2genescore_dimi_siddsymbol137_humannet.tsv")
+    # dsim = experiments.sim_geneset2geneset_rwr(dgassos_cal, sim_gene2geneset)
+    #
+    # write_simmatrix(dsim, "data/test/similarity_rwr_siddsymbol137_humannet.tsv", True, d137order)
     # -----------------------------------------------------------------------------------
 
 
@@ -2432,7 +2428,21 @@ def similarity_cal_didr():
 
     sims = similarity_module.similarity_cal_spavgn(mim2gene, g)
     stat_sims(sims)
-    # write_simmatrix(sims, 'data/similarity_spavgn_didrmim2disgenet006_interactome.tsv', True, mim, '\t')
+    write_simmatrix(sims, 'data/similarity_spavgn_didrmim2disgenet006_interactome.tsv', True, mim, '\t')
+    pass
+
+
+def get_loc_in_mat():
+    mim2gene = read_assos('data/didr_mim2gene_dsigenet006.tsv')
+    stat_assos(mim2gene)
+    mims = set(mim2gene.keys())
+    allmims = read_one_col("data/diseasename_new.txt", 1)
+
+    mim2loc = {}
+    for i in range(0, len(allmims)):
+        if allmims[i] in mims:
+            mim2loc[allmims[i]] = i + 1
+    # write_mappings(mim2loc, "data/mim215locinallmim.tsv")
     pass
 # --------------------------------------------------------------
 
@@ -2443,5 +2453,5 @@ if __name__ == "__main__":
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
     # evaluation_classification()
-    # similarity_cal_didr()
+    experiment()
     pass
