@@ -36,8 +36,8 @@ def read_assos(filepath, header=False, sep="\t", xcol=1, ycol=2):
     :param sep: delimiter, a string, default "\t"
     :param xcol: number of the column contains the dict's key, default 1
     :param ycol: number of the column contains the dict's value, default 2
-    :return: a dict object which keys are entities in the first row, values are
-    set of entities have relationships with the key.
+    :return: a dict object which keys are entities in xcol column, values are
+    set of entities in ycol column which have relationships with the key.
     """
     assos = {}
     xcol -= 1
