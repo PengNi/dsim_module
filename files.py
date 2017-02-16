@@ -316,6 +316,26 @@ def write_sorteddict(dictlist, filepath, header=False, sep="\t"):
     print("write_sorteddict: writing finished.")
 
 
+def write_graphtofile(g, filepath, header=False, sep="\t"):
+    """
+
+    :param g: igraph object
+    :param filepath:
+    :param header:
+    :param sep:
+    :return: None
+    """
+    with open(filepath, mode='w') as f:
+        if header:
+            f.write("V1"+sep+"V2\n")
+        ges = g.es
+        for e in ges:
+            ns = g.vs[e.source]['name']
+            nt = g.vs[e.target]['name']
+            f.write(str(ns)+sep+str(nt)+'\n')
+    print("write_graphtofile: writing finished.")
+
+
 def stat_assos(assos):
     """
     print how many keys/values/associations in the dict assos

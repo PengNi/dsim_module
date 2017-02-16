@@ -2453,5 +2453,4 @@ if __name__ == "__main__":
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
     # evaluation_classification()
-    evaluation_classification()
     pass
