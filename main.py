@@ -1484,13 +1484,15 @@ def experiment():
     #                                        False, False)
     # g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
     #                                        False, False)
-    g = similarity_module.read_interactome("data/original_ppi.txt",
+    g = similarity_module.read_interactome("D:/Documents/workspace/pyworkspace/dsimFusion/data/birw_xie/"
+                                           "BiRW_ppi_network_hprdnumber.txt",
                                            False, False)
     print("number of vertices:", g.vcount())
     gvs = set(g.vs['name'])
     # disease2gene_entrez = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
     #                                                          0.06, True, True)
-    disease2gene = read_assos('data/pheno2geno.txt')
+    disease2gene = read_assos('D:/Documents/workspace/pyworkspace/dsimFusion/data/birw_xie/'
+                              'BiRW_pheno2genonumber_omim2007.txt')
     stat_assos(disease2gene)
     dgassos_new = {}
     for d in disease2gene.keys():
@@ -1516,9 +1518,9 @@ def experiment():
     # # ------------------------------------------------------------------
 
     # # ---bmc rwr------------------------------------------------------------
-    sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2genescore_dige_omim170_originalppimagger.tsv")
+    sim_gene2geneset = read_simmatrix("data/test/rwr_geneset2genescore_birwomim2007_birwhprd.tsv")
     sim_d2d = experiments.sim_geneset2geneset_rwr(disease2gene, sim_gene2geneset)
-    write_sims(sim_d2d, "data/similarity_rwr_digeomim170_originalppimagger_triplet.tsv")
+    write_sims(sim_d2d, "data/similarity_rwr_birwomim2007_birwhprd_triplet.tsv")
     # # ----------------------------------------------------------------------
 
     # ---shortest path------------------------------------------------------
@@ -2452,5 +2454,5 @@ if __name__ == "__main__":
     # evaluation_70benchmarkset(evaluation_simfilepaths_di, shortnames_di, 0, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    # evaluation_classification()
+    experiment()
     pass

@@ -238,7 +238,7 @@ def write_sims(simdict, filepath, header=False, sep='\t'):
     print("write_sims: writing finished.")
 
 
-def write_simmatrix(simdict, filepath, asorder=False, dorder=None, sep='\t'):
+def write_simmatrix(simdict, filepath, asorder=False, dorder=None, sep='\t', rownames=True, colnames=True):
     """
     write dict contains similarities between each two entities (e.g. diseases)
     to a file in matrix format
@@ -249,6 +249,8 @@ def write_simmatrix(simdict, filepath, asorder=False, dorder=None, sep='\t'):
     :param asorder: if row name and col name of the output matrix as order
     :param dorder: list of ordered matrix dimnames, if asorder is True, this will work
     :param sep: delimiter, default '\t'
+    :param rownames: write rownames or not
+    :param colnames: write colnames or not
     :return: None
     """
     def findsimvalue(d1, d2, dsims):
@@ -269,14 +271,22 @@ def write_simmatrix(simdict, filepath, asorder=False, dorder=None, sep='\t'):
     else:
         dnames = list(dnames)
     with open(filepath, mode='w') as f:
-        for d in dnames:
-            f.write(sep + d)
-        f.write("\n")
-        for da in dnames:
-            f.write(da)
-            for db in dnames:
-                f.write(sep + str(findsimvalue(da, db, simdict)))
+        if colnames:
+            for d in dnames:
+                f.write(sep + d)
             f.write("\n")
+        if rownames:
+            for da in dnames:
+                f.write(da)
+                for db in dnames:
+                    f.write(sep + str(findsimvalue(da, db, simdict)))
+                f.write("\n")
+        else:
+            for da in dnames:
+                f.write(str(findsimvalue(da, dnames[0], simdict)))
+                for dbi in range(1, len(dnames)):
+                    f.write(sep + str(findsimvalue(da, dnames[dbi], simdict)))
+                f.write("\n")
         print("write_simmatrix: writing finished.")
 
 
