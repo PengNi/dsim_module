@@ -7,6 +7,7 @@ from igraph import Graph
 from files import stat_assos
 from files import invert_dict
 from common_use import hypergeometric_test
+import yen_igraph
 
 
 def read_interactome(interactomefile, weights, directed):
@@ -1024,6 +1025,89 @@ def read_adjmatrix(filepath):
             words = line.strip().split('\t')
             adjlist.append([int(i) for i in words[1:len(words)]])
     return numpy.array(adjlist)
+
+
+def similarity_cal_ksp(dgassos, graph, k=10, gfilter=False, gncutoff=1):
+    """
+
+    :param dgassos:
+    :param graph:
+    :param k:
+    :param gfilter:
+    :param gncutoff:
+    :return:
+    """
+    gvs = set(graph.vs['name'])
+
+    if gfilter:
+        dgassos_new = {}
+        for d in dgassos.keys():
+            dgleft = gvs.intersection(dgassos[d])
+            if len(dgleft) >= gncutoff:
+                dgassos_new[d] = dgleft
+    else:
+        dgassos_new = dgassos
+    diseases = list(dgassos_new.keys())
+    print("there are {} diseases can be calculated.".format(len(diseases)))
+
+    dgs = set()
+    for d in diseases:
+        dgs |= set(dgassos_new[d])
+    print("disease genes num:", len(dgs))
+
+    dgnames = list(dgs)
+    dgksp = cal_ksp(graph, dgnames, k)
+    dg2loc = {}
+    for i in range(0, len(dgnames)):
+        dg2loc[dgnames[i]] = i
+    result = {}
+    for i in range(0, len(diseases)):
+        result[diseases[i]] = {}
+        now = time.time()
+        print("sim_geneset2geneset():", i, "dg len:", len(dgassos_new[diseases[i]]))
+        for j in range(i, len(diseases)):
+            simsum = 0.0
+            for g in dgassos_new[diseases[i]]:
+                vmax = 0.0
+                loc1 = dg2loc[g]
+                for gg in dgassos_new[diseases[j]]:
+                    if dgksp[loc1, dg2loc[gg]] > vmax:
+                        vmax = dgksp[loc1, dg2loc[gg]]
+                simsum += vmax
+            for g in dgassos_new[diseases[j]]:
+                vmax = 0.0
+                loc1 = dg2loc[g]
+                for gg in dgassos_new[diseases[i]]:
+                    if dgksp[loc1, dg2loc[gg]] > vmax:
+                        vmax = dgksp[loc1, dg2loc[gg]]
+                simsum += vmax
+            result[diseases[i]][diseases[j]] = (simsum /
+                                                (len(dgassos_new[diseases[i]]) +
+                                                 len(dgassos_new[diseases[j]])))
+        print("---------------------------------------cost time:", str(time.time() - now))
+    return result
+    pass
+
+
+def cal_ksp(graph, vnames, k):
+    vlen = len(vnames)
+    gnodes = graph.vs['name']
+    mbase = 1 + math.exp(-1)
+    kspmat = numpy.zeros(shape=(vlen, vlen), dtype=numpy.float32)
+    for i in range(0, vlen):
+        for j in range(i, vlen):
+            if i == j:
+                kspmat[i, j] = k
+            else:
+                v1, v2 = vnames[i], vnames[j]
+                if v1 in gnodes and v2 in gnodes:
+                    a, a_cost = yen_igraph.yen_igraph(graph, v1, v2, k, None)
+                    if not (len(a_cost) == 1 and a_cost[0] == -1):
+                        kspmat[i, j] = sum([mbase**(-x) for x in a_cost])
+                        kspmat[j, i] = kspmat[i, j]
+            print("cal_ksp:", i, j)
+        print("cal_ksp:", i, "done...")
+    return kspmat
 
 
 def diameter(dgassos, graph):

@@ -6,6 +6,7 @@ import common_use
 import experiments
 import similarity_genesim
 import similarity_tissuespecificity
+import yen_igraph
 from files import read_one_col
 from files import read_mappings
 from files import read_assos
@@ -890,6 +891,18 @@ def similarity_cal_katz():
     # -----------
     sims = similarity_module.similarity_cal_katz(dgassos, gene2loc, adjmats[0:4], None)
     write_sims(sims, 'outputs/similarity_katz4_disgenet_dgcutoff006_interactome_betadef.tsv')
+    pass
+
+
+def simcal_ksp():
+    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
+                                           False, False)
+    print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
+
+    disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
+
+    sims = similarity_module.similarity_cal_ksp(disease2gene, g, 5)
+    write_sims(sims, 'outputs/similarity_ksp_k5_rwrsidd_hppinwsl.tsv')
     pass
 # -----------------------------------------------------------
 
