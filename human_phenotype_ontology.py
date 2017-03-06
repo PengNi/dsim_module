@@ -1,6 +1,77 @@
 #! /usr/bin/env python3
-"""defining a class for Disease Ontology"""
+"""defining a class for Human Phenotype Ontology"""
 from queue import Queue
+import math
+
+hpo_annotation_evidence_codes = ("EXP", "IDA", "IMP", "IGI", "IEP", "ISS", "ISA", "ISM", "ISO")
+
+
+def terms_information_content(hpo, expp2anno):
+    """
+
+    :param hpo:
+    :param expp2anno:
+    :return:
+    """
+    termsic = {}
+    hpoterms = hpo.getterms()
+    allanno = set()
+    for p in expp2anno.keys():
+        allanno.update(expp2anno[p])
+    allannonum = len(allanno)
+    for t in hpoterms.keys():
+        if t in expp2anno.keys():
+            termsic[t] = -math.log2(len(expp2anno[t])/allannonum)
+        else:
+            termsic[t] = 0.0
+    return termsic
+
+
+def hpo_expp2anno(p2anno, hpo):
+    """
+
+    :param p2anno:
+    :param hpo:
+    :return:
+    """
+    hpoterms = hpo.getterms()
+    expp2anno = {}
+    for p in hpoterms.keys():
+        poffspring = hpo.get_termsoffspring(p)
+        poffspring.add(p)
+        expp2anno[p] = set()
+        for ospring in poffspring:
+            if ospring in p2anno.keys():
+                expp2anno[p].update(p2anno[ospring])
+    expps = list(expp2anno.keys())
+    for expp in expps:
+        if len(expp2anno[expp]) == 0:
+            del expp2anno[expp]
+    return expp2anno
+
+
+def read_hpo_annotation_file(filepath, db='OMIM', hcec=False):
+    """
+    "phenotype_annotation.tab"
+    :param filepath: file path
+    :param db: annotation db name, in the first column of the file
+    :param hcec: boolean virable, True means only annotations with high confidence
+    evidence code are used, False means annotations with all evidence code are used,
+    7th column of the file
+    :return:
+    """
+    p2anno = {}
+    with open(filepath, mode='r', encoding='utf-8') as rf:
+        for line in rf:
+            words = line.strip().split('\t')
+            if words[0] != db:
+                continue
+            if hcec and words[6].strip() not in hpo_annotation_evidence_codes:
+                continue
+            if words[4].strip() not in p2anno.keys():
+                p2anno[words[4].strip()] = set()
+            p2anno[words[4].strip()].add(words[1].strip())
+    return p2anno
 
 
 def get_terms_at_layern(n, hpo):
@@ -21,7 +92,7 @@ def get_terms_at_layern(n, hpo):
 
 def get_terms2offsprings(terms, hpo):
     """
-    get terms-offsprings dict
+    get terms-offsprings dict, offsprings include the term itself
     :param terms: set()
     :param hpo: HumanPhenotypeOntology
     :return: dict
@@ -31,6 +102,21 @@ def get_terms2offsprings(terms, hpo):
         result[t] = set()
         result[t].add(t)
         result[t].update(hpo.get_termsoffspring(t))
+    return result
+
+
+def get_terms2ancestors(terms, hpo):
+    """
+
+    :param terms:
+    :param hpo:
+    :return:
+    """
+    result = {}
+    for t in terms:
+        result[t] = set()
+        result[t].add(t)
+        result[t].update(hpo.get_termsancestors(t))
     return result
 
 
@@ -129,6 +215,18 @@ class HumanPhenotypeOntology:
                 q.put(ncc)
             offspring.add(nextc)
         return offspring
+
+    def get_termsancestors(self, termid):
+        ancestors = set()
+        q = Queue()
+        for c in self._terms[termid].getparents():
+            q.put(c)
+        while not q.empty():
+            nextc = q.get()
+            for ncc in self._terms[nextc].getparents():
+                q.put(ncc)
+            ancestors.add(nextc)
+        return ancestors
 
 
 class HPOTerm:

@@ -6,7 +6,7 @@ import common_use
 import experiments
 import similarity_genesim
 import similarity_tissuespecificity
-import yen_igraph
+import similarity_hpo
 from files import read_one_col
 from files import read_mappings
 from files import read_assos
@@ -51,6 +51,7 @@ from evaluation import eva_diseaseclasses
 from disease_ontology import DiseaseOntology
 from disease_ontology import get_terms_at_layern
 from disease_ontology import get_terms2offsprings
+import human_phenotype_ontology
 from human_phenotype_ontology import HumanPhenotypeOntology
 from plots import plot_roc
 from plots import plot_simshist
@@ -900,9 +901,73 @@ def simcal_ksp():
     print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
 
     disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
+    stat_assos(disease2gene)
 
-    sims = similarity_module.similarity_cal_ksp(disease2gene, g, 5)
+    bmkpfile = "data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv"
+    benchmarkpairs = read_assos(bmkpfile, header=False)
+    stat_assos(benchmarkpairs)
+    diseases = list(disease2gene.keys())
+    from random import randint
+    caldiseases = set()
+    for d in benchmarkpairs.keys():
+        caldiseases.add(d)
+        caldiseases.update(benchmarkpairs[d])
+    caldlen = 100
+    while len(caldiseases) < caldlen:
+        caldiseases.add(diseases[randint(0, len(diseases)-1)])
+    caldiseases = list(caldiseases)
+
+    pairsum = 1000
+    count = 0
+    while count < pairsum:
+        d1 = caldiseases[randint(0, len(caldiseases)-1)]
+        d2 = caldiseases[randint(0, len(caldiseases)-1)]
+        if d1 != d2:
+            if not ((d1 in benchmarkpairs.keys() and d2 in benchmarkpairs[d1]) or
+                    (d2 in benchmarkpairs.keys() and d1 in benchmarkpairs[d2])):
+                if d1 not in benchmarkpairs.keys():
+                    benchmarkpairs[d1] = set()
+                benchmarkpairs[d1].add(d2)
+                count += 1
+    stat_assos(benchmarkpairs)
+    bmptuple = []
+    for p in benchmarkpairs.keys():
+        for q in benchmarkpairs[p]:
+            bmptuple.append((p, q))
+
+    sims = similarity_module.similarity_cal_ksp_fast(bmptuple, disease2gene, g, 5)
     write_sims(sims, 'outputs/similarity_ksp_k5_rwrsidd_hppinwsl.tsv')
+    pass
+
+
+def similarity_cal_hpo():
+    hpo = human_phenotype_ontology.HumanPhenotypeOntology()
+    hpo.readobofile("data/hpo/hp.obo")
+    p2anno = human_phenotype_ontology.read_hpo_annotation_file("data/hpo/phenotype_annotation.tab")
+    print('read p2anno: ', end='')
+    stat_assos(p2anno)
+    expp2anno = human_phenotype_ontology.hpo_expp2anno(p2anno, hpo)
+    dids = read_one_col("D:\\Documents\\workspace\\pyworkspace\\dsimFusion\\data\\birw_xie\\"
+                        "BiRW_phenotype_annotation.txt", 2)
+    # dids = read_one_col("D:\\Documents\\workspace\\matlabworkspace\\NoNCRstar-master\\CRstar\\"
+    #                     "PhenotypeID_170.tsv", 1)
+    anno2p = invert_dict(expp2anno)
+    d2p = {}
+    for d in dids:
+        if d in anno2p.keys():
+            d2p[d] = set()
+            d2p[d].update(anno2p[d])
+    print('d2p: ', end='')
+    stat_assos(d2p)
+    calterms = set()
+    for d in d2p.keys():
+        calterms.update(d2p[d])
+    print('calterms: ', len(calterms))
+
+    psims = similarity_hpo.termssimilarity_lin(calterms, hpo, p2anno)
+    dsims = similarity_hpo.diseasesimilarity_funsimavg(d2p, psims)
+    write_simmatrix(dsims, "outputs/similarity_hpolinfunavg_birwomim5080_matrix.tsv", True, dids, '\t',
+                    False, False)
     pass
 # -----------------------------------------------------------
 
@@ -2098,6 +2163,20 @@ def diseaseid_mapping_stats():
     # do2umls = get_idmapping(allidsnew, 'do', 'umls')
     # stat_assos(do2umls)
     # write_assos(do2umls, 'data/disgenet/doid2umlsid.tsv')
+    # # -----------------------------------------------------
+    # # ------------mesh2omim----------------------------------
+    # mesh2omim = get_idmapping(allidsnew, 'mesh', 'omim')
+    # stat_assos(mesh2omim)
+    # write_assos(mesh2omim, 'data/disgenet/meshid2omimid.tsv')
+    # # -------------------------------------------------------
+    # # ------------mesh2doid----------------------------------
+    # mesh2doid = get_idmapping(allidsnew, 'mesh', 'do')
+    # stat_assos(mesh2doid)
+    # write_assos(mesh2doid, 'data/disgenet/meshid2doid.tsv')
+    # # ------------------------------------------------------
+    # mesh2umls = get_idmapping(allidsnew, 'mesh', 'umls')
+    # stat_assos(mesh2umls)
+    # write_assos(mesh2umls, 'data/disgenet/meshid2umlsid.tsv')
 
 
 def allids_mrconsorrf(filepath):
@@ -2467,5 +2546,5 @@ if __name__ == "__main__":
     # evaluation_70benchmarkset(evaluation_simfilepaths_di, shortnames_di, 0, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    experiment()
+    diseaseid_mapping_stats()
     pass

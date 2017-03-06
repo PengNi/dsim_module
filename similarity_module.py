@@ -1086,7 +1086,6 @@ def similarity_cal_ksp(dgassos, graph, k=10, gfilter=False, gncutoff=1):
                                                  len(dgassos_new[diseases[j]])))
         print("---------------------------------------cost time:", str(time.time() - now))
     return result
-    pass
 
 
 def cal_ksp(graph, vnames, k):
@@ -1108,6 +1107,82 @@ def cal_ksp(graph, vnames, k):
             print("cal_ksp:", i, j)
         print("cal_ksp:", i, "done...")
     return kspmat
+
+
+def similarity_cal_ksp_fast(dpairs, dgassos, graph, k=5):
+    """
+
+    :param dpairs: tuple list
+    :param dgassos:
+    :param graph:
+    :param k:
+    :return:
+    """
+    gvs = set(graph.vs['name'])
+    mbase = 1 + math.exp(-1)
+
+    allcaldisease = set()
+    for pair in dpairs:
+        allcaldisease.add(pair[0])
+        allcaldisease.add(pair[1])
+    dgs = set()
+    for d in allcaldisease:
+        dgs |= set(dgassos[d])
+    print("disease genes num:", len(dgs))
+
+    dgnames = list(dgs)
+    dgksp = numpy.zeros(shape=(len(dgnames), len(dgnames)), dtype=numpy.float32)
+    dgksp.fill(-1)
+    dg2loc = {}
+    for i in range(0, len(dgnames)):
+        dg2loc[dgnames[i]] = i
+    result = {}
+    for i in range(0, len(dpairs)):
+        disease1, disease2 = dpairs[i]
+        if disease1 not in result.keys():
+            result[disease1] = {}
+        now = time.time()
+        print("disease pair:", i, "dg len:", len(dgassos[disease1]), len(dgassos[disease2]))
+        simsum = 0.0
+        for g in dgassos[disease1]:
+            vmax = 0.0
+            loc1 = dg2loc[g]
+            for gg in dgassos[disease2]:
+                loc2 = dg2loc[gg]
+                if dgksp[loc1, loc2] == -1.0:
+                    dgksp[loc1, loc2] = cal_ksp_onpair(g, gg, k, graph, gvs, mbase)
+                    dgksp[loc2, loc1] = dgksp[loc1, loc2]
+                if dgksp[loc1, loc2] > vmax:
+                    vmax = dgksp[loc1, loc2]
+            simsum += vmax
+        for g in dgassos[disease2]:
+            vmax = 0.0
+            loc1 = dg2loc[g]
+            for gg in dgassos[disease1]:
+                loc2 = dg2loc[gg]
+                if dgksp[loc1, loc2] == -1.0:
+                    dgksp[loc1, loc2] = cal_ksp_onpair(g, gg, k, graph, gvs, mbase)
+                    dgksp[loc2, loc1] = dgksp[loc1, loc2]
+                if dgksp[loc1, loc2] > vmax:
+                    vmax = dgksp[loc1, loc2]
+            simsum += vmax
+        result[disease1][disease2] = (simsum /
+                                      (len(dgassos[disease1]) +
+                                       len(dgassos[disease2])))
+        print("---------------------------------------cost time:", str(time.time() - now))
+    return result
+
+
+def cal_ksp_onpair(v1, v2, k, graph, gnodes, mbase):
+    if v1 == v2:
+        return k
+    else:
+        if v1 in gnodes and v2 in gnodes:
+            a, a_cost = yen_igraph.yen_igraph(graph, v1, v2, k, None)
+            if not (len(a_cost) == 1 and a_cost[0] == -1):
+                return sum([mbase ** (-x) for x in a_cost])
+            return 0
+        return 0
 
 
 def diameter(dgassos, graph):
