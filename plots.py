@@ -25,8 +25,8 @@ def plot_roc(tprfpr, names2legends, names2aucs, savepath='roc.png', fformat='png
             tprs.append(dot[1])
         plt.plot(fprs, tprs, ls='-',
                  label=str(names2legends[tf]) + '(' + "%.3f" % names2aucs[tf] + ')')
-    plt.plot([0, 1], [0, 1], ls='--')
-    plt.title('roc')
+    plt.plot([0, 1], [0, 1], ls='--', color='k')
+    plt.title('ROC')
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
     plt.legend(loc='lower right')

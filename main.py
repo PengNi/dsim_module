@@ -198,6 +198,17 @@ shnames_omim = {'D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\similarity_rwr_
                 'D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\similarity_spavgn_dgomim_hprd_matrix.tsv': 'spavgn',
                 'D:\\bioinformatics\\tools\\zrq\\PDGTR\\example\\disease_disease_similarity.tsv': 'MimMiner', }
 
+amm = [
+    'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv',
+    'outputs/similarity_spmaxn_rwrsidd_hppinwsl.tsv',
+    'outputs/similarity_spmediann_rwrsidd_hppinwsl.tsv',
+]
+shortnames_amm = {
+    'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv': 'ModuleSim_avg',
+    'outputs/similarity_spmaxn_rwrsidd_hppinwsl.tsv': 'ModuleSim_max',
+    'outputs/similarity_spmediann_rwrsidd_hppinwsl.tsv': 'ModuleSim_median',
+}
+
 
 # ---evaluation-----------------------------------------
 def evaluation_validationpairs(simpathlist, shortnames, times=1):
@@ -727,16 +738,18 @@ def geneid_convert_coexpression():
 
 
 def similarity_cal_module():
-    # g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv", False, False)
-    g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
-                                           False, False)
+    g = similarity_module.read_interactome("data/interactome_science/DataS1_interactome.tsv", False, False)
+    # g = similarity_module.read_interactome("data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop.tab",
+    #                                        False, False)
     print("number of vertices:", g.vcount(), "number of edges:", g.ecount())
     gvs = set(g.vs['name'])
 
     # disease2gene = read_all_gene_disease_associations("data/disgenet/all_gene_disease_associations.tsv",
     #                                                   0.0, True, True)
-    # disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_disgenet.tab")
-    disease2gene = read_assos('data/disgenet/gene_disease_assos_doid2symbol_disgenetcutoff006.tsv')
+    # disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
+    # disease2gene = read_assos('data/disgenet/gene_disease_assos_doid2symbol_disgenetcutoff006.tsv')
+    disease2gene = read_assos('data/disgenet/'
+                              'omim1092entrezid_disgenet.txt')
     print("disease gene assos: ", end='')
     stat_assos(disease2gene)
     dgassos_new = {}
@@ -748,7 +761,7 @@ def similarity_cal_module():
     stat_assos(dgassos_new)
 
     sims = similarity_module.similarity_cal_spavgn(disease2gene, g)
-    # write_sims(sims, 'outputs/similarity_spavgn_doiddisgenet006_hppinwsl.tsv')
+    write_sims(sims, 'outputs/similarity_spavgn_mim109disgenet_interactome.tsv')
 
 
 def combine_pathway_data_gsea():
@@ -947,8 +960,8 @@ def similarity_cal_hpo():
     print('read p2anno: ', end='')
     stat_assos(p2anno)
     expp2anno = human_phenotype_ontology.hpo_expp2anno(p2anno, hpo)
-    dids = read_one_col("D:\\Documents\\workspace\\pyworkspace\\dsimFusion\\data\\birw_xie\\"
-                        "BiRW_phenotype_annotation.txt", 2)
+    dids = read_one_col("D:\\Documents\\workspace\\pyworkspace\\BiRW\\data\\birw_omim\\"
+                        "diseaseID_omim5080.txt", 1)
     # dids = read_one_col("D:\\Documents\\workspace\\matlabworkspace\\NoNCRstar-master\\CRstar\\"
     #                     "PhenotypeID_170.tsv", 1)
     anno2p = invert_dict(expp2anno)
@@ -965,8 +978,9 @@ def similarity_cal_hpo():
     print('calterms: ', len(calterms))
 
     psims = similarity_hpo.termssimilarity_lin(calterms, hpo, p2anno)
-    dsims = similarity_hpo.diseasesimilarity_funsimavg(d2p, psims)
-    write_simmatrix(dsims, "outputs/similarity_hpolinfunavg_birwomim5080_matrix.tsv", True, dids, '\t',
+    dsims = similarity_hpo.diseasesimilarity_bma(d2p, psims)
+    write_simmatrix(dsims, "D:\\Documents\\workspace\\pyworkspace\\BiRW\\data\\birw_omim\\"
+                           "similarity_hporesnikfunavg_birwomim5080_matrix.tsv", True, dids, '\t',
                     False, False)
     pass
 # -----------------------------------------------------------
@@ -1483,6 +1497,14 @@ def venn_stats():
     stat_assos(d2g1)
     stat_assos(d2g2)
     vennstats_twosets_dgassos(d2g1, d2g2)
+
+
+def dgassos_ana():
+    d2g = read_assos('data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab')
+    print('DOID:552', len(d2g['DOID:552']))
+    print('DOID:9471', len(d2g['DOID:9471']))
+    print(len(d2g['DOID:9471'].intersection(d2g['DOID:552'])))
+    pass
 # ------------------------------------------------------------
 
 
@@ -2543,8 +2565,8 @@ def get_loc_in_mat():
 
 if __name__ == "__main__":
     # evaluation_groundtruth(evaluation_simfilepaths1, shortnames1, [gtpathlist1[1], ])
-    # evaluation_70benchmarkset(evaluation_simfilepaths_di, shortnames_di, 0, 100,
+    # evaluation_70benchmarkset(amm, shortnames_amm, 0, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    diseaseid_mapping_stats()
+    similarity_cal_module()
     pass

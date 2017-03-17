@@ -583,7 +583,7 @@ def similarity_cal_spmaxn(dgassos, graph, gfilter=False, gncutoff=1, transformdi
     for d in diseases:
         avgavg = 0.0
         for g in dgassos_new[d]:
-            avgavg += sim_geneset2gene_avg(g, dgassos_new[d], sim_gene2gene)
+            avgavg += sim_geneset2gene_max_s(g, dgassos_new[d], sim_gene2gene)
         dselfavg[d] = avgavg / len(dgassos_new[d])
 
     result = {}
@@ -597,6 +597,61 @@ def similarity_cal_spmaxn(dgassos, graph, gfilter=False, gncutoff=1, transformdi
                 simsum += sim_geneset2gene_max(g, dgassos_new[diseases[j]], sim_gene2gene)
             for g in dgassos_new[diseases[j]]:
                 simsum += sim_geneset2gene_max(g, dgassos_new[diseases[i]], sim_gene2gene)
+            osim = (simsum / (len(dgassos_new[diseases[i]]) + len(dgassos_new[diseases[j]])))
+            navg = (dselfavg[diseases[i]] + dselfavg[diseases[j]]) / 2
+
+            result[diseases[i]][diseases[j]] = osim / navg
+        print("---------------------------------------cost time:", str(time.time() - now))
+    return result
+
+
+def similarity_cal_spmediann(dgassos, graph, gfilter=False, gncutoff=1, transformdistance=True):
+    """
+
+    :param dgassos:
+    :param graph:
+    :param gfilter:
+    :param gncutoff:
+    :param transformdistance:
+    :return:
+    """
+    gvs = set(graph.vs['name'])
+
+    if gfilter:
+        dgassos_new = {}
+        for d in dgassos.keys():
+            dgleft = gvs.intersection(dgassos[d])
+            if len(dgleft) >= gncutoff:
+                dgassos_new[d] = dgleft
+    else:
+        dgassos_new = dgassos
+    diseases = list(dgassos_new.keys())
+    print("there are {} diseases can be calculated.".format(len(diseases)))
+
+    dgs = set()
+    for d in diseases:
+        dgs |= set(dgassos_new[d])
+    print("disease genes num:", len(dgs))
+    sim_gene2gene = sim_gene2gene_shortestpath(dgs, graph, transformdistance)
+    print("gene2gene sim cal done..")
+    dselfavg = {}
+    for d in diseases:
+        avgavg = 0.0
+        for g in dgassos_new[d]:
+            avgavg += sim_geneset2gene_median(g, dgassos_new[d], sim_gene2gene)
+        dselfavg[d] = avgavg / len(dgassos_new[d])
+
+    result = {}
+    for i in range(0, len(diseases)):
+        result[diseases[i]] = {}
+        now = time.time()
+        print("sim_geneset2geneset():", i, "dg len:", len(dgassos_new[diseases[i]]))
+        for j in range(i, len(diseases)):
+            simsum = 0.0
+            for g in dgassos_new[diseases[i]]:
+                simsum += sim_geneset2gene_median(g, dgassos_new[diseases[j]], sim_gene2gene)
+            for g in dgassos_new[diseases[j]]:
+                simsum += sim_geneset2gene_median(g, dgassos_new[diseases[i]], sim_gene2gene)
             osim = (simsum / (len(dgassos_new[diseases[i]]) + len(dgassos_new[diseases[j]])))
             navg = (dselfavg[diseases[i]] + dselfavg[diseases[j]]) / 2
 
@@ -920,11 +975,42 @@ def sim_geneset2gene_avg(g, gset, sim_gene2gene):
         return 0.0
 
 
+def sim_geneset2gene_median(g, gset, sim_gene2gene):
+    res = 0.0
+    sims = []
+    for i in gset:
+        sims.append(sim_gene2gene[g][i])
+    if len(sims) > 0:
+        sims = sorted(sims)
+        if len(sims) % 2 == 0:
+            res = (sims[round(len(sims) / 2)] + sims[round(len(sims) / 2) - 1]) / 2
+        else:
+            res = sims[round((len(sims) - 1) / 2)]
+    if res == 0.0:
+        res = 0.00001
+    return res
+
+
 def sim_geneset2gene_max(g, gset, sim_gene2gene):
     result = 0.0
     for i in gset:
         if sim_gene2gene[g][i] > result:
             result = sim_gene2gene[g][i]
+    return result
+
+
+def sim_geneset2gene_max_s(g, gset, sim_gene2gene):
+    result = 0.0
+    gsettmp = set()
+    gsettmp.update(gset)
+    gsettmp.discard(g)
+    if len(gsettmp) == 0:
+        result = 1.0
+    for i in gsettmp:
+        if sim_gene2gene[g][i] > result:
+            result = sim_gene2gene[g][i]
+    if result == 0:
+        result = 0.00001
     return result
 
 

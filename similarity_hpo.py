@@ -41,6 +41,7 @@ def termssimilarity_resnik(termlist, hpo, p2anno):
         for j in range(i, len(termlist)):
             sim[termlist[i]][termlist[j]] = termsimilarity_resnik(termlist[i], termlist[j],
                                                                   p2ancestors, pinforcontent)
+    print('termssimilarity_resnik finished..')
     return sim
 
 
@@ -164,6 +165,7 @@ def diseasesimilarity_bma(d2p, psim):
                         simptemp = simtemp
                 simvalue += simptemp
             sim[diseases[i]][diseases[j]] = simvalue / (len(d2p[diseases[i]]) + len(d2p[diseases[j]]))
+        print('diseasesimilarity_bma:', i)
     return sim
 
 
