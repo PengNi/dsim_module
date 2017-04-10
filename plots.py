@@ -15,6 +15,9 @@ def plot_roc(tprfpr, names2legends, names2aucs, savepath='roc.png', fformat='png
     :param fformat: format of saved file
     :return: a plot
     """
+    colors = ['#fdcc8a', '#fc8d59', '#d7301f']
+    colorcount = 0
+
     from matplotlib import pyplot as plt
     for tf in tprfpr.keys():
         line = tprfpr[tf]
@@ -24,7 +27,8 @@ def plot_roc(tprfpr, names2legends, names2aucs, savepath='roc.png', fformat='png
             fprs.append(dot[0])
             tprs.append(dot[1])
         plt.plot(fprs, tprs, ls='-',
-                 label=str(names2legends[tf]) + '(' + "%.3f" % names2aucs[tf] + ')')
+                 label=str(names2legends[tf]) + '(' + "%.3f" % names2aucs[tf] + ')', color=colors[colorcount])
+        colorcount += 1
     plt.plot([0, 1], [0, 1], ls='--', color='k')
     plt.title('ROC')
     plt.ylabel('True Positive Rate')

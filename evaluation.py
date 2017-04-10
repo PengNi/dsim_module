@@ -4,7 +4,9 @@ from files import read_sims
 from files import stat_assos
 from copy import deepcopy
 from random import randint
+from random import sample
 from operator import itemgetter
+import scipy
 
 
 def eva_readsims(methodfilepaths):
@@ -449,11 +451,12 @@ def eva_70benchmarkpairs_onetime(allsims, alldpairs, bencallist):
     return res
 
 
-def eva_diseaseclasses(dsim, term2group, wfpath, dstype):
+def eva_diseaseclasses(dsim, term2group, ifwrite, wfpath, dstype):
     """
     evaluation dsim with disease classification
     :param dsim: disease sim, a dict (key-value: string-dict<string-float>)
     :param term2group: diseases classification, a dict (key-value: string-set<string>)
+    :param ifwrite: if write classification to path
     :param wfpath: writefile path
     :param dstype: dataset type, string
     :return:
@@ -470,19 +473,61 @@ def eva_diseaseclasses(dsim, term2group, wfpath, dstype):
                 else:
                     val_same.append(dsim[d1][d2])
                 val_all.append(dsim[d1][d2])
-    with open(wfpath, mode='w') as wf:
-        wf.write('category\tvalue\tdataset\n')
-        for v in val_same:
-            wf.write('same\t' + str(v) + '\t' + str(dstype) + '\n')
-        for v in val_diff:
-            wf.write('diff\t' + str(v) + '\t' + str(dstype) + '\n')
-        for v in val_all:
-            wf.write('all\t' + str(v) + '\t' + str(dstype) + '\n')
+    if ifwrite:
+        with open(wfpath, mode='w') as wf:
+            wf.write('category\tvalue\tdataset\n')
+            for v in val_same:
+                wf.write('same\t' + str(v) + '\t' + str(dstype) + '\n')
+            for v in val_diff:
+                wf.write('diff\t' + str(v) + '\t' + str(dstype) + '\n')
+            for v in val_all:
+                wf.write('all\t' + str(v) + '\t' + str(dstype) + '\n')
     print('disease counted:', len(ds_cal))
     print('\tall\tsame\tdiff')
     print('len\t' + str(len(val_all)) + '\t' + str(len(val_same)) + '\t' + str(len(val_diff)))
     print('avg\t' + str(sum(val_all) / len(val_all)) + '\t' + str(sum(val_same) / len(val_same))
           + '\t' + str(sum(val_diff) / len(val_diff)))
+    # # p-value test
+    # samelen, difflen = len(val_same), len(val_diff)
+    # count = 0
+    # mbase = sum(val_same) / len(val_same) - sum(val_diff) / len(val_diff)
+    # randometimes = 10000
+    # testvalues = val_same + val_diff
+    # wholerange = range(0, len(testvalues))
+    # for i in range(0, randometimes):
+    #     sameindexs = sample(wholerange, samelen)
+    #     samevalues = [testvalues[i] for i in sameindexs]
+    #
+    #     sameflags = [0] * len(testvalues)
+    #     for ii in sameindexs:
+    #         sameflags[ii] = 1
+    #     diffvalues = [None] * difflen
+    #     cc = 0
+    #     for ii in wholerange:
+    #         if sameflags[ii] == 0:
+    #             diffvalues[cc] = testvalues[ii]
+    #             cc += 1
+    #     if (sum(samevalues) / len(samevalues) - sum(diffvalues) / len(diffvalues)) >= mbase:
+    #         count += 1
+    #     # print(i)
+    # pvalue = (count+1) / (randometimes + 1)
+    # print('p-value:', pvalue)
+
+
+def eva_mannwhitney_u_test(dsim, term2group):
+    val_same, val_diff, val_all = [], [], []
+    ds_cal = set()
+    for d1 in dsim.keys():
+        for d2 in dsim[d1].keys():
+            if d1 != d2 and d1 in term2group.keys() and d2 in term2group.keys():
+                ds_cal.add(d1)
+                ds_cal.add(d2)
+                if len(term2group[d1].intersection(term2group[d2])) == 0:
+                    val_diff.append(dsim[d1][d2])
+                else:
+                    val_same.append(dsim[d1][d2])
+                val_all.append(dsim[d1][d2])
+    print(scipy.stats.mannwhitneyu(val_same, val_diff, True, 'greater'))
 
 
 def eva_test_pair_rankinfo_ranking(rankinfo, benchmarkmethod, comparemethods):

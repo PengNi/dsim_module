@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 from copy import deepcopy
+from random import sample
 import similarity_module
 import mapping
 import common_use
@@ -48,6 +49,7 @@ from evaluation import eva_test_rankstats_multi
 from evaluation import eva_test_pair_rankinfos
 from evaluation import eva_test_pair_rankinfo_ranking
 from evaluation import eva_diseaseclasses
+from evaluation import eva_mannwhitney_u_test
 from disease_ontology import DiseaseOntology
 from disease_ontology import get_terms_at_layern
 from disease_ontology import get_terms2offsprings
@@ -203,6 +205,7 @@ amm = [
     'outputs/similarity_spmaxn_rwrsidd_hppinwsl.tsv',
     'outputs/similarity_spmediann_rwrsidd_hppinwsl.tsv',
 ]
+
 shortnames_amm = {
     'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl.tsv': 'ModuleSim_avg',
     'outputs/similarity_spmaxn_rwrsidd_hppinwsl.tsv': 'ModuleSim_max',
@@ -576,8 +579,9 @@ def evaluation_classification():
     do = DiseaseOntology()
     do.readobofile('data/do/HumanDO.obo')
     do.settermslayers()
-    layer = 3
+    layer = 2
     termgroups = get_terms_at_layern(layer, do)
+    print(len(termgroups))
     term2group = invert_dict(get_terms2offsprings(termgroups, do))
     stat_assos(term2group)
 
@@ -595,8 +599,9 @@ def evaluation_classification():
     sims = eva_readsims(simfiles)
     for mn in sims.keys():
         print(mn)
-        eva_diseaseclasses(sims[mn], term2group,
+        eva_diseaseclasses(sims[mn], term2group, False,
                            'evaresult/evaclassification_' + simdstype[mn] + '.tsv', simdstype[mn])
+        eva_mannwhitney_u_test(sims[mn], term2group)
 # --------------------------------------------------------------------
 
 
@@ -977,11 +982,12 @@ def similarity_cal_hpo():
         calterms.update(d2p[d])
     print('calterms: ', len(calterms))
 
-    psims = similarity_hpo.termssimilarity_lin(calterms, hpo, p2anno)
-    dsims = similarity_hpo.diseasesimilarity_bma(d2p, psims)
-    write_simmatrix(dsims, "D:\\Documents\\workspace\\pyworkspace\\BiRW\\data\\birw_omim\\"
-                           "similarity_hporesnikfunavg_birwomim5080_matrix.tsv", True, dids, '\t',
-                    False, False)
+    psims = similarity_hpo.termssimilarity_resnik(calterms, hpo, p2anno)
+    dsims = similarity_hpo.diseasesimilarity_le(d2p, psims)
+    # write_simmatrix(dsims, "D:\\Documents\\workspace\\pyworkspace\\BiRW\\data\\birw_omim\\"
+    #                        "similarity_hporesnikfunavg_birwomim5080_matrix.tsv", True, dids, '\t',
+    #                 False, False)
+    write_sims(dsims, 'outputs/omimsim_hpole_4343_triplet.txt')
     pass
 # -----------------------------------------------------------
 
@@ -1500,11 +1506,319 @@ def venn_stats():
 
 
 def dgassos_ana():
-    d2g = read_assos('data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab')
-    print('DOID:552', len(d2g['DOID:552']))
-    print('DOID:9471', len(d2g['DOID:9471']))
-    print(len(d2g['DOID:9471'].intersection(d2g['DOID:552'])))
+    dgassos1 = 'data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab'
+    dgassos2 = 'data/disgenet/gene_disease_assos_doid2entrezid_disgenetcutoff006.tsv'
+    d2g = read_assos(dgassos1)
+    stat_assos(d2g)
+    g2d = invert_dict(d2g)
+    stat_assos(g2d)
+
+    # print('DOID:552', len(d2g['DOID:552']))
+    # print('DOID:9471', len(d2g['DOID:9471']))
+    # print(len(d2g['DOID:9471'].intersection(d2g['DOID:552'])))
+
+    maxdegree = 0
+    for d in d2g:
+        if len(d2g[d]) > maxdegree:
+            maxdegree = len(d2g[d])
+            print(d, maxdegree)
+
+    maxdegree = 0
+    for g in g2d.keys():
+        if len(g2d[g]) > maxdegree:
+            maxdegree = len(g2d[g])
+            print(g, maxdegree)
+
+    count = 0
+    for d in d2g.keys():
+        if len(d2g[d]) == 1:
+            count += 1
+    print("disease degree = 1:", count, count / len(d2g))
+
+    count = 0
+    for g in g2d.keys():
+        if len(g2d[g]) == 1:
+            count += 1
+    print("gene degree = 1:", count, count / len(g2d))
+
+
+def lcc_ana():
+    dgassos1 = 'data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab'
+    dgassos2 = 'data/disgenet/gene_disease_assos_doid2entrezid_disgenetcutoff006.tsv'
+    d2g = read_assos(dgassos1)
+    stat_assos(d2g)
+
+    gfile1 = "data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop_entrezid.tab"
+    g = similarity_module.read_interactome(gfile1, False, False)
+    print(len(g.vs), len(g.es))
+
+    resultfile = 'evaresult/lccinfo_sidd_hppin.txt'
+    with open(resultfile, mode='w') as wf:
+        wf.write('disease\tdgnum\tdgingraph\tlccnum\tlccratio\n')
+        for d in d2g.keys():
+            wf.write(d + '\t' + str(len(d2g[d])) + '\t')
+            subgtemp = similarity_module.get_subgraph(g, d2g[d])
+            subgnodeslen = len(subgtemp.vs)
+            if subgnodeslen == 0:
+                subglcclen = 0
+                lccratio = 0
+            else:
+                subglcclen = len(subgtemp.clusters(mode='WEAK').giant().vs)
+                lccratio = subglcclen/subgnodeslen
+            wf.write(str(subgnodeslen) + '\t' + str(subglcclen) + '\t' + str(lccratio) + '\n')
     pass
+
+
+def lcc_singledisease_ana():
+    def pvalue(s, srand):
+        count = 0
+        for sr in srand:
+            if sr >= s:
+                count += 1
+        return (count + 1) / (len(srand) + 1)
+
+    dgassos1 = 'data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab'
+    dgassos2 = 'data/disgenet/gene_disease_assos_doid2entrezid_disgenetcutoff006.tsv'
+    d2g = read_assos(dgassos1)
+    stat_assos(d2g)
+
+    gfile1 = "data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop_entrezid.tab"
+    g = similarity_module.read_interactome(gfile1, False, False)
+    print(len(g.vs), len(g.es))
+    gvs = set(g.vs['name'])
+
+    diseasename = "DOID:6000"
+    dgenes = d2g[diseasename]
+    dgenesinppi = gvs.intersection(dgenes)
+    dlccsize = len(similarity_module.get_subgraph(g, dgenesinppi).clusters(mode='WEAK').giant().vs)
+    print(diseasename, len(dgenes), len(dgenesinppi), dlccsize, sep='\t')
+
+    gvs = list(gvs)
+    randomtimes = 10000
+    random_lccsize = [0]*randomtimes
+    for i in range(0, randomtimes):
+        rnodes_idx_tmp = sample(range(0, len(gvs)), len(dgenesinppi))
+        rnodes_tmp = [gvs[j] for j in rnodes_idx_tmp]
+        rsubgraph_tmp = similarity_module.get_subgraph(g, rnodes_tmp)
+        random_lccsize[i] = len(rsubgraph_tmp.clusters(mode='WEAK').giant().vs)
+        # print(len(rsubgraph_tmp.vs))
+    import numpy
+    random_lccsize_mean = sum(random_lccsize) / len(random_lccsize)
+    random_lccsize_std = numpy.std(random_lccsize, ddof=1)
+    print("z-score:", (dlccsize-random_lccsize_mean) / random_lccsize_std)
+    # random_lccsize_std = numpy.std(random_lccsize, ddof=0)
+    # print("z-score0:", (dlccsize - random_lccsize_mean) / random_lccsize_std)
+    print("p-value:", pvalue(dlccsize, random_lccsize))
+    with open('evaresult/randomlccsize_doid6000.txt', mode='w') as wf:
+        for rlcc in random_lccsize:
+            wf.write(str(rlcc) + '\n')
+    pass
+
+
+def lcc_alldisease_random_ana():
+    dgassos1 = 'data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab'
+    dgassos2 = 'data/disgenet/gene_disease_assos_doid2entrezid_disgenetcutoff006.tsv'
+    d2g = read_assos(dgassos1)
+    stat_assos(d2g)
+
+    gfile1 = "data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop_entrezid.tab"
+    g = similarity_module.read_interactome(gfile1, False, False)
+    print(len(g.vs), len(g.es))
+    gvs = set(g.vs['name'])
+
+    dginppis = set()
+    cutoff = 10
+    for d in d2g.keys():
+        dgenes = d2g[d]
+        dgenesinppi = gvs.intersection(dgenes)
+        if len(dgenesinppi) >= cutoff:
+            dginppis.add(len(dgenesinppi))
+    dginppis = sorted(list(dginppis))
+
+    gvs = list(gvs)
+    dgnum2randomlccs = {}
+    randomtimes = 10000
+    for dgnum in dginppis:
+        random_lccsize = [0]*randomtimes
+        for i in range(0, randomtimes):
+            rnodes_idx_tmp = sample(range(0, len(gvs)), dgnum)
+            rnodes_tmp = [gvs[j] for j in rnodes_idx_tmp]
+            rsubgraph_tmp = similarity_module.get_subgraph(g, rnodes_tmp)
+            random_lccsize[i] = len(rsubgraph_tmp.clusters(mode='WEAK').giant().vs)
+        dgnum2randomlccs[dgnum] = random_lccsize
+        print(dgnum2randomlccs[dgnum])
+    with open('evaresult/randomlccsize_all_dginppinum_sidd_hppin.txt', mode='w') as wf:
+        for dgnum in dgnum2randomlccs.keys():
+            wf.write(str(dgnum))
+            for rlcc in dgnum2randomlccs[dgnum]:
+                wf.write('\t' + str(rlcc))
+            wf.write('\n')
+    pass
+
+
+def lcc_alldiseaes_mannual():
+    dgassos1 = 'data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd_entrezid.tab'
+    dgassos2 = 'data/disgenet/gene_disease_assos_doid2entrezid_disgenetcutoff006.tsv'
+    d2g = read_assos(dgassos1)
+    stat_assos(d2g)
+
+    gfile1 = "data/rwr_bmc_bioinfo/ppi/rwr_ppi_hppin_withselfloop_entrezid.tab"
+    g = similarity_module.read_interactome(gfile1, False, False)
+    print(len(g.vs), len(g.es))
+    gvs = set(g.vs['name'])
+
+    dginppis = set()
+    cutoff = 10
+    for d in d2g.keys():
+        dgenes = d2g[d]
+        dgenesinppi = gvs.intersection(dgenes)
+        if len(dgenesinppi) >= cutoff:
+            dginppis.add(len(dgenesinppi))
+    dginppis = sorted(list(dginppis))
+
+    dgnum2randomlccs = {}
+    count = 0
+    with open('evaresult/randomlccsizes_s.log', mode='r') as rf:
+        for line in rf:
+            words = line.strip().split(',')
+            randomsize = [0] * len(words)
+            for i in range(0, len(words)):
+                randomsize[i] = int(words[i].strip())
+            print(len(randomsize))
+            dgnum2randomlccs[dginppis[count]] = randomsize
+            count += 1
+    with open('evaresult/randomlccsize_all_dginppinum_sidd_hppin_manual.txt', mode='w') as wf:
+        for dgnum in dgnum2randomlccs.keys():
+            wf.write(str(dgnum))
+            for rlcc in dgnum2randomlccs[dgnum]:
+                wf.write('\t' + str(rlcc))
+            wf.write('\n')
+
+
+def get_alldiseases_zscore_pvalue():
+    def pvalue(s, srand):
+        count = 0
+        for sr in srand:
+            if sr >= s:
+                count += 1
+        return (count + 1) / (len(srand) + 1)
+
+    disease_lccinfofile = 'evaresult/lccinfo_sidd_hppin.txt'
+    # disease_randomelccfile = 'evaresult/randomlccsize_all_dginppinum_sidd_hppin.txt'
+    disease_randomelccfile = 'evaresult/randomlccsize_all_dginppinum_sidd_hppin_manual.txt'
+
+    dginppicf = 10
+    diseaseinfo = {}
+    with open(disease_lccinfofile, mode='r') as rf:
+        next(rf)
+        for line in rf:
+            words = line.strip().split('\t')
+            if int(words[2]) >= dginppicf:
+                diseaseinfo[words[0]] = {}
+                diseaseinfo[words[0]]['dgnum'] = int(words[1])
+                diseaseinfo[words[0]]['dgingraph'] = int(words[2])
+                diseaseinfo[words[0]]['lccnum'] = int(words[3])
+                diseaseinfo[words[0]]['lccratio'] = float(words[4])
+    randomtimes = 10000
+    dgnum2randomlccs = {}
+    with open(disease_randomelccfile, mode='r') as rf:
+        for line in rf:
+            words = line.strip().split('\t')
+            dgnum2randomlccs[int(words[0])] = None
+            randomlcclen = len(words) - 1
+            randomlccs = None
+            if randomlcclen != randomtimes:
+                print("wrong")
+            else:
+                randomlccs = [int(words[i]) for i in range(1, len(words))]
+            dgnum2randomlccs[int(words[0])] = randomlccs
+    print('dgnum2randomlcc_len:', len(dgnum2randomlccs))
+
+    import numpy
+    for d in diseaseinfo.keys():
+        # zscoretmp, p_value = 0.0, 0.0
+        dgingraphtmp = diseaseinfo[d]['dgingraph']
+        lccnumtmp = diseaseinfo[d]['lccnum']
+
+        lccrandomtmp = dgnum2randomlccs[dgingraphtmp]
+        random_lccsize_mean = sum(lccrandomtmp) / len(lccrandomtmp)
+        random_lccsize_std = numpy.std(lccrandomtmp, ddof=1)
+        zscoretmp = (lccnumtmp - random_lccsize_mean) / random_lccsize_std
+        p_value = pvalue(lccnumtmp, lccrandomtmp)
+
+        diseaseinfo[d]['zscore'] = zscoretmp
+        diseaseinfo[d]['pvalue'] = p_value
+
+    with open("evaresult/lccinfo_zscore_sidd_hppin_manual.txt", mode='w') as wf:
+        wf.write('disease\tdgnum\tdgingraph\tlccnum\tlccratio\tzscore\tpvalue\n')
+        for d in diseaseinfo.keys():
+            dinfotmp = diseaseinfo[d]
+            wf.write(d + '\t' + str(dinfotmp['dgnum']) + '\t' + str(dinfotmp['dgingraph']) + '\t' +
+                     str(dinfotmp['lccnum']) + '\t' + str(dinfotmp['lccratio']) + '\t' + str(dinfotmp['zscore']) +
+                     '\t' + str(dinfotmp['pvalue']) + "\n")
+    pass
+
+
+def get_nodeinsimnet_info():
+    simfile = 'outputs/similarity_spavgn_trans_rwrsidd_hppinwsl_co14671.tsv'
+    nodes1 = read_one_col(simfile, 1)
+    nodes2 = read_one_col(simfile, 2)
+    nodes = set(nodes1).union(nodes2)
+    print(len(nodes))
+
+    do = DiseaseOntology()
+    do.readobofile('data/do/HumanDO.obo')
+    do.settermslayers()
+    layer = 3
+    termgroups = get_terms_at_layern(layer, do)
+    print(len(termgroups))
+    term2group = invert_dict(get_terms2offsprings(termgroups, do))
+    stat_assos(term2group)
+
+    doterms = do.getterms()
+    node2class = {}
+    for n in nodes:
+        if n in term2group.keys():
+            # if len(term2group[n]) > 1:
+            #     print(n, term2group[n])
+            node2class[n] = list(term2group[n])[0]
+        else:
+            node2class[n] = n
+            # print(n, '-------------')
+    class2node = {}
+    for n in node2class.keys():
+        if node2class[n] not in class2node.keys():
+            class2node[node2class[n]] = set()
+        class2node[node2class[n]].add(n)
+    stat_assos(class2node)
+
+    dclasses = []
+    for c in class2node.keys():
+        dclasses.append((c, len(class2node[c])))
+    dclasses = sorted(dclasses, key=lambda x: x[1], reverse=True)
+    # import pprint
+    # pprint.pprint(dclasses)
+    diseasetypes = set()
+    # diseasetypes.add('other')
+    for i in range(0, 15):
+        diseasetypes.add(dclasses[i][0])
+    # print(diseasetypes)
+
+    diseaseattris = []
+    for n in nodes:
+        labeltmp = "-"
+        if n in doterms.keys():
+            labeltmp = doterms[n].getname()
+        classlabeltmp = "-"
+        if node2class[n] in doterms.keys():
+            classlabeltmp = doterms[node2class[n]].getname()
+        if node2class[n] not in diseasetypes:
+            classlabeltmp = 'other'
+        diseaseattris.append((n, labeltmp, node2class[n], classlabeltmp))
+    with open('data/do/doid2category.txt', mode='w') as wf:
+        wf.write('doid\tdiseasename\tcategoryid\tcategoryname\n')
+        for d in diseaseattris:
+            wf.write(d[0] + '\t' + d[1] + '\t' + d[2] + '\t' + d[3] + '\n')
 # ------------------------------------------------------------
 
 
@@ -2568,5 +2882,7 @@ if __name__ == "__main__":
     # evaluation_70benchmarkset(amm, shortnames_amm, 0, 100,
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
-    similarity_cal_module()
+    # evaluation_classification()
+    # get_nodeinsimnet_info()
+    get_alldiseases_zscore_pvalue()
     pass

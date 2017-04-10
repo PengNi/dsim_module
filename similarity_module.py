@@ -1356,6 +1356,11 @@ def lambda_module(dgassos, graph):
     return dlambda
 
 
+def get_subgraph(graph, nodes):
+    nodes = graph.vs.select(name_in=nodes)
+    return graph.subgraph(nodes)
+
+
 def get_lcc(graphfile):
     """
     given a graph ncol file path, return the largest connected component
