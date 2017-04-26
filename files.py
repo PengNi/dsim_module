@@ -217,6 +217,63 @@ def write_assos(dictionary, filepath, header=False, sep="\t"):
     print("write_assos: writing finished.")
 
 
+def write_assos2matrix(assos, filepath, asorder=False, roworder=None, colorder=None, sep='\t',
+                       rownames=True, colnames=True):
+    """
+
+    :param assos:
+    :param filepath:
+    :param asorder:
+    :param roworder:
+    :param colorder:
+    :param sep:
+    :param rownames:
+    :param colnames:
+    :return:
+    """
+    def findloc(a, b, abassos):
+        if a in assos.keys() and b in abassos[a]:
+            return 1
+        elif b in assos.keys() and a in abassos[b]:
+            return 1
+        else:
+            return 0
+
+    dnames = set(assos.keys())
+    for d in assos.keys():
+        dnames.update(assos[d])
+    if asorder:
+        rorder = roworder
+        corder = colorder
+    else:
+        rorder = list(dnames)
+        corder = list(dnames)
+
+    with open(filepath, mode='w') as f:
+        if colnames:
+            for c in corder:
+                f.write(sep + c)
+            f.write("\n")
+        if rownames:
+            for da in rorder:
+                sbuff = ""
+                sbuff += da
+                for db in corder:
+                    sbuff += sep + str(findloc(da, db, assos))
+                sbuff += "\n"
+                f.write(sbuff)
+        else:
+            for da in rorder:
+                sbuff = ""
+                sbuff += str(findloc(da, corder[0], assos))
+                for dbi in range(1, len(corder)):
+                    sbuff += (sep + str(findloc(da, corder[dbi], assos)))
+                sbuff += "\n"
+                f.write(sbuff)
+                # print(da)
+        print("write_assos2matrix: writing finished.")
+
+
 def write_sims(simdict, filepath, header=False, sep='\t'):
     """
     write dict contains similarities between each two entities (e.g. diseases)
@@ -288,6 +345,65 @@ def write_simmatrix(simdict, filepath, asorder=False, dorder=None, sep='\t', row
                     f.write(sep + str(findsimvalue(da, dnames[dbi], simdict)))
                 f.write("\n")
         print("write_simmatrix: writing finished.")
+
+
+def write_simmatrix_notsymm(sims, filepath, asorder=False, roworder=None, colorder=None, sep='\t',
+                            rownames=True, colnames=True):
+    """
+
+    :param sims:
+    :param filepath:
+    :param asorder:
+    :param roworder:
+    :param colorder:
+    :param sep:
+    :param rownames:
+    :param colnames:
+    :return:
+    """
+    def findsimvalue(d1, d2, dsims):
+        if d1 in dsims.keys() and d2 in dsims[d1].keys():
+            return dsims[d1][d2]
+        elif d2 in dsims.keys() and d1 in dsims[d2].keys():
+            return dsims[d2][d1]
+        else:
+            if d1 == d2:
+                return 1.0
+            return 0.0
+
+    dnames = set(sims.keys())
+    for d in sims.keys():
+        dnames.update(set(sims[d].keys()))
+    if asorder:
+        rorder = roworder
+        corder = colorder
+    else:
+        rorder = list(dnames)
+        corder = list(dnames)
+
+    with open(filepath, mode='w') as f:
+        if colnames:
+            for c in corder:
+                f.write(sep + c)
+            f.write("\n")
+        if rownames:
+            for da in rorder:
+                sbuff = ""
+                sbuff += da
+                for db in corder:
+                    sbuff += sep + str(findsimvalue(da, db, sims))
+                sbuff += "\n"
+                f.write(sbuff)
+        else:
+            for da in rorder:
+                sbuff = ""
+                sbuff += str(findsimvalue(da, corder[0], sims))
+                for dbi in range(1, len(corder)):
+                    sbuff += (sep + str(findsimvalue(da, corder[dbi], sims)))
+                sbuff += "\n"
+                f.write(sbuff)
+                # print(da)
+        print("write_sim2matrix_notsymm: writing finished.")
 
 
 def write_slist(slist, filepath, header=False):

@@ -754,7 +754,7 @@ def similarity_cal_module():
     # disease2gene = read_assos("data/rwr_bmc_bioinfo/dg/rwr_dgassos_sidd.tab")
     # disease2gene = read_assos('data/disgenet/gene_disease_assos_doid2symbol_disgenetcutoff006.tsv')
     disease2gene = read_assos('data/disgenet/'
-                              'omim1092entrezid_disgenet.txt')
+                              'mim126mirna505_2_genenotweak.txt')
     print("disease gene assos: ", end='')
     stat_assos(disease2gene)
     dgassos_new = {}
@@ -766,7 +766,7 @@ def similarity_cal_module():
     stat_assos(dgassos_new)
 
     sims = similarity_module.similarity_cal_spavgn(disease2gene, g)
-    write_sims(sims, 'outputs/similarity_spavgn_mim109disgenet_interactome.tsv')
+    write_sims(sims, 'outputs/similarity_spavgn_mim126mirna505disgenetmirtarbasenotweak_interactome.tsv')
 
 
 def combine_pathway_data_gsea():
@@ -2513,6 +2513,10 @@ def diseaseid_mapping_stats():
     # mesh2umls = get_idmapping(allidsnew, 'mesh', 'umls')
     # stat_assos(mesh2umls)
     # write_assos(mesh2umls, 'data/disgenet/meshid2umlsid.tsv')
+    # ------------icd92umls----------------------------------
+    # icd92umls = get_idmapping(allidsnew, 'icd9cm', 'umls')
+    # stat_assos(icd92umls)
+    # write_assos(icd92umls, 'data/disgenet/icd9cm2umls.tsv')
 
 
 def allids_mrconsorrf(filepath):
@@ -2883,6 +2887,5 @@ if __name__ == "__main__":
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
     # evaluation_classification()
-    # get_nodeinsimnet_info()
-    get_alldiseases_zscore_pvalue()
+    similarity_cal_module()
     pass
