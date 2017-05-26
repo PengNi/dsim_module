@@ -2517,6 +2517,13 @@ def diseaseid_mapping_stats():
     # icd92umls = get_idmapping(allidsnew, 'icd9cm', 'umls')
     # stat_assos(icd92umls)
     # write_assos(icd92umls, 'data/disgenet/icd9cm2umls.tsv')
+    # ------------doid2umls----------------------------------
+    # doid2umls = get_idmapping(allidsnew, 'do', 'umls')
+    # stat_assos(doid2umls)
+    # write_assos(doid2umls, 'data/disgenet/doid2umls_v2.tsv')
+    icd92omim = get_idmapping(allidsnew, 'icd9cm', 'omim')
+    stat_assos(icd92omim)
+    write_assos(icd92omim, 'data/disgenet/icd92omim.tsv')
 
 
 def allids_mrconsorrf(filepath):
@@ -2887,5 +2894,5 @@ if __name__ == "__main__":
     #                           'data/benchmarkset_funsim/ground_truth_70_disease_pairs_doid.tsv')
     # evaluation_validationpairs(evaluation_simfilepaths4, shortnames4, 100)
     # evaluation_classification()
-    similarity_cal_module()
+    diseaseid_mapping_stats()
     pass
